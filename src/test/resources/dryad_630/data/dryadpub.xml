@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DryadPublication xmlns="http://purl.org/dryad/terms/" xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
+	xmlns:dwcterms="http://rs.tdwg.org/dwc/terms/"
+	xsi:schemaLocation="http://purl.org/dryad/terms/ http://dev.datadryad.org/profile/v3/dryad.xsd">
+	<status>approved</status>
+	<pubStatus>published</pubStatus>
+	<dcterms:type>publication</dcterms:type>
+	<dcterms:creator>Cameron, Sydney A.</dcterms:creator>
+	<dcterms:creator>Mardulyn, Patrick</dcterms:creator>
+	<dcterms:issued>2001</dcterms:issued>
+	<dcterms:title>Multiple Molecular Data Sets Suggest Independent Origins of Highly
+	Eusocial Behavior in Bees (Hymenoptera:Apinae)</dcterms:title>
+	<prism:publicationName>Systematic Biology</prism:publicationName>
+	<prism:volume>50</prism:volume>
+	<prism:issueIdentifier>2</prism:issueIdentifier>
+	<prism:pageRange>194-214</prism:pageRange>
+	<dcterms:identifier>doi:10.1080/10635150120230</dcterms:identifier>
+	<dcterms:description>Different views of the pattern of social evolution among the highly eusocial
+		bees have arisen as a result of discordance between past molecular and morphology-based
+		phylogenies. Here we present new data and taxa for four molecular data sets and reassess the
+		morphological characters available to date. We show that there is no significant character
+		incongruence between four molecular data sets (two nuclear and two mitochondrial) but that there
+		is highly significant character incongruence, which leads to topological incongruence, between
+		the molecular and morphological data. We investigate the effects of using different outgroup
+		combinations to root the estimated tree. We also consider various ways in which biases in the
+		sequence data could be misleading, employing several maximum likelihood models, LogDet
+		corrections, and spectral analyses. Ultimately, we concede that there is strong discordance
+		between the molecular and morphological data partitions, and that the conditional combination
+		approach is appropriately applied in this case. We also find for the molecular trees that there
+		are two equally well supported placements of the root, one supported by 16S and 28S sequences,
+		the other supported by cyt b and opsin. The strength of the evidence leads us to accept two
+		equally well supported hypotheses based on analyses of the molecular data sets. These are the
+		most rigorously supported hypotheses of corbiculate bee relationships at this time, and frame
+		our argument that highly eusocial behavior within the corbiculate bees evolved twice
+		independently.</dcterms:description>
+	<dcterms:isReferencedBy>doi:10.5061/dryad.630</dcterms:isReferencedBy>
+</DryadPublication>

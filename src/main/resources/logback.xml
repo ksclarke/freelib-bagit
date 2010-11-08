@@ -1,0 +1,22 @@
+<configuration debug="false">
+  
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>[%level] %c - %msg%n</pattern>
+    </encoder>
+  </appender>
+	
+<!--	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<encoder>
+			<pattern>[%level] %c - %msg%n</pattern>
+		</encoder>
+		<file>target/bagit_log.out</file>
+	</appender>-->
+  
+  <logger name="info.freelibrary.bagit" level="DEBUG"/>
+	<logger name="ch.qos.logback" level="ERROR"/>
+  
+  <root level="ERROR">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
