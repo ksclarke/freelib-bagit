@@ -75,4 +75,61 @@ public class BagTest extends I18nObject implements BagConstants {
 			fail(throwable.getMessage());
 		}
 	}
+	
+	@Test
+	public void testBagTarGz() {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTarGz"));
+		}
+
+		try {
+			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.tar.gz"));
+			bag.finalize();
+		}
+		catch (Throwable throwable) {
+			if (LOGGER.isErrorEnabled()) {
+				LOGGER.error(throwable.getMessage(), throwable);
+			}
+			
+			fail(throwable.getMessage());
+		}
+	}
+	
+	@Test
+	public void testBagTarBzip2() {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTarBzip2"));
+		}
+
+		try {
+			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.tar.bz2"));
+			bag.finalize();
+		}
+		catch (Throwable throwable) {
+			if (LOGGER.isErrorEnabled()) {
+				LOGGER.error(throwable.getMessage(), throwable);
+			}
+			
+			fail(throwable.getMessage());
+		}
+	}
+	
+	@Test
+	public void testBagZip() {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTarGz"));
+		}
+
+		try {
+			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.zip"));
+			bag.finalize();
+		}
+		catch (Throwable throwable) {
+			if (LOGGER.isErrorEnabled()) {
+				LOGGER.error(throwable.getMessage(), throwable);
+			}
+			
+			fail(throwable.getMessage());
+		}
+	}
 }

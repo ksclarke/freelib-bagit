@@ -130,6 +130,10 @@ public class BagPackager extends I18nObject implements BagConstants {
 		ZipEntry entry;
 
 		while ((entry = zipStream.getNextEntry()) != null) {
+			if (entry.isDirectory()) {
+				continue; // We create dirs for files; no empty dirs allowed
+			}
+			
 			String entryName = entry.getName();
 			File file = new File(workDir, entryName);
 
