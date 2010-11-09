@@ -2,15 +2,23 @@ package info.freelibrary.bagit;
 
 import static org.junit.Assert.fail;
 
+import info.freelibrary.util.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 
 public class TagManifestTest {
 
 	private static final String MANIFESTS_PATH = "src/test/resources/manifests/";
-	
+
+	@AfterClass
+	public static void oneTimeTearDown() throws Exception {
+		FileUtils.delete(new File(MANIFESTS_PATH));
+	}
+
 	@Test
 	public void testTagManifest() {
 		File dir1 = new File(MANIFESTS_PATH + "test1");

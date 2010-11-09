@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -26,6 +28,16 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BagInfoTest.class);
 
+	@AfterClass
+	public static void oneTimeTearDown() throws Exception {
+		new File(DIR_PATH).delete();
+	}
+	
+	@BeforeClass
+	public static void oneTimeSetUp() throws Exception {
+		new File(DIR_PATH).mkdirs();
+	}
+	
 	@Test
 	public void testBagInfoProperties() {
 		Properties properties = new Properties();

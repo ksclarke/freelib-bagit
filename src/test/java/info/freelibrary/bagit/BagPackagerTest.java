@@ -7,6 +7,7 @@ import info.freelibrary.util.I18nObject;
 import java.io.File;
 
 import org.junit.Before;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -21,6 +22,11 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 	@Before
 	public void setUp() throws Exception {
 		System.setProperty(BAGIT_WORK_DIR_PROPERTY, "src/test/resources/packager");
+	}
+	
+	@AfterClass
+	public static void oneTimeTearDown() throws Exception {
+		new File("src/test/resources/packager").delete();
 	}
 
 	@Test

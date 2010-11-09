@@ -7,6 +7,7 @@ import info.freelibrary.util.I18nObject;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,6 +26,11 @@ public class BagTest extends I18nObject implements BagConstants {
 				"src/test/resources/bagTests");
 	}
 
+	@AfterClass
+	public static void oneTimeTearDown() throws Exception {
+		new File("src/test/resources/bagTests").delete();
+	}
+	
 	@Test
 	public void testBagFile() {
 		if (LOGGER.isDebugEnabled()) {
