@@ -317,42 +317,9 @@ public class Bag extends I18nObject implements BagConstants {
 				LOGGER.debug(getI18n("bagit.cleanup", workDir));
 			}
 
-			try {
-				RegexFileFilter fileFilter = new RegexFileFilter(".*");
-				RegexDirFilter dirFilter = new RegexDirFilter(".*");
-				File[] files = FileUtils.listFiles(workDir, fileFilter, true);
-				File[] dirs = FileUtils.listFiles(workDir, dirFilter, true);
-
-				// We have to clean-up the files first
-				for (File file : files) {
-					if (!file.delete()) {
-						throw new RuntimeException(getI18n("bagit.file_delete",
-								file));
-					}
-				}
-
-				// Before cleaning dirs we need to sort them to get files first
-				Arrays.sort(dirs, new Comparator<File>() {
-					public int compare(File a1st, File a2nd) {
-						return a2nd.getAbsolutePath().length()
-								- a1st.getAbsolutePath().length();
-					}
-				});
-
-				// Then we clean-up the directories, starting with the children
-				for (File dir : dirs) {
-					if (!dir.delete()) {
-						throw new RuntimeException(getI18n("bagit.dir_delete",
-								dir));
-					}
-				}
-
-				// Lastly, the top-level work directory can be removed
-				workDir.delete();
-			}
-			catch (IOException details) {
+			if (!FileUtils.delete(workDir)) {
 				if (LOGGER.isWarnEnabled()) {
-					LOGGER.warn(getI18n("bagit.cleanup_failed"), details);
+					LOGGER.warn(getI18n("bagit.cleanup_failed"));
 				}
 			}
 		}
