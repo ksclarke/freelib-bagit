@@ -111,20 +111,15 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 		bagInfo.setMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
 		assertEquals(3, bagInfo.countTags());
 
-		Iterator<String> iterator = bagInfo.getTags();
-		int count = 0;
+		String[] tags = bagInfo.getTags();
 
-		while (iterator.hasNext()) {
-			String tag = iterator.next();
-
+		for (String tag : tags) {
 			if (!bagInfo.containsTag(tag)) {
-				fail("Huh? Found something we don't think we have");
+				fail(getI18n("bagit.test.bag_info_tag", tag));
 			}
-
-			count += 1;
 		}
 
-		assertEquals(3, count);
+		assertEquals(3, tags.length);
 	}
 
 	@Test

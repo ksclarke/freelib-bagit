@@ -76,4 +76,5 @@
 	<entry key="bagit.test.gz_deleted">Tar Gzip file '{}' successfully deleted</entry>
 	<entry key="bagit.test.created_bag">Created bag directory: {}</entry>
 	<entry key="bagit.test.starting_test">Starting test: {}</entry>
+	<entry key="bagit.test.bag_info_tag">Failed to find expected bag-info tag: {}</entry>
 </properties>

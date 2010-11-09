@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
@@ -135,8 +136,14 @@ public class BagInfo extends I18nObject implements BagInfoConstants {
 		return myProperties.size();
 	}
 
-	public Iterator<String> getTags() {
-		return myProperties.stringPropertyNames().iterator();
+	/**
+	 * Returns an array of tags found in this <code>BagInfo</code>.
+	 * 
+	 * @return An array of tags
+	 */
+	public String[] getTags() {
+		Set<String> tagSet = myProperties.stringPropertyNames();
+		return tagSet.toArray(new String[myProperties.size()]);
 	}
 
 	/**
@@ -266,12 +273,10 @@ public class BagInfo extends I18nObject implements BagInfoConstants {
 
 	void writeTo(File aBagInfoFile) throws IOException {
 		BufferedFileWriter writer = new BufferedFileWriter(aBagInfoFile);
-		Iterator<String> iterator = getTags();
-
-		while (iterator.hasNext()) {
-			String tag = iterator.next();
+		
+		for (String tag : getTags()) {
 			String value = myProperties.getProperty(tag);
-
+			
 			writer.append(tag).append(": ").append(value);
 
 			if (LOGGER.isDebugEnabled()) {
