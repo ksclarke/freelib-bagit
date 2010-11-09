@@ -239,7 +239,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 	 * Takes a bag in a tar gzip file and unpacks it into a Bag object.
 	 * 
 	 * @param aTarGzipFile
-	 * @return
+	 * @return A <code>Bag</code> object
 	 * @throws IOException
 	 */
 	public static Bag fromTarGz(File aTarGzipFile) throws IOException {

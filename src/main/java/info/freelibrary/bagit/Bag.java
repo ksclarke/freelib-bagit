@@ -59,7 +59,7 @@ public class Bag extends I18nObject implements BagConstants {
 	 * make it valid without throwing validity exceptions; if it can't create a
 	 * valid <code>Bag</code>, though, it will throw an exception.
 	 * 
-	 * @param aBagDir A <code>Bag</code> directory
+	 * @param aBag A <code>Bag</code> directory
 	 * @throws IOException An exception indicating there was problem reading or
 	 *         writing the <code>Bag</code>
 	 */
@@ -75,7 +75,7 @@ public class Bag extends I18nObject implements BagConstants {
 	 * 
 	 * Overwrite true only makes sense for directories, not .tar, .zip, etc.
 	 * 
-	 * @param aBagDir A <code>Bag</code> directory
+	 * @param aBag A <code>Bag</code>
 	 * @throws IOException An exception indicating there was problem reading or
 	 *         writing the <code>Bag</code>
 	 */
