@@ -11,28 +11,15 @@
 	<url>http://wiki.github.com/ksclarke/freelib-bagit/</url>
 	<licenses>
 		<license>
-			<name>GNU Lesser General Public License, Version 2.1</name>
-			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
-			<comments>Licensed under GNU LGPL 2.1 or 3.0 (at your option)
-			</comments>
-		</license>
-		<license>
 			<name>GNU Lesser General Public License, Version 3.0</name>
 			<url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
 			<comments>Licensed under GNU LGPL 2.1 or 3.0 (at your option)
 			</comments>
 		</license>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<comments>Used by mime-utils and jtar (dependencies)</comments>
-		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:git@github.com:ksclarke/freelib-bagit.git
-		</connection>
-		<developerConnection>scm:git:git@github.com:ksclarke/freelib-bagit.git
-		</developerConnection>
+		<connection>scm:git:git@github.com:ksclarke/freelib-bagit.git</connection>
+		<developerConnection>scm:git:git@github.com:ksclarke/freelib-bagit.git</developerConnection>
 		<url>git@github.com:ksclarke/freelib-bagit.git</url>
 	</scm>
 	<developers>
@@ -52,19 +39,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<!-- LGPL -->
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>0.9.24</version>
 		</dependency>
 		<dependency>
-			<!-- LGPL -->
 			<groupId>info.freelibrary</groupId>
 			<artifactId>freelib-utils</artifactId>
 			<version>0.2.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<!-- ASL 2.0 -->
 			<groupId>eu.medsea.mimeutil</groupId>
 			<artifactId>mime-util</artifactId>
 			<version>2.1.3</version>
@@ -76,7 +60,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<!-- ASL 2.0 -->
 			<groupId>org.xeustechnologies</groupId>
 			<artifactId>jtar</artifactId>
 			<version>1.0.2</version>
@@ -103,10 +86,108 @@
 				<version>2.7</version>
 				<configuration>
 					<show>public</show>
+					<links>
+						<link>http://download.oracle.com/javase/6/docs/api/</link>
+					</links>
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-provider-gitexe</artifactId>
+				<version>1.3</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-manager-plexus</artifactId>
+				<version>1.3</version>
+			</extension>
+			<extension>
+				<groupId>org.kathrynhuxtable.maven.wagon</groupId>
+				<artifactId>wagon-gitsite</artifactId>
+				<version>0.2</version>
+			</extension>
+		</extensions>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<configuration>
+							<charset>UTF-8</charset>
+							<docencoding>UTF-8</docencoding>
+							<docfilessubdirs>true</docfilessubdirs>
+							<links>
+								<link>http://download.oracle.com/javase/6/docs/api/</link>
+							</links>
+							<notimestamp>true</notimestamp>
+							<show>public</show>
+							<source>1.6</source>
+							<sourcepath>src/main/java/info/freelibrary</sourcepath>
+						</configuration>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.0.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changelog-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.1.1</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>dependencies</report>
+							<report>issue-tracking</report>
+							<report>license</report>
+							<report>scm</report>
+							<report>summary</report>
+							<report>javadoc</report>
+							<report>surefire-report</report>
+							<report>changelog</report>
+							<report>changes</report>
+							<report>jxr</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 	<profiles>
 		<profile>
 			<id>release-sign-artifacts</id>
@@ -140,4 +221,10 @@
 		<artifactId>oss-parent</artifactId>
 		<version>3</version>
 	</parent>
+	<distributionManagement>
+		<site>
+			<id>github-site</id>
+			<url>gitsite:git@github.com/ksclarke/freelib-bagit.git</url>
+		</site>
+	</distributionManagement>
 </project>

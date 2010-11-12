@@ -27,7 +27,7 @@ import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 import org.xeustechnologies.jtar.TarOutputStream;
 
-public class BagPackager extends I18nObject implements BagConstants {
+class BagPackager extends I18nObject implements BagConstants {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BagPackager.class);
@@ -36,7 +36,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 
 	private BagPackager() {}
 
-	public static File toTarBZip2(Bag aBag) throws FileNotFoundException,
+	static File toTarBZip2(Bag aBag) throws FileNotFoundException,
 			IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar_bz2", aBag.myDir));
@@ -63,7 +63,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 		return tarBZip2File;
 	}
 
-	public static Bag fromTarBZip2(File aBZip2File)
+	static Bag fromTarBZip2(File aBZip2File)
 			throws FileNotFoundException, IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar_bz2", aBZip2File));
@@ -85,7 +85,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 		return bag;
 	}
 
-	public static File toZip(Bag aBag) throws FileNotFoundException,
+	static File toZip(Bag aBag) throws FileNotFoundException,
 			IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_zip", aBag.myDir));
@@ -117,7 +117,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 		return zipFile;
 	}
 
-	public static Bag fromZip(File aZipFile) throws FileNotFoundException,
+	static Bag fromZip(File aZipFile) throws FileNotFoundException,
 			IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_zip", aZipFile));
@@ -152,7 +152,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 		return new Bag(bagDir, true);
 	}
 
-	public static File toTar(Bag aBag) throws FileNotFoundException,
+	static File toTar(Bag aBag) throws FileNotFoundException,
 			IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar", aBag.myDir));
@@ -184,7 +184,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 		return tarFile;
 	}
 
-	public static Bag fromTar(File aTarFile) throws FileNotFoundException,
+	static Bag fromTar(File aTarFile) throws FileNotFoundException,
 			IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar", aTarFile));
@@ -220,7 +220,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 		return new Bag(bagDir, true);
 	}
 
-	public static File toTarGz(Bag aBag) throws IOException {
+	static File toTarGz(Bag aBag) throws IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar_gz", aBag.myDir));
 		}
@@ -242,7 +242,7 @@ public class BagPackager extends I18nObject implements BagConstants {
 	 * @return A <code>Bag</code> object
 	 * @throws IOException
 	 */
-	public static Bag fromTarGz(File aTarGzipFile) throws IOException {
+	static Bag fromTarGz(File aTarGzipFile) throws IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar_gz", aTarGzipFile));
 		}

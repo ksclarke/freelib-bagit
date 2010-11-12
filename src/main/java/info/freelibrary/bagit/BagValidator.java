@@ -33,6 +33,16 @@ public class BagValidator extends I18nObject {
 			return true;
 		}
 
+		public boolean isValid(Bag aBag) throws IOException {
+			try {
+				validate(aBag);
+				return true;
+			}
+			catch (BagException details) {
+				return false;
+			}
+		}
+		
 		public ValidatedBag validate(Bag aBag) throws BagException, IOException {
 			checkStructure(aBag);
 			// check validity

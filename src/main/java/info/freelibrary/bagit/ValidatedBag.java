@@ -8,6 +8,7 @@ public class ValidatedBag {
 	private Bag myBag;
 	
 	ValidatedBag(Bag aBag) {
+		aBag.validate();
 		myBag = aBag;
 	}
 	
@@ -15,8 +16,8 @@ public class ValidatedBag {
 		return BagPackager.toTarBZip2(myBag);
 	}
 	
-	public File toDir() {
-		return myBag.myDir;
+	public File save() throws IOException {
+		return myBag.save();
 	}
 	
 	public File toTar() throws IOException {

@@ -69,9 +69,11 @@ public class Bag extends I18nObject implements BagConstants {
 
 	/**
 	 * Creates a new <code>Bag</code> from scratch or by completing an existing
-	 * partial one. If a supplied <code>Bag</code> isn't valid, it attempts to
-	 * make it valid without throwing validity exceptions; if it can't create a
-	 * valid <code>Bag</code>, though, it will throw an exception.
+	 * partial one; the overwrite parameter specifies whether existing files
+	 * should be overwritten in they already exist. If a supplied
+	 * <code>Bag</code> isn't valid, it attempts to make it valid without
+	 * throwing validity exceptions; if it can't create a valid <code>Bag</code>
+	 * , though, it will throw an exception.
 	 * 
 	 * Overwrite true only makes sense for directories, not .tar, .zip, etc.
 	 * 
@@ -81,7 +83,7 @@ public class Bag extends I18nObject implements BagConstants {
 	 */
 	public Bag(File aBag, boolean aOverwrite) throws IOException {
 		myBagIsOverwritten = aOverwrite;
-		
+
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(getI18n("bagit.debug.creating"), aBag.getName());
 		}
@@ -95,7 +97,7 @@ public class Bag extends I18nObject implements BagConstants {
 				if (!aOverwrite && !myDir.mkdirs()) {
 					throw new IOException(getI18n("bagit.dir_create", myDir));
 				}
-				
+
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug(getI18n("bagit.debug.existing"));
 				}
@@ -169,7 +171,7 @@ public class Bag extends I18nObject implements BagConstants {
 		}
 
 		File dataDir = new File(myDir, "data");
-		
+
 		if (!dataDir.exists() && !dataDir.mkdir()) {
 			throw new IOException(getI18n("bagit.dir_create", dataDir));
 		}
@@ -245,6 +247,41 @@ public class Bag extends I18nObject implements BagConstants {
 		myBagInfo = aBagInfo;
 	}
 
+	/**
+	 * Saves this <code>Bag</code> to the file system in the form of a bag
+	 * directory.
+	 * 
+	 * @return A directory representing this bag package
+	 * @throws IOException If there is a problem writing the bag to the file
+	 *         system
+	 */
+	public File save() throws IOException {
+		if (myBagIsOverwritten) {
+			return myDir;
+		}
+		else {
+			File dir = myDir.getParentFile();
+			String name = myDir.getName();
+			int end = name.lastIndexOf('_');
+			File bagDir = new File(dir.getParentFile(), name.substring(0, end));
+
+			if (bagDir.exists()) {
+				FileUtils.delete(bagDir);
+			}
+
+			FileUtils.copy(myDir, bagDir);
+
+			return bagDir;
+		}
+
+		// TODO write a unit test to make sure this does what I think
+	}
+
+	/**
+	 * Returns an XML representation of the <code>Bag</code> object.
+	 * 
+	 * @return An XML representation of the <code>Bag</code> object
+	 */
 	public String toString() {
 		String eol = System.getProperty("line.separator");
 		String systemPath = myDir.getAbsolutePath();
