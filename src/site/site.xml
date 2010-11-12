@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd"
+	name="FreeLibrary BagIt">
+	<bannerLeft>
+		<name>FreeLibrary BagIt</name>
+		<src>images/freelib-bagit.png</src>
+		<alt>FreeLibrary BagIt</alt>
+		<href>http://freelibrary.info/freelib-bagit</href>
+	</bannerLeft>
+	<publishDate position="left"/>
+	<version position="left"/>
+	<body>
+		<links>
+			<item name="Other FreeLibrary Projects" href="http://freelibrary.info/" />
+		</links>
+		<menu ref="reports"/>
+	</body>
+	<skin>
+		<groupId>com.googlecode.fluido-skin</groupId>
+		<artifactId>fluido-skin</artifactId>
+		<version>1.3</version>
+	</skin>
+</project>
