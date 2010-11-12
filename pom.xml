@@ -8,7 +8,7 @@
 	<name>bagit</name>
 	<description>A Java library for working with and creating BagIt
 		packages</description>
-	<url>http://wiki.github.com/ksclarke/freelib-bagit/</url>
+	<url>http://freelibrary.info/freelib-bagit/</url>
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License, Version 3.0</name>
@@ -22,6 +22,10 @@
 		<developerConnection>scm:git:git@github.com:ksclarke/freelib-bagit.git</developerConnection>
 		<url>git@github.com:ksclarke/freelib-bagit.git</url>
 	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>http://github.com/ksclarke/freelib-bagit/issues</url>
+	</issueManagement>
 	<developers>
 		<developer>
 			<email>ksclarke@gmail.com</email>
