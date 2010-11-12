@@ -39,7 +39,7 @@ class Declaration extends I18nObject {
 		myVersion = VERSION;
 		myEncoding = ENCODING;
 	}
-	
+
 	/**
 	 * The tag file required to be in all bags conforming to this specification.
 	 * Contains tags necessary for bootstrapping the reading and processing of
@@ -66,28 +66,34 @@ class Declaration extends I18nObject {
 		}
 		else {
 			FileReader fileReader = new FileReader(bagItTxt);
-			BufferedReader bufReader = new BufferedReader(fileReader);
-			LineNumberReader reader = new LineNumberReader(bufReader);
+			LineNumberReader reader = null;
 			String line;
 
-			while ((line = reader.readLine()) != null) {
-				int start = line.indexOf(":") + 1;
+			try {
+				reader = new LineNumberReader(new BufferedReader(fileReader));
 
-				if (reader.getLineNumber() == 1
-						&& line.startsWith(VERSION_TAG + ": ")) {
-					myVersion = line.substring(start).trim();
-				}
-				else if (reader.getLineNumber() == 2
-						&& line.startsWith(ENCODING_TAG + ": ")) {
-					myEncoding = line.substring(start).trim();
-				}
-				else {
-					// Spec says MUST consist of only two lines (above)
-					isValid = false;
+				while ((line = reader.readLine()) != null) {
+					int start = line.indexOf(":") + 1;
+
+					if (reader.getLineNumber() == 1
+							&& line.startsWith(VERSION_TAG + ": ")) {
+						myVersion = line.substring(start).trim();
+					}
+					else if (reader.getLineNumber() == 2
+							&& line.startsWith(ENCODING_TAG + ": ")) {
+						myEncoding = line.substring(start).trim();
+					}
+					else {
+						// Spec says MUST consist of only two lines (above)
+						isValid = false;
+					}
 				}
 			}
-			
-			reader.close();
+			finally {
+				if (reader != null) {
+					reader.close();
+				}
+			}
 		}
 	}
 
@@ -154,16 +160,16 @@ class Declaration extends I18nObject {
 	public String toString() {
 		String eol = System.getProperty("line.separator");
 		StringBuilder builder = new StringBuilder();
-		
+
 		builder.append("<declaration>").append(eol).append("<version>");
 		builder.append(getVersion()).append("</version>").append(eol);
 		builder.append("<encoding>").append(getEncoding());
 		builder.append("</encoding>").append(eol).append("</declaration>");
 		builder.append(eol);
-		
+
 		return builder.toString();
 	}
-	
+
 	/**
 	 * Writes a new <code>bagit.txt</code> file. If you are working with an
 	 * existing bag that already has a valid declaration, you don't need to
@@ -175,20 +181,23 @@ class Declaration extends I18nObject {
 	 */
 	void write() throws IOException {
 		File bagItTxt = new File(myBagDir, FILE_NAME);
-		BufferedFileWriter writer = new BufferedFileWriter(bagItTxt);
+		BufferedFileWriter writer = null;
 
 		if (bagItTxt.exists() && !bagItTxt.delete()) {
 			throw new IOException(getI18n("bagit.file_delete", bagItTxt));
 		}
 
 		try {
+			writer = new BufferedFileWriter(bagItTxt);
 			writer.write(VERSION_TAG + ": " + VERSION);
 			writer.newLine();
 			writer.write(ENCODING_TAG + ": " + ENCODING);
 			writer.newLine();
 		}
 		finally {
-			writer.close();
+			if (writer != null) {
+				writer.close();
+			}
 		}
 	}
 }

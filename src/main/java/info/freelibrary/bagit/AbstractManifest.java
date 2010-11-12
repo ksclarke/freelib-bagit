@@ -81,39 +81,48 @@ abstract class AbstractManifest extends I18nObject {
 		if (files.length > 0) {
 			String fileName = files[0].getName();
 			Matcher matcher = Pattern.compile(pattern).matcher(fileName);
-			BufferedFileReader reader = new BufferedFileReader(files[0]);
+			BufferedFileReader reader = null;
 			String line;
 
-			if (getLogger().isDebugEnabled()) {
-				getLogger().debug("Found existing tagmanifest: " + fileName);
-			}
-
-			matcher.find();
-			myHashAlgorithm = matcher.group(1);
-
-			if (getLogger().isDebugEnabled()) {
-				getLogger().debug("Using hash algorithm: " + myHashAlgorithm);
-			}
-
-			if (getLogger().isDebugEnabled()) {
-				getLogger().debug(
-						getI18n("bagit.debug.reading_manifest", files[0]));
-			}
-
-			while ((line = reader.readLine()) != null) {
-				String[] parts = line.replaceAll("[\\s|\\*]+", " ").split(" ");
-				File file = new File(aBagDir, parts[1]);
-				String relativePath = getRelativePath(file);
+			try {
+				reader = new BufferedFileReader(files[0]);
 
 				if (getLogger().isDebugEnabled()) {
-					String value = parts[0] + " " + relativePath;
-					getLogger().debug(getI18n("bagit.debug.reading", value));
+					getLogger()
+							.debug("Found existing tagmanifest: " + fileName);
 				}
 
-				myHashes.add(new Entry(file, parts[0]));
+				matcher.find();
+				myHashAlgorithm = matcher.group(1);
+
+				if (getLogger().isDebugEnabled()) {
+					getLogger().debug(
+							"Using hash algorithm: " + myHashAlgorithm);
+				}
+
+				if (getLogger().isDebugEnabled()) {
+					getLogger().debug(
+							getI18n("bagit.debug.reading_manifest", files[0]));
+				}
+
+				while ((line = reader.readLine()) != null) {
+					String cleanedLine = line.replaceAll("[\\s|\\*]+", " ");
+					String[] parts = cleanedLine.split(" ");
+					File file = new File(aBagDir, parts[1]);
+					String relativePath = getRelativePath(file);
+
+					if (getLogger().isDebugEnabled()) {
+						String value = parts[0] + " " + relativePath;
+						String message = getI18n("bagit.debug.reading", value);
+						getLogger().debug(message);
+					}
+
+					myHashes.add(new Entry(file, parts[0]));
+				}
 			}
-			
-			reader.close();
+			finally {
+				reader.close();
+			}
 		}
 		else {
 			pattern = getNamePattern();
@@ -141,7 +150,7 @@ abstract class AbstractManifest extends I18nObject {
 			builder.append(entry.myHash).append("\" algorithm=\"");
 			builder.append(myHashAlgorithm).append("\" />").append(eol);
 		}
-		
+
 		return builder.toString();
 	}
 
@@ -158,7 +167,7 @@ abstract class AbstractManifest extends I18nObject {
 	}
 
 	protected abstract Logger getLogger();
-	
+
 	protected abstract String getNamePattern();
 
 	/**
@@ -168,8 +177,7 @@ abstract class AbstractManifest extends I18nObject {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	void add(File aFile) throws IOException,
-			NoSuchAlgorithmException {
+	void add(File aFile) throws IOException, NoSuchAlgorithmException {
 		myHashes.add(new Entry(aFile, FileUtils.hash(aFile, myHashAlgorithm)));
 	}
 
@@ -196,8 +204,7 @@ abstract class AbstractManifest extends I18nObject {
 		myHashes.clear();
 	}
 
-	boolean remove(File aFile) throws IOException,
-			NoSuchAlgorithmException {
+	boolean remove(File aFile) throws IOException, NoSuchAlgorithmException {
 		String algorithm = FileUtils.hash(aFile, myHashAlgorithm);
 		return myHashes.remove(new Entry(aFile, algorithm));
 	}
@@ -210,7 +217,7 @@ abstract class AbstractManifest extends I18nObject {
 	 */
 	void write() throws IOException {
 		File manifestFile = new File(myBagDir, myFileName);
-		BufferedFileWriter writer = new BufferedFileWriter(manifestFile);
+		BufferedFileWriter writer = null;
 		Iterator<Entry> iterator;
 
 		if (myManifestsAreSortable) {
@@ -219,15 +226,20 @@ abstract class AbstractManifest extends I18nObject {
 
 		iterator = myHashes.iterator();
 
-		while (iterator.hasNext()) {
-			Entry entry = iterator.next();
+		try {
+			writer = new BufferedFileWriter(manifestFile);
 
-			writer.write(entry.myHash);
-			writer.write(" ");
-			writer.write(getRelativePath(entry.myFile));
-			writer.newLine();
+			while (iterator.hasNext()) {
+				Entry entry = iterator.next();
+
+				writer.write(entry.myHash);
+				writer.write(" ");
+				writer.write(getRelativePath(entry.myFile));
+				writer.newLine();
+			}
 		}
-		
-		writer.close();
+		finally {
+			writer.close();
+		}
 	}
 }

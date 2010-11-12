@@ -113,19 +113,19 @@ public class Bag extends I18nObject implements BagConstants {
 							aBag.getName(), mimeType }));
 				}
 
-				if (type.equals("application/x-gzip")) {
+				if (mimeType.equals("application/x-gzip")) {
 					myDir = BagPackager.fromTarGz(aBag).myDir;
 					myBagIsOverwritten = true;
 				}
-				else if (type.equals("application/x-tar")) {
+				else if (mimeType.equals("application/x-tar")) {
 					myDir = BagPackager.fromTar(aBag).myDir;
 					myBagIsOverwritten = true;
 				}
-				else if (type.equals("application/zip")) {
+				else if (mimeType.equals("application/zip")) {
 					myDir = BagPackager.fromZip(aBag).myDir;
 					myBagIsOverwritten = true;
 				}
-				else if (type.equals("application/x-bzip2")) {
+				else if (mimeType.equals("application/x-bzip2")) {
 					myDir = BagPackager.fromTarBZip2(aBag).myDir;
 					myBagIsOverwritten = true;
 				}

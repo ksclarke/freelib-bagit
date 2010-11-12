@@ -113,7 +113,8 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	/**
 	 * Creates a new <code>BagInfo</code> from this one.
 	 */
-	public BagInfo clone() {
+	public BagInfo clone() throws CloneNotSupportedException {
+		super.clone();
 		return new BagInfo(myProperties);
 	}
 
@@ -245,32 +246,35 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 		String lastProperty = null;
 		String line;
 
-		while ((line = reader.readLine()) != null) {
-			if (line.matches(whitespacePattern)) {
-				if (lastProperty != null) {
-					setMetadata(lastProperty, getValue(lastProperty)
-							+ line.replaceFirst(whitespacePattern, " "));
-				}
-			}
-			else {
-				String[] parts = line.split(": ");
-
-				if (parts.length == 2) {
-					lastProperty = parts[0].trim();
-					setMetadata(lastProperty, parts[1]);
+		try {
+			while ((line = reader.readLine()) != null) {
+				if (line.matches(whitespacePattern)) {
+					if (lastProperty != null) {
+						setMetadata(lastProperty, getValue(lastProperty)
+								+ line.replaceFirst(whitespacePattern, " "));
+					}
 				}
 				else {
-					// won't throw exception here, postpone to validation
+					String[] parts = line.split(": ");
 
-					if (LOGGER.isWarnEnabled()) {
-						LOGGER.warn("bagit.invalid_baginfo", new String[] {
-								aBagInfoFile.getAbsolutePath(), line });
+					if (parts.length == 2) {
+						lastProperty = parts[0].trim();
+						setMetadata(lastProperty, parts[1]);
+					}
+					else {
+						// won't throw exception here, postpone to validation
+
+						if (LOGGER.isWarnEnabled()) {
+							LOGGER.warn("bagit.invalid_baginfo", new String[] {
+									aBagInfoFile.getAbsolutePath(), line });
+						}
 					}
 				}
 			}
 		}
-
-		reader.close();
+		finally {
+			reader.close();
+		}
 	}
 
 	void writeTo(File aBagInfoFile) throws IOException {
