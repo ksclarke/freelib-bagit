@@ -3,16 +3,12 @@ package info.freelibrary.bagit;
 import info.freelibrary.util.DOMUtils;
 import info.freelibrary.util.FileUtils;
 import info.freelibrary.util.I18nObject;
-import info.freelibrary.util.RegexDirFilter;
-import info.freelibrary.util.RegexFileFilter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -142,7 +138,7 @@ public class Bag extends I18nObject implements BagConstants {
 					}
 
 					try {
-						finalize();
+						cleanUp();
 					}
 					catch (Throwable throwable) {
 						LOGGER.warn(throwable.getMessage());
@@ -334,13 +330,17 @@ public class Bag extends I18nObject implements BagConstants {
 		return new File(tmpBagDir, aBagDir.getName());
 	}
 
+	protected void finalize() throws Throwable {
+		cleanUp();
+	}
+	
 	/**
 	 * Cleans up all the temporary files created during the manipulation of the
 	 * bag. The JVM will not reliably call this method, so if the work files
 	 * should be removed, this method needs to be called explicitly or as a part
 	 * of the serialization of the bag.
 	 */
-	protected void finalize() throws Throwable {
+	public void cleanUp() {
 		String clean = System.getProperty(BAGIT_AUTOCLEAN_PROPERTY, "true");
 
 		if (clean.equals("true")) {

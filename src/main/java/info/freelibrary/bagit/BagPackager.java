@@ -36,8 +36,7 @@ class BagPackager extends I18nObject implements BagConstants {
 
 	private BagPackager() {}
 
-	static File toTarBZip2(Bag aBag) throws FileNotFoundException,
-			IOException {
+	static File toTarBZip2(Bag aBag) throws FileNotFoundException, IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar_bz2", aBag.myDir));
 		}
@@ -63,8 +62,8 @@ class BagPackager extends I18nObject implements BagConstants {
 		return tarBZip2File;
 	}
 
-	static Bag fromTarBZip2(File aBZip2File)
-			throws FileNotFoundException, IOException {
+	static Bag fromTarBZip2(File aBZip2File) throws FileNotFoundException,
+			IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar_bz2", aBZip2File));
 		}
@@ -77,16 +76,15 @@ class BagPackager extends I18nObject implements BagConstants {
 		FileOutputStream fileOutputStream = new FileOutputStream(tarFile);
 		IOUtils.copyStream(bz2Stream, fileOutputStream);
 		Bag bag = fromTar(tarFile);
-		
+
 		if (!tarFile.delete() && LOGGER.isWarnEnabled()) {
 			LOGGER.warn(PKGR.getI18n("bagit.debug.tar_delete", tarFile));
 		}
-		
+
 		return bag;
 	}
 
-	static File toZip(Bag aBag) throws FileNotFoundException,
-			IOException {
+	static File toZip(Bag aBag) throws FileNotFoundException, IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_zip", aBag.myDir));
 		}
@@ -117,8 +115,7 @@ class BagPackager extends I18nObject implements BagConstants {
 		return zipFile;
 	}
 
-	static Bag fromZip(File aZipFile) throws FileNotFoundException,
-			IOException {
+	static Bag fromZip(File aZipFile) throws FileNotFoundException, IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_zip", aZipFile));
 		}
@@ -133,7 +130,7 @@ class BagPackager extends I18nObject implements BagConstants {
 			if (entry.isDirectory()) {
 				continue; // We create dirs for files; no empty dirs allowed
 			}
-			
+
 			String entryName = entry.getName();
 			File file = new File(workDir, entryName);
 
@@ -142,7 +139,11 @@ class BagPackager extends I18nObject implements BagConstants {
 						new String[] { entryName, file.getAbsolutePath() }));
 			}
 
-			file.getParentFile().mkdirs(); // Create the dirs needed for file
+			// Create the dirs needed for file
+			if (!file.getParentFile().mkdirs()) {
+				File dir = file.getParentFile();
+				throw new IOException(PKGR.getI18n("bagit.dir_create", dir));
+			}
 
 			FileOutputStream out = new FileOutputStream(file);
 			IOUtils.copyStream(zipStream, out, false);
@@ -152,8 +153,7 @@ class BagPackager extends I18nObject implements BagConstants {
 		return new Bag(bagDir, true);
 	}
 
-	static File toTar(Bag aBag) throws FileNotFoundException,
-			IOException {
+	static File toTar(Bag aBag) throws FileNotFoundException, IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar", aBag.myDir));
 		}
@@ -184,8 +184,7 @@ class BagPackager extends I18nObject implements BagConstants {
 		return tarFile;
 	}
 
-	static Bag fromTar(File aTarFile) throws FileNotFoundException,
-			IOException {
+	static Bag fromTar(File aTarFile) throws FileNotFoundException, IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar", aTarFile));
 		}
@@ -201,16 +200,20 @@ class BagPackager extends I18nObject implements BagConstants {
 			if (entry.isDirectory()) {
 				continue; // We create dirs for files; no empty dirs allowed
 			}
-			
+
 			String entryName = entry.getName();
 			File file = new File(workDir, entryName);
-			
+
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(PKGR.getI18n("bagit.debug.reading_tar_entry",
 						new String[] { entryName, file.getAbsolutePath() }));
 			}
 
-			file.getParentFile().mkdirs(); // Create the dirs needed for file
+			// Create the dirs needed for file
+			if (!file.getParentFile().mkdirs()) {
+				File dir = file.getParentFile();
+				throw new IOException(PKGR.getI18n("bagit.dir_create", dir));
+			}
 
 			FileOutputStream out = new FileOutputStream(file);
 			IOUtils.copyStream(tarStream, out, false);
@@ -255,11 +258,11 @@ class BagPackager extends I18nObject implements BagConstants {
 		FileOutputStream tarStream = new FileOutputStream(tarFile);
 		IOUtils.copyStream(gzipStream, tarStream);
 		Bag bag = fromTar(tarFile);
-		
+
 		if (!tarFile.delete() && LOGGER.isWarnEnabled()) {
 			LOGGER.warn(PKGR.getI18n("bagit.debug.tar_delete", tarFile));
 		}
-		
+
 		return bag;
 	}
 

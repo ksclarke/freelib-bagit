@@ -32,8 +32,7 @@ public class ValidatedBag {
 		return BagPackager.toZip(myBag);
 	}
 	
-	protected void finalize() throws Throwable {
-		super.finalize();
-		myBag.finalize();
+	protected void cleanUp() {
+		myBag.cleanUp();
 	}
 }

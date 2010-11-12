@@ -20,7 +20,7 @@ import info.freelibrary.util.StringUtils;
 
 abstract class AbstractManifest extends I18nObject {
 
-	private class Entry implements Comparable<Entry> {
+	private static class Entry implements Comparable<Entry> {
 		private File myFile;
 		private String myHash;
 
@@ -112,6 +112,8 @@ abstract class AbstractManifest extends I18nObject {
 
 				myHashes.add(new Entry(file, parts[0]));
 			}
+			
+			reader.close();
 		}
 		else {
 			pattern = getNamePattern();
@@ -225,5 +227,7 @@ abstract class AbstractManifest extends I18nObject {
 			writer.write(getRelativePath(entry.myFile));
 			writer.newLine();
 		}
+		
+		writer.close();
 	}
 }

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
-public class BagInfo extends I18nObject implements BagInfoConstants {
+public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 
 	private static final String FILE_NAME = "bag-info.txt";
 
@@ -269,24 +269,29 @@ public class BagInfo extends I18nObject implements BagInfoConstants {
 				}
 			}
 		}
+
+		reader.close();
 	}
 
 	void writeTo(File aBagInfoFile) throws IOException {
 		BufferedFileWriter writer = new BufferedFileWriter(aBagInfoFile);
-		
-		for (String tag : getTags()) {
-			String value = myProperties.getProperty(tag);
-			
-			writer.append(tag).append(": ").append(value);
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.debug.metadata"), new String[] {
-						tag, value });
+		try {
+			for (String tag : getTags()) {
+				String value = myProperties.getProperty(tag);
+
+				writer.append(tag).append(": ").append(value);
+
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(getI18n("bagit.debug.metadata"), new String[] {
+							tag, value });
+				}
+
+				writer.newLine();
 			}
-
-			writer.newLine();
 		}
-
-		writer.close();
+		finally {
+			writer.close();
+		}
 	}
 }

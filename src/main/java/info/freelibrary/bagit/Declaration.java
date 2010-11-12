@@ -86,6 +86,8 @@ class Declaration extends I18nObject {
 					isValid = false;
 				}
 			}
+			
+			reader.close();
 		}
 	}
 
@@ -173,18 +175,20 @@ class Declaration extends I18nObject {
 	 */
 	void write() throws IOException {
 		File bagItTxt = new File(myBagDir, FILE_NAME);
-		BufferedFileWriter writer;
+		BufferedFileWriter writer = new BufferedFileWriter(bagItTxt);
 
 		if (bagItTxt.exists() && !bagItTxt.delete()) {
 			throw new IOException(getI18n("bagit.file_delete", bagItTxt));
 		}
 
-		writer = new BufferedFileWriter(bagItTxt);
-		writer.write(VERSION_TAG + ": " + VERSION);
-		writer.newLine();
-		writer.write(ENCODING_TAG + ": " + ENCODING);
-		writer.newLine();
-
-		writer.close();
+		try {
+			writer.write(VERSION_TAG + ": " + VERSION);
+			writer.newLine();
+			writer.write(ENCODING_TAG + ": " + ENCODING);
+			writer.newLine();
+		}
+		finally {
+			writer.close();
+		}
 	}
 }
