@@ -340,7 +340,7 @@ public class Bag extends I18nObject implements BagConstants {
 	 * should be removed, this method needs to be called explicitly or as a part
 	 * of the serialization of the bag.
 	 */
-	public void cleanUp() {
+	void cleanUp() {
 		String clean = System.getProperty(BAGIT_AUTOCLEAN_PROPERTY, "true");
 
 		if (clean.equals("true")) {

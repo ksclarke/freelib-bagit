@@ -32,7 +32,7 @@ public class ValidatedBag {
 		return BagPackager.toZip(myBag);
 	}
 	
-	protected void cleanUp() {
+	protected void finalize() {
 		myBag.cleanUp();
 	}
 }
