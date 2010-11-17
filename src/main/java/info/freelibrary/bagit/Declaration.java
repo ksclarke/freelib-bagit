@@ -5,6 +5,7 @@ import info.freelibrary.util.I18nObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -57,12 +58,7 @@ class Declaration extends I18nObject {
 		myBagDir = aBagDir;
 
 		if (!bagItTxt.exists()) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.debug.create_bagit_txt"));
-			}
-
-			myVersion = VERSION;
-			myEncoding = ENCODING;
+			throw new FileNotFoundException(bagItTxt.getAbsolutePath());
 		}
 		else {
 			FileReader fileReader = new FileReader(bagItTxt);

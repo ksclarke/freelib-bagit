@@ -149,6 +149,15 @@ public class Bag extends I18nObject implements BagConstants {
 			}
 
 			setBagInfo(new BagInfo(myDir));
+			
+			try {
+				setDeclaration(new Declaration(myDir));
+			}
+			catch (FileNotFoundException details) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(details.getMessage());
+				}
+			}
 		}
 		else {
 			myDir = !aOverwrite ? createWorkingDir(aBag) : aBag;
@@ -157,6 +166,8 @@ public class Bag extends I18nObject implements BagConstants {
 			if (!aOverwrite && !myDir.mkdirs()) {
 				throw new IOException(getI18n("bagit.dir_create", myDir));
 			}
+			
+			setDeclaration(new Declaration());
 		}
 
 		setManifest(new PayloadManifest(myDir));

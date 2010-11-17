@@ -1,5 +1,0 @@
-Source-Organization: Dryad Data Repository
-Contact-Email: admin@datadryad.org
-Payload-Oxum: 133387.12
-Bagging-Date: 2010-07-10
-Bag-Size: 130.4 KB
