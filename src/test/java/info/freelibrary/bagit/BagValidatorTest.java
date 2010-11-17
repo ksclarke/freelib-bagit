@@ -2,6 +2,7 @@ package info.freelibrary.bagit;
 
 import static org.junit.Assert.*;
 
+import info.freelibrary.util.FileUtils;
 import info.freelibrary.util.I18nObject;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 	
 	@AfterClass
 	public static void onTimeTearDown() throws Exception {
-		new File(BAGS_TEST_DIR).delete(); // cleaning up
+		FileUtils.delete(new File(BAGS_TEST_DIR)); // cleaning up
 	}
 
 	@Test
