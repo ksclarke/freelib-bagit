@@ -1,0 +1,12 @@
+58cbda9e90fd80bb9df278811a427d7c  data/datafile-3/dryadfile-3.xml
+662563293cd6750f7cb18ef5e4e853fe  data/datafile-5/dryadfile-5.xml
+0c539d940f2f72a76ca081f5c8780f5e  data/datafile-5/ApineOPSIN.nexus
+207e8b74f2c51b2404ed206215707101  data/datafile-1/dryadfile-1.xml
+86e01d6b8cbd674be0a3bba3f74182e2  data/dryadpub.xml
+a7f516e57db3628171f14ef293519568  data/datafile-1/ApineCYTB.nexus
+d0036108b62ca167b59fd7597317026b  data/datafile-2/dryadfile-2.xml
+7df119a1bd33dd3c6a5bcfda986b683c  data/dryadpkg.xml
+76651f149a2b3edd64847130b76bd08a  data/datafile-3/Apine16S.nexus
+c7d417c5fcda2e931674a4d5d9c3c486  data/datafile-4/Apine28S.nexus
+5e87bfcba70333e1688b84c44c45b036  data/datafile-4/dryadfile-4.xml
+e053976b42569e12d0cd7d5bbf023f96  data/datafile-2/ApineDNA.morph.nexus
