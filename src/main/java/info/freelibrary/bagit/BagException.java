@@ -38,11 +38,6 @@ public class BagException extends Exception {
 	public static final int INVALID_BAGIT_TXT_FILE = 11;
 
 	/**
-	 * An exception indicating that the required baginfo.txt file is missing.
-	 */
-	public static final int MISSING_BAG_INFO_TXT_FILE = 7;
-
-	/**
 	 * An exception indicating that the required bagit.txt file is missing.
 	 */
 	public static final int MISSING_BAGIT_TXT_FILE = 9;
@@ -66,7 +61,7 @@ public class BagException extends Exception {
 	/**
 	 * An exception indicating the tag manifest is missing from the bag.
 	 */
-	public static final int MISSING_TAG_FILE = 21;
+	//public static final int MISSING_TAG_FILE = 21;
 	
 	/**
 	 * An exception indicating the payload manifest is missing from the bag.
@@ -95,10 +90,8 @@ public class BagException extends Exception {
 			return "bagit.no_data";
 		case INVALID_BAG_INFO_TXT_FILE:
 			return "bagit.invalid_baginfo";
-		case MISSING_BAG_INFO_TXT_FILE:
-			return "bagit.no_baginfo";
-		case MISSING_TAG_FILE:
-			return "bagit.tagfile_mismatch";
+//		case MISSING_TAG_FILE:
+//			return "bagit.tagfile_mismatch";
 		case MISSING_MANIFEST:
 			return "bagit.missing_manifest";
 		case MISSING_BAGIT_TXT_FILE:

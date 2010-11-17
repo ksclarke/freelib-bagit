@@ -141,10 +141,7 @@ public class BagValidator extends I18nObject {
 	private void checkTagManifest(TagManifest aTagManifest, File aBagDir)
 			throws BagException, IOException {
 		for (File tagFile : aTagManifest.getFiles()) {
-			if (!tagFile.exists()) {
-				throw new BagException(BagException.MISSING_TAG_FILE, tagFile
-						.getAbsolutePath());
-			}
+			
 		}
 	}
 

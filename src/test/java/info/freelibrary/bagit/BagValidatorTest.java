@@ -4,9 +4,11 @@ import static org.junit.Assert.*;
 
 import info.freelibrary.util.I18nObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -26,6 +28,11 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 	public static void oneTimeSetUp() throws Exception {
 		System.setProperty(BAGIT_WORK_DIR_PROPERTY, BAGS_TEST_DIR);
 		VALIDATOR = new BagValidator();
+	}
+	
+	@AfterClass
+	public static void onTimeTearDown() throws Exception {
+		new File(BAGS_TEST_DIR).delete(); // cleaning up
 	}
 
 	@Test
