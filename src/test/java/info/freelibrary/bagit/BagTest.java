@@ -51,8 +51,7 @@ public class BagTest extends I18nObject implements BagConstants {
 		}
 
 		try {
-			Bag bag = new Bag(new File("src/test/resources/dryad_630"));
-			bag.finalize();
+			new Bag(new File("src/test/resources/dryad_630"));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -70,8 +69,7 @@ public class BagTest extends I18nObject implements BagConstants {
 		}
 
 		try {
-			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.tar"));
-			bag.finalize();
+			new Bag(new File(BAGS_DIR + "dryad_630.tar"));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -89,8 +87,7 @@ public class BagTest extends I18nObject implements BagConstants {
 		}
 
 		try {
-			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.tar.gz"));
-			bag.finalize();
+			new Bag(new File(BAGS_DIR + "dryad_630.tar.gz"));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -108,8 +105,7 @@ public class BagTest extends I18nObject implements BagConstants {
 		}
 
 		try {
-			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.tar.bz2"));
-			bag.finalize();
+			new Bag(new File(BAGS_DIR + "dryad_630.tar.bz2"));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -127,8 +123,7 @@ public class BagTest extends I18nObject implements BagConstants {
 		}
 
 		try {
-			Bag bag = new Bag(new File(BAGS_DIR + "dryad_630.zip"));
-			bag.finalize();
+			new Bag(new File(BAGS_DIR + "dryad_630.zip"));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {

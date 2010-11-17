@@ -2,6 +2,7 @@ package info.freelibrary.bagit;
 
 import static org.junit.Assert.fail;
 
+import info.freelibrary.util.FileUtils;
 import info.freelibrary.util.I18nObject;
 
 import java.io.File;
@@ -17,16 +18,18 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagPackagerTest.class);
 	
+	private static final String PACKAGER_TEST_DIR = "src/test/resources/packager";
+	
 	private static final String SOURCE_BAG_PATH = "src/test/resources/dryad_630";
 	
 	@Before
 	public void setUp() throws Exception {
-		System.setProperty(BAGIT_WORK_DIR_PROPERTY, "src/test/resources/packager");
+		System.setProperty(BAGIT_WORK_DIR_PROPERTY, PACKAGER_TEST_DIR);
 	}
 	
 	@AfterClass
 	public static void oneTimeTearDown() throws Exception {
-		new File("src/test/resources/packager").delete();
+		FileUtils.delete(new File(PACKAGER_TEST_DIR));
 	}
 
 	@Test
@@ -36,14 +39,11 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 		}
 		
 		try {
-			Bag bag = new Bag(SOURCE_BAG_PATH);
-			File file = BagPackager.toTar(bag);
+			File file = BagPackager.toTar(new Bag(SOURCE_BAG_PATH));
 			
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(getI18n("bagit.test.tar_written", file));
 			}
-			
-			bag.finalize();
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -68,8 +68,6 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
 			}
-
-			bag.finalize();
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -94,14 +92,11 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 		}
 		
 		try {
-			Bag bag = new Bag(SOURCE_BAG_PATH);
-			File zipFile = BagPackager.toZip(bag);
+			File zipFile = BagPackager.toZip(new Bag(SOURCE_BAG_PATH));
 			
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(getI18n("bagit.test.zip_written", zipFile));
 			}
-			
-			bag.finalize();
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -126,8 +121,6 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
 			}
-
-			bag.finalize();
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -152,10 +145,7 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 		}
 		
 		try {
-			Bag bag = new Bag(SOURCE_BAG_PATH);
-			BagPackager.toTarBZip2(bag);
-			
-			bag.finalize();
+			BagPackager.toTarBZip2(new Bag(SOURCE_BAG_PATH));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -180,8 +170,6 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
 			}
-
-			bag.finalize();
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -206,10 +194,7 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 		}
 		
 		try {
-			Bag bag = new Bag(SOURCE_BAG_PATH);
-			BagPackager.toTarGz(bag);
-			
-			bag.finalize();
+			BagPackager.toTarGz(new Bag(SOURCE_BAG_PATH));
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {
@@ -234,8 +219,6 @@ public class BagPackagerTest extends I18nObject implements BagConstants {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
 			}
-
-			bag.finalize();
 		}
 		catch (Throwable throwable) {
 			if (LOGGER.isErrorEnabled()) {

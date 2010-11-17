@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -27,8 +28,6 @@ import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
 public class Bag extends I18nObject implements BagConstants {
-
-	private static final String BAGIT_AUTOCLEAN_PROPERTY = "bagit.autoclean";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Bag.class);
 
@@ -138,7 +137,7 @@ public class Bag extends I18nObject implements BagConstants {
 					}
 
 					try {
-						cleanUp();
+						clean();
 					}
 					catch (Throwable throwable) {
 						LOGGER.warn(throwable.getMessage());
@@ -149,7 +148,7 @@ public class Bag extends I18nObject implements BagConstants {
 			}
 
 			setBagInfo(new BagInfo(myDir));
-			
+
 			try {
 				setDeclaration(new Declaration(myDir));
 			}
@@ -166,7 +165,7 @@ public class Bag extends I18nObject implements BagConstants {
 			if (!aOverwrite && !myDir.mkdirs()) {
 				throw new IOException(getI18n("bagit.dir_create", myDir));
 			}
-			
+
 			setDeclaration(new Declaration());
 		}
 
@@ -180,8 +179,24 @@ public class Bag extends I18nObject implements BagConstants {
 		File dataDir = new File(myDir, "data");
 
 		if (!dataDir.exists() && !dataDir.mkdir()) {
+			try {
+				if (!aOverwrite) {
+					clean();
+				}
+			}
+			catch (Throwable throwable) {
+				LOGGER.warn(throwable.getMessage());
+			}
+
 			throw new IOException(getI18n("bagit.dir_create", dataDir));
 		}
+
+		// Add a cleanup thread (doesn't use resources until it's run)
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				clean();
+			}
+		});
 	}
 
 	/**
@@ -224,14 +239,14 @@ public class Bag extends I18nObject implements BagConstants {
 
 	File getDataDir() {
 		File dataDir = new File(myDir, "data");
-		
+
 		if (!dataDir.exists() && !dataDir.mkdir() && LOGGER.isWarnEnabled()) {
 			LOGGER.warn(getI18n("bagit.dir_create", dataDir));
 		}
-		
+
 		return dataDir;
 	}
-	
+
 	/**
 	 * Returns the <code>BagInfo</code> for this <code>Bag</code>.
 	 * 
@@ -296,12 +311,12 @@ public class Bag extends I18nObject implements BagConstants {
 
 	public void complete() {
 		getDataDir(); // creates it if it doesn't exist
-		
+
 		if (!hasDeclaration()) {
 			setDeclaration(new Declaration());
 		}
 	}
-	
+
 	/**
 	 * Returns an XML representation of the <code>Bag</code> object.
 	 * 
@@ -359,24 +374,20 @@ public class Bag extends I18nObject implements BagConstants {
 		return new File(tmpBagDir, aBagDir.getName());
 	}
 
-	protected void finalize() throws Throwable {
-		cleanUp();
-	}
-	
 	/**
 	 * Cleans up all the temporary files created during the manipulation of the
 	 * bag. The JVM will not reliably call this method, so if the work files
 	 * should be removed, this method needs to be called explicitly or as a part
 	 * of the serialization of the bag.
 	 */
-	void cleanUp() {
-		String clean = System.getProperty(BAGIT_AUTOCLEAN_PROPERTY, "true");
+	private void clean() {
+		String clean = System.getProperty("bagit.autoclean", "true");
 
 		if (clean.equals("true")) {
 			File workDir = myBagIsOverwritten ? myDir : myDir.getParentFile();
 
 			if (!workDir.exists()) {
-				return; // already cleaned up, perhaps manually
+				return;
 			}
 
 			if (LOGGER.isDebugEnabled()) {
@@ -394,7 +405,7 @@ public class Bag extends I18nObject implements BagConstants {
 	boolean hasDeclaration() {
 		return myDeclaration != null;
 	}
-	
+
 	Declaration getDeclaration() {
 		if (myDeclaration == null) {
 			myDeclaration = new Declaration();

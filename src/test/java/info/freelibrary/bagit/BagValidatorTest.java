@@ -33,15 +33,13 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 	
 	@AfterClass
 	public static void onTimeTearDown() throws Exception {
-		FileUtils.delete(new File(BAGS_TEST_DIR)); // cleaning up
+		FileUtils.delete(new File(BAGS_TEST_DIR));
 	}
 
 	@Test
 	public void testCheckPayloadDataFiles() {
-		Bag bag = null;
-		
 		try {
-			bag = new Bag(BAGS_DIR + "dryad_632");
+			Bag bag = new Bag(BAGS_DIR + "dryad_632");
 			VALIDATOR.validate(bag);
 		}
 		catch (IOException details) {
@@ -57,17 +55,12 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 				}
 			}
 		}
-		finally {
-			bag.cleanUp();
-		}
 	}
 	
 	@Test
 	public void testCheckPayloadDataFileCount() {
-		Bag bag = null;
-
 		try {
-			bag = new Bag(BAGS_DIR + "dryad_631");
+			Bag bag = new Bag(BAGS_DIR + "dryad_631");
 			VALIDATOR.validate(bag);
 			fail(getI18n("bagit.test.file_mismatch"));
 		}
@@ -86,11 +79,6 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug(getI18n("bagit.test.expected", details.getMessage()));
 				}
-			}
-		}
-		finally {
-			if (null != null) {
-				bag.cleanUp();
 			}
 		}
 	}

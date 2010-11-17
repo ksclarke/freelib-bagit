@@ -31,8 +31,4 @@ public class ValidatedBag {
 	public File toZip() throws IOException {
 		return BagPackager.toZip(myBag);
 	}
-	
-	protected void finalize() {
-		myBag.cleanUp();
-	}
 }
