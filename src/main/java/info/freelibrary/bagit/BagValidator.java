@@ -132,16 +132,19 @@ public class BagValidator extends I18nObject {
 		if (!aBag.hasDeclaration()) {
 			throw new BagException(BagException.MISSING_BAGIT_TXT_FILE);
 		}
-		
+
 		if (aBag.getManifest().countEntries() < 1) {
 			throw new BagException(BagException.MISSING_MANIFEST);
 		}
 	}
-	
+
 	private void checkTagManifest(TagManifest aTagManifest, File aBagDir)
 			throws BagException, IOException {
 		for (File tagFile : aTagManifest.getFiles()) {
-			
+			if (!tagFile.exists()) {
+				throw new BagException(
+						BagException.TAG_MANIFEST_DIFFERS_FROM_BAG_DIR, tagFile);
+			}
 		}
 	}
 

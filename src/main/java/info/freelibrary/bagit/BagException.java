@@ -57,12 +57,12 @@ public class BagException extends Exception {
 	 * An exception indicating there is an invalid tag file checksum.
 	 */
 	public static final int INVALID_TAG_CHECKSUM = 19;
-	
+
 	/**
-	 * An exception indicating the tag manifest is missing from the bag.
+	 * An exception indicating the tag manifest differs from file system.
 	 */
-	//public static final int MISSING_TAG_FILE = 21;
-	
+	public static final int TAG_MANIFEST_DIFFERS_FROM_BAG_DIR = 21;
+
 	/**
 	 * An exception indicating the payload manifest is missing from the bag.
 	 */
@@ -73,6 +73,9 @@ public class BagException extends Exception {
 	 */
 	public static final int UNSPECIFIED_OTHER_REASON = 0;
 
+	/**
+	 * XML resource bundle that contains internationalized exception messages.
+	 */
 	private static final XMLResourceBundle BUNDLE = (XMLResourceBundle) ResourceBundle
 			.getBundle("Messages", new XMLBundleControl());
 
@@ -90,8 +93,8 @@ public class BagException extends Exception {
 			return "bagit.no_data";
 		case INVALID_BAG_INFO_TXT_FILE:
 			return "bagit.invalid_baginfo";
-//		case MISSING_TAG_FILE:
-//			return "bagit.tagfile_mismatch";
+		case TAG_MANIFEST_DIFFERS_FROM_BAG_DIR:
+			return "bagit.tagfile_mismatch";
 		case MISSING_MANIFEST:
 			return "bagit.missing_manifest";
 		case MISSING_BAGIT_TXT_FILE:
@@ -125,7 +128,7 @@ public class BagException extends Exception {
 	}
 
 	/**
-	 * Creates an exception using the hard-coded reasons and underlying cause.
+	 * Creates an exception using the hard-coded reason and underlying cause.
 	 * 
 	 * @param aReason A message explaining why the exception is being thrown
 	 * @param aThrowable An underlying exception
@@ -133,6 +136,19 @@ public class BagException extends Exception {
 	public BagException(int aReason, Throwable aThrowable) {
 		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason))),
 				aThrowable);
+		myReason = aReason;
+	}
+
+	/**
+	 * Creates an exception using the hard-coded reason and path of supplied
+	 * file as additional detail.
+	 * 
+	 * @param aReason A message explaining why the exception is being thrown
+	 * @param aFile A file that is related to the exception being thrown
+	 */
+	public BagException(int aReason, File aFile) {
+		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason), aFile
+				.getAbsolutePath())));
 		myReason = aReason;
 	}
 
@@ -154,7 +170,8 @@ public class BagException extends Exception {
 	 * @param aDetailsArray Providing more information about the exception
 	 */
 	public BagException(int aReason, String[] aDetailsArray) {
-		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason), aDetailsArray)));
+		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason),
+				aDetailsArray)));
 		myReason = aReason;
 	}
 
