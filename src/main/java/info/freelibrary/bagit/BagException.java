@@ -48,6 +48,32 @@ public class BagException extends Exception {
 	public static final int MISSING_BAGIT_TXT_FILE = 9;
 
 	/**
+	 * An exception indicating the payload doesn't match its manifest; this
+	 * exception takes two parameters, the two files that don't match.
+	 */
+	public static final int PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR = 15;
+
+	/**
+	 * An exception indicating there is an invalid payload file checksum.
+	 */
+	public static final int INVALID_PAYLOAD_CHECKSUM = 17;
+
+	/**
+	 * An exception indicating there is an invalid tag file checksum.
+	 */
+	public static final int INVALID_TAG_CHECKSUM = 19;
+	
+	/**
+	 * An exception indicating the tag manifest is missing from the bag.
+	 */
+	public static final int MISSING_TAG_FILE = 21;
+	
+	/**
+	 * An exception indicating the payload manifest is missing from the bag.
+	 */
+	public static final int MISSING_MANIFEST = 23;
+
+	/**
 	 * An exception that doesn't have a hard-coded reason.
 	 */
 	public static final int UNSPECIFIED_OTHER_REASON = 0;
@@ -71,10 +97,20 @@ public class BagException extends Exception {
 			return "bagit.invalid_baginfo";
 		case MISSING_BAG_INFO_TXT_FILE:
 			return "bagit.no_baginfo";
+		case MISSING_TAG_FILE:
+			return "bagit.tagfile_mismatch";
+		case MISSING_MANIFEST:
+			return "bagit.missing_manifest";
 		case MISSING_BAGIT_TXT_FILE:
 			return "bagit.no_bagit";
 		case INVALID_BAGIT_TXT_FILE:
 			return "bagit.invalid_bagit";
+		case PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR:
+			return "bagit.file_mismatch";
+		case INVALID_PAYLOAD_CHECKSUM:
+			return "bagit.invalid_data_checksum";
+		case INVALID_TAG_CHECKSUM:
+			return "bagit.invalid_tag_checksum";
 		default:
 			return "bagit.other_reason";
 		}
@@ -91,7 +127,7 @@ public class BagException extends Exception {
 	 * @param aReason A hard-coded reason for the exception
 	 */
 	public BagException(int aReason) {
-		super(BUNDLE.get(getMessageFromReason(aReason)));
+		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason))));
 		myReason = aReason;
 	}
 
@@ -102,19 +138,42 @@ public class BagException extends Exception {
 	 * @param aThrowable An underlying exception
 	 */
 	public BagException(int aReason, Throwable aThrowable) {
-		super(BUNDLE.get(getMessageFromReason(aReason)), aThrowable);
+		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason))),
+				aThrowable);
 		myReason = aReason;
 	}
-	
+
+	/**
+	 * Creates an exception using the hard-coded reasons and underlying cause.
+	 * 
+	 * @param aReason A message explaining why the exception is being thrown
+	 * @param aDetail Providing more information about the exception
+	 */
+	public BagException(int aReason, String aDetail) {
+		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason), aDetail)));
+		myReason = aReason;
+	}
+
+	/**
+	 * Creates an exception using the hard-coded reasons and underlying cause.
+	 * 
+	 * @param aReason A message explaining why the exception is being thrown
+	 * @param aDetailsArray Providing more information about the exception
+	 */
+	public BagException(int aReason, String[] aDetailsArray) {
+		super(normalizeWS(BUNDLE.get(getMessageFromReason(aReason), aDetailsArray)));
+		myReason = aReason;
+	}
+
 	/**
 	 * Creates an exception using the supplied message.
 	 * 
 	 * @param aMessage A message explaining why the exception is being thrown
 	 */
 	public BagException(String aMessage) {
-		super(BUNDLE.get(aMessage));
+		super(normalizeWS(BUNDLE.get(aMessage)));
 	}
-	
+
 	/**
 	 * Creates an exception using the supplied message.
 	 * 
@@ -122,9 +181,9 @@ public class BagException extends Exception {
 	 * @param aFile A file from which we its absolute path on the file system
 	 */
 	public BagException(String aMessage, File aFile) {
-		super(BUNDLE.get(aMessage, aFile.getAbsolutePath()));
+		super(normalizeWS(BUNDLE.get(aMessage, aFile.getAbsolutePath())));
 	}
-	
+
 	/**
 	 * Creates an exception using the supplied message.
 	 * 
@@ -132,7 +191,7 @@ public class BagException extends Exception {
 	 * @param aDetail An additional detail about the cause of the exception
 	 */
 	public BagException(String aMessage, String aDetail) {
-		super(BUNDLE.get(aMessage, aDetail));
+		super(normalizeWS(BUNDLE.get(aMessage, aDetail)));
 	}
 
 	/**
@@ -142,7 +201,7 @@ public class BagException extends Exception {
 	 * @param aDetailsArray Additional details about the cause of the exception
 	 */
 	public BagException(String aMessage, String[] aDetailsArray) {
-		super(BUNDLE.get(aMessage, aDetailsArray));
+		super(normalizeWS(BUNDLE.get(aMessage, aDetailsArray)));
 	}
 
 	/**
@@ -152,7 +211,7 @@ public class BagException extends Exception {
 	 * @param aThrowable An underlying exception
 	 */
 	public BagException(String aMessage, Throwable aThrowable) {
-		super(BUNDLE.get(aMessage), aThrowable);
+		super(normalizeWS(BUNDLE.get(aMessage)), aThrowable);
 	}
 
 	/**
@@ -162,5 +221,16 @@ public class BagException extends Exception {
 	 */
 	public int getReason() {
 		return myReason;
+	}
+
+	/**
+	 * Cleans up whitespace issues that might arise when the XML resources file
+	 * is pretty-printed; for our messages, we just want straight text, no EOLs.
+	 * 
+	 * @param aMessage
+	 * @return
+	 */
+	private static String normalizeWS(String aMessage) {
+		return aMessage.replaceAll("\\s+", " ");
 	}
 }

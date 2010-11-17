@@ -137,6 +137,24 @@ abstract class AbstractManifest extends I18nObject {
 		}
 	}
 
+	/**
+	 * Returns the hash algorithm used in the manifest file.
+	 * 
+	 * @return The hash algorithm in the manifest file
+	 */
+	public String getHashAlgorithm() {
+		return myHashAlgorithm;
+	}
+	
+	/**
+	 * Returns the number of entries in the manifest file.
+	 * 
+	 * @return The number of entries in the manifest file
+	 */
+	public int countEntries() {
+		return myHashes.size();
+	}
+	
 	public String toString() {
 		String eol = System.getProperty("line.separator");
 		StringBuilder builder = new StringBuilder();
@@ -169,6 +187,39 @@ abstract class AbstractManifest extends I18nObject {
 	protected abstract Logger getLogger();
 
 	protected abstract String getNamePattern();
+
+	File[] getFiles() {
+		ArrayList<File> files = new ArrayList<File>();
+		Iterator<Entry> entryIterator = myHashes.iterator();
+
+		while (entryIterator.hasNext()) {
+			Entry entry = entryIterator.next();
+			files.add(entry.myFile);
+		}
+
+		return files.toArray(new File[myHashes.size()]);
+	}
+
+	/**
+	 * Returns the hash associated with the supplied <code>File</code> or null
+	 * if there isn't one yet.
+	 * 
+	 * @param aFile
+	 * @return
+	 */
+	String getStoredHash(File aFile) {
+		Iterator<Entry> entryIterator = myHashes.iterator();
+
+		while (entryIterator.hasNext()) {
+			Entry entry = entryIterator.next();
+
+			if (entry.myFile.getAbsolutePath().equals(aFile.getAbsolutePath())) {
+				return entry.myHash;
+			}
+		}
+
+		return null;
+	}
 
 	/**
 	 * Adds a new file to the manifest.

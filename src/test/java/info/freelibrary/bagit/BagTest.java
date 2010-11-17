@@ -62,7 +62,7 @@ public class BagTest extends I18nObject implements BagConstants {
 			fail(throwable.getMessage());
 		}
 	}
-
+	
 	@Test
 	public void testBagTar() {
 		if (LOGGER.isDebugEnabled()) {

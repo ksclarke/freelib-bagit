@@ -2,7 +2,7 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 	<!-- Main messages, used mostly for exceptions -->
-  <entry key="bagit.no_bagit">Missing the required bagit.txt file: {}</entry>
+	<entry key="bagit.no_bagit">Missing the required bagit.txt file: {}</entry>
 	<entry key="bagit.dir_create">Unable to create directory: {}</entry>
 	<entry key="bagit.file_delete">Unable to delete file: {}</entry>
 	<entry key="bagit.dir_delete">Unable to delete dir: {}</entry>
@@ -23,9 +23,19 @@
 	<entry key="bagit.cleanup">Cleaning up the bagit work directories: {}</entry>
 	<entry key="bagit.cleanup_failed">Failed to remove all the temporary work files</entry>
 	<entry key="bagit.not_complete">The {} bag is not yet complete: {}</entry>
-	<entry key="bagit.unknown_mime_type">Couldn't read bag '{}' because its MIME type '{}' isn't recognized</entry>
+	<entry key="bagit.unknown_mime_type">Couldn't read bag '{}' because its MIME type '{}' isn't
+		recognized</entry>
+	<entry key="bagit.data_file_count">Different number of data files from payload manifest
+		entries</entry>
+	<entry key="bagit.file_mismatch">Data directory or payload manifest is missing a file</entry>
+	<entry key="bagit.tagfile_mismatch">A tag file is missing from the directory: {}</entry>
+	<entry key="bagit.invalid_tag_checksum">Invalid tag checksum for: {} ({} vs. {})</entry>
+	<entry key="bagit.invalid_data_checksum">Invalid data checksum for: {} ({} vs. {})</entry>
+	<entry key="bagit.missing_manifest">Missing the required payload manifest file</entry>
 
 	<!-- Messages related to debugging -->
+	<entry key="bagit.debug.file_count">Data file count: {}; file entries in payload manifest:
+		{}</entry>
 	<entry key="bagit.debug.creating">Creating new Bag object: {}</entry>
 	<entry key="bagit.debug.existing">Using bag's existing data files</entry>
 	<entry key="bagit.debug.new_dir">Creating new directory: {}</entry>
@@ -67,7 +77,8 @@
 	<entry key="bagit.test.directory">Failed to notice BagIt directory was a file: {}</entry>
 	<entry key="bagit.test.tar_written">Tar file written to: {}</entry>
 	<entry key="bagit.test.failed_tar_delete">Failed to delete created tar file: {}</entry>
-	<entry key="bagit.test.failed_baginfo_delete">Failed to delete created bag-info.txt file: {}</entry>
+	<entry key="bagit.test.failed_baginfo_delete">Failed to delete created bag-info.txt file:
+		{}</entry>
 	<entry key="bagit.test.tar_deleted">Tar file '{}' successfully deleted</entry>
 	<entry key="bagit.test.zip_written">Zip file written to: {}</entry>
 	<entry key="bagit.test.failed_zip_delete">Failed to delete created zip file: {}</entry>
@@ -77,4 +88,9 @@
 	<entry key="bagit.test.created_bag">Created bag directory: {}</entry>
 	<entry key="bagit.test.starting_test">Starting test: {}</entry>
 	<entry key="bagit.test.bag_info_tag">Failed to find expected bag-info tag: {}</entry>
+	<entry key="bagit.test.failed_count">Failed to detect difference in data files and payload
+		manifest</entry>
+	<entry key="bagit.test.failed">Failed for unexpected reason: {}</entry>
+	<entry key="bagit.test.file_compare">Comparing data directory files: {} and {}</entry>
+	<entry key="bagit.test.expected">Catching expected exception from the BagValidator: {}</entry>
 </properties>

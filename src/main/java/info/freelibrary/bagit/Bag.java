@@ -81,7 +81,7 @@ public class Bag extends I18nObject implements BagConstants {
 		myBagIsOverwritten = aOverwrite;
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.debug.creating"), aBag.getName());
+			LOGGER.debug(getI18n("bagit.debug.creating", aBag.getName()));
 		}
 
 		// If we're using an existing bag, copy its contents into our dir
@@ -211,6 +211,16 @@ public class Bag extends I18nObject implements BagConstants {
 		}
 	}
 
+	File getDataDir() {
+		File dataDir = new File(myDir, "data");
+		
+		if (!dataDir.exists() && !dataDir.mkdir() && LOGGER.isWarnEnabled()) {
+			LOGGER.warn(getI18n("bagit.dir_create", dataDir));
+		}
+		
+		return dataDir;
+	}
+	
 	/**
 	 * Returns the <code>BagInfo</code> for this <code>Bag</code>.
 	 * 
@@ -273,6 +283,14 @@ public class Bag extends I18nObject implements BagConstants {
 		// TODO write a unit test to make sure this does what I think
 	}
 
+	public void complete() {
+		getDataDir(); // creates it if it doesn't exist
+		
+		if (!hasDeclaration()) {
+			setDeclaration(new Declaration());
+		}
+	}
+	
 	/**
 	 * Returns an XML representation of the <code>Bag</code> object.
 	 * 
@@ -362,6 +380,10 @@ public class Bag extends I18nObject implements BagConstants {
 		}
 	}
 
+	boolean hasDeclaration() {
+		return myDeclaration != null;
+	}
+	
 	Declaration getDeclaration() {
 		if (myDeclaration == null) {
 			myDeclaration = new Declaration();
