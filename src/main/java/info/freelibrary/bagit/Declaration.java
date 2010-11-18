@@ -10,6 +10,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 
+/**
+ * A bag's required <code>BagIt</code> declaration. 
+ *  
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 class Declaration extends I18nObject {
 
 	public static final String ENCODING = "UTF-8";

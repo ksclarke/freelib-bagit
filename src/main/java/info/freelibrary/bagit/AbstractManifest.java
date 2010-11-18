@@ -18,6 +18,12 @@ import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.RegexFileFilter;
 import info.freelibrary.util.StringUtils;
 
+/**
+ * An abstract manifest class from which other specific manifests are implemented.
+ * 
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 abstract class AbstractManifest extends I18nObject {
 
 	private static class Entry implements Comparable<Entry> {

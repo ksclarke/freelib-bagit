@@ -21,9 +21,7 @@ import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
 /**
- * A package structure for conveying files and metadata according to the <a
- * href="http://tools.ietf.org/html/draft-kunze-bagit-05">BagIt</a>
- * specification.
+ * A package structure for conveying data files and metadata about them.
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;

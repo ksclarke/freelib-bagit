@@ -6,6 +6,12 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A manifest for describing metadata files contained within the bag.
+ * 
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 class TagManifest extends AbstractManifest {
 
 	private static final String FILE_NAME = "tagmanifest-{}.txt";

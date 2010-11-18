@@ -13,6 +13,12 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A bag validator that can determine whether bags are complete and/or valid.
+ * 
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 public class BagValidator extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory

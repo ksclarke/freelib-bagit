@@ -27,6 +27,12 @@ import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 import org.xeustechnologies.jtar.TarOutputStream;
 
+/**
+ * A bag packager that prepares bags for transmission.
+ * 
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 class BagPackager extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory

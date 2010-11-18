@@ -6,6 +6,12 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A manifest for data files conveyed in the bag's data directory.
+ * 
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 class PayloadManifest extends AbstractManifest {
 
 	private static final String FILE_NAME = "manifest-{}.txt";
