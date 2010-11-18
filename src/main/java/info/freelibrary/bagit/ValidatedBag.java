@@ -16,8 +16,8 @@ public class ValidatedBag {
 		return BagPackager.toTarBZip2(myBag);
 	}
 	
-	public File save() throws IOException {
-		return myBag.save();
+	public File toDir() throws IOException {
+		return myBag.toDir();
 	}
 	
 	public File toTar() throws IOException {

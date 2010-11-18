@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BagTest extends I18nObject implements BagConstants {
+public class BagTest extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagTest.class);
 
@@ -22,15 +22,14 @@ public class BagTest extends I18nObject implements BagConstants {
 
 	@Before
 	public void setUp() throws Exception {
-		System.setProperty(BAGIT_WORK_DIR_PROPERTY,
-				"src/test/resources/bagTests");
+		System.setProperty(Bag.WORK_DIR, "src/test/resources/bagTests");
 	}
 
 	@AfterClass
 	public static void oneTimeTearDown() throws Exception {
 		new File("src/test/resources/bagTests").delete();
 	}
-	
+
 	@Test
 	public void testBagFile() {
 		if (LOGGER.isDebugEnabled()) {
@@ -61,7 +60,7 @@ public class BagTest extends I18nObject implements BagConstants {
 			fail(throwable.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testBagTar() {
 		if (LOGGER.isDebugEnabled()) {
@@ -75,11 +74,11 @@ public class BagTest extends I18nObject implements BagConstants {
 			if (LOGGER.isErrorEnabled()) {
 				LOGGER.error(throwable.getMessage(), throwable);
 			}
-			
+
 			fail(throwable.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testBagTarGz() {
 		if (LOGGER.isDebugEnabled()) {
@@ -93,15 +92,17 @@ public class BagTest extends I18nObject implements BagConstants {
 			if (LOGGER.isErrorEnabled()) {
 				LOGGER.error(throwable.getMessage(), throwable);
 			}
-			
+
 			fail(throwable.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testBagTarBzip2() {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTarBzip2"));
+			LOGGER
+					.debug(getI18n("bagit.test.starting_test",
+							"testBagTarBzip2"));
 		}
 
 		try {
@@ -111,11 +112,11 @@ public class BagTest extends I18nObject implements BagConstants {
 			if (LOGGER.isErrorEnabled()) {
 				LOGGER.error(throwable.getMessage(), throwable);
 			}
-			
+
 			fail(throwable.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testBagZip() {
 		if (LOGGER.isDebugEnabled()) {
@@ -129,7 +130,7 @@ public class BagTest extends I18nObject implements BagConstants {
 			if (LOGGER.isErrorEnabled()) {
 				LOGGER.error(throwable.getMessage(), throwable);
 			}
-			
+
 			fail(throwable.getMessage());
 		}
 	}

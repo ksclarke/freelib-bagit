@@ -27,7 +27,7 @@ import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 import org.xeustechnologies.jtar.TarOutputStream;
 
-class BagPackager extends I18nObject implements BagConstants {
+class BagPackager extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BagPackager.class);
@@ -332,7 +332,7 @@ class BagPackager extends I18nObject implements BagConstants {
 	 * @return A new file stub we can use to create a new file
 	 */
 	private static File getNewFile(File aFile) {
-		String workDir = System.getProperty(BAGIT_WORK_DIR_PROPERTY);
+		String workDir = System.getProperty(Bag.WORK_DIR);
 		String fileName = aFile.getName();
 		int end = fileName.indexOf(".");
 		File newFile;

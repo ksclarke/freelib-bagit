@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BagValidatorTest extends I18nObject implements BagConstants {
+public class BagValidatorTest extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagTest.class);
 
@@ -27,10 +27,10 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 
 	@BeforeClass
 	public static void oneTimeSetUp() throws Exception {
-		System.setProperty(BAGIT_WORK_DIR_PROPERTY, BAGS_TEST_DIR);
+		System.setProperty(Bag.WORK_DIR, BAGS_TEST_DIR);
 		VALIDATOR = new BagValidator();
 	}
-	
+
 	@AfterClass
 	public static void onTimeTearDown() throws Exception {
 		FileUtils.delete(new File(BAGS_TEST_DIR));
@@ -51,12 +51,13 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 			}
 			else {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.test.expected", details.getMessage()));
+					LOGGER.debug(getI18n("bagit.test.expected", details
+							.getMessage()));
 				}
 			}
 		}
 	}
-	
+
 	@Test
 	public void testCheckPayloadDataFileCount() {
 		try {
@@ -77,7 +78,8 @@ public class BagValidatorTest extends I18nObject implements BagConstants {
 			}
 			else {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.test.expected", details.getMessage()));
+					LOGGER.debug(getI18n("bagit.test.expected", details
+							.getMessage()));
 				}
 			}
 		}

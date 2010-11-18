@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -22,21 +21,24 @@ import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
 /**
- * The <code>BagIt</code> structure for conveying files and metadata.
+ * A package structure for conveying files and metadata according to the <a
+ * href="http://tools.ietf.org/html/draft-kunze-bagit-05">BagIt</a>
+ * specification.
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
-public class Bag extends I18nObject implements BagConstants {
+public class Bag extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Bag.class);
 
-	private static final String MIME_DETECTOR = MagicMimeMimeDetector.class
-			.getName();
-
+	static final String WORK_DIR = "bagit.workdir";
+	
 	private boolean isValid;
 
 	private BagInfo myBagInfo;
+
+	private boolean myBagIsOverwritten;
 
 	private Declaration myDeclaration;
 
@@ -44,33 +46,25 @@ public class Bag extends I18nObject implements BagConstants {
 
 	private TagManifest myTagManifest;
 
-	private boolean myBagIsOverwritten;
-
 	File myDir;
 
 	/**
-	 * Creates a new <code>Bag</code> from scratch or by completing an existing
-	 * partial one. If a supplied <code>Bag</code> isn't valid, it attempts to
-	 * make it valid without throwing validity exceptions; if it can't create a
-	 * valid <code>Bag</code>, though, it will throw an exception.
+	 * Creates a new package from scratch or from an existing bag.
 	 * 
-	 * @param aBag A <code>Bag</code> directory
+	 * @param aBag A bag (either a bag directory or tar, tar.bz, zip, or tar.gz
+	 *        file)
 	 * @throws IOException An exception indicating there was problem reading or
-	 *         writing the <code>Bag</code>
+	 *         writing the bag
 	 */
 	public Bag(File aBag) throws IOException {
 		this(aBag, false);
 	}
 
 	/**
-	 * Creates a new <code>Bag</code> from scratch or by completing an existing
-	 * partial one; the overwrite parameter specifies whether existing files
-	 * should be overwritten in they already exist. If a supplied
-	 * <code>Bag</code> isn't valid, it attempts to make it valid without
-	 * throwing validity exceptions; if it can't create a valid <code>Bag</code>
-	 * , though, it will throw an exception.
-	 * 
-	 * Overwrite true only makes sense for directories, not .tar, .zip, etc.
+	 * Creates a new package from scratch or from an existing bag. The overwrite
+	 * option indicates whether an existing bad directory should be changed in
+	 * place or not. An overwrite value of &quot;true&quot; only makes sense for
+	 * bag directories; it is ignored for tar, zip, tar.gz, and tar.bz2 bags.
 	 * 
 	 * @param aBag A <code>Bag</code>
 	 * @throws IOException An exception indicating there was problem reading or
@@ -102,7 +96,8 @@ public class Bag extends I18nObject implements BagConstants {
 				}
 			}
 			else {
-				MimeUtil.registerMimeDetector(MIME_DETECTOR);
+				String mimeDetector = MagicMimeMimeDetector.class.getName();
+				MimeUtil.registerMimeDetector(mimeDetector);
 				Collection<?> types = MimeUtil.getMimeTypes(aBag);
 				MimeType type = MimeUtil.getMostSpecificMimeType(types);
 				String mimeType = type.toString();
@@ -150,7 +145,7 @@ public class Bag extends I18nObject implements BagConstants {
 			setBagInfo(new BagInfo(myDir));
 
 			try {
-				setDeclaration(new Declaration(myDir));
+				myDeclaration = new Declaration(myDir);
 			}
 			catch (FileNotFoundException details) {
 				if (LOGGER.isDebugEnabled()) {
@@ -166,11 +161,11 @@ public class Bag extends I18nObject implements BagConstants {
 				throw new IOException(getI18n("bagit.dir_create", myDir));
 			}
 
-			setDeclaration(new Declaration());
+			myDeclaration = new Declaration();
 		}
 
-		setManifest(new PayloadManifest(myDir));
-		setTagManifest(new TagManifest(myDir));
+		myManifest = new PayloadManifest(myDir);
+		myTagManifest = new TagManifest(myDir);
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(getI18n("bagit.debug.data_dir"));
@@ -191,11 +186,11 @@ public class Bag extends I18nObject implements BagConstants {
 			throw new IOException(getI18n("bagit.dir_create", dataDir));
 		}
 
-		// Add a cleanup thread to catch whatever isn't explicitly finalized
+		// Add a cleanup thread to catch whatever isn't caught by finalize
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("bagit.debug.shutdown_hook", myDir);
+					LOGGER.debug(getI18n("bagit.debug.shutdown_hook", myDir));
 				}
 
 				clean();
@@ -204,14 +199,12 @@ public class Bag extends I18nObject implements BagConstants {
 	}
 
 	/**
-	 * Creates a new <code>Bag</code> from scratch or by completing an existing
-	 * partial one. If a supplied <code>Bag</code> isn't valid, it attempts to
-	 * make it valid without throwing validity exceptions; if it can't create a
-	 * valid <code>Bag</code>, though, it will throw an exception.
+	 * Creates a new package from scratch or from an existing bag.
 	 * 
-	 * @param aBagName A name of a new or existing <code>Bag</code>
+	 * @param aBagName The name of a bag (either a bag directory, new or
+	 *        existing, or a tar, tar.bz, zip, or tar.gz file)
 	 * @throws IOException An exception indicating there was problem reading or
-	 *         writing the <code>Bag</code>
+	 *         writing the bag
 	 */
 	public Bag(String aBagName) throws IOException {
 		this(new File(aBagName));
@@ -241,14 +234,16 @@ public class Bag extends I18nObject implements BagConstants {
 		}
 	}
 
-	File getDataDir() {
+	public void complete() throws IOException {
 		File dataDir = new File(myDir, "data");
 
-		if (!dataDir.exists() && !dataDir.mkdir() && LOGGER.isWarnEnabled()) {
-			LOGGER.warn(getI18n("bagit.dir_create", dataDir));
+		if (!dataDir.mkdir()) {
+			throw new IOException(getI18n("bagit.dir_create", dataDir));
 		}
 
-		return dataDir;
+		if (!hasDeclaration()) {
+			myDeclaration = new Declaration();
+		}
 	}
 
 	/**
@@ -265,25 +260,6 @@ public class Bag extends I18nObject implements BagConstants {
 	}
 
 	/**
-	 * Sets the <code>BagInfo</code> for this <code>Bag</code>.
-	 * 
-	 * @param aBagInfo The <code>BagInfo</code> for this <code>Bag</code>
-	 * @throws RuntimeException If the <code>Bag</code> to which the
-	 *         <code>BagInfo</code> is being added has already been validated
-	 */
-	public void setBagInfo(BagInfo aBagInfo) throws RuntimeException {
-		if (isValid) {
-			throw new RuntimeException(getI18n("bagit.validated"));
-		}
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.debug.setting_info"));
-		}
-
-		myBagInfo = aBagInfo;
-	}
-
-	/**
 	 * Saves this <code>Bag</code> to the file system in the form of a bag
 	 * directory.
 	 * 
@@ -291,7 +267,7 @@ public class Bag extends I18nObject implements BagConstants {
 	 * @throws IOException If there is a problem writing the bag to the file
 	 *         system
 	 */
-	public File save() throws IOException {
+	public File toDir() throws IOException {
 		if (myBagIsOverwritten) {
 			return myDir;
 		}
@@ -313,12 +289,23 @@ public class Bag extends I18nObject implements BagConstants {
 		// TODO write a unit test to make sure this does what I think
 	}
 
-	public void complete() {
-		getDataDir(); // creates it if it doesn't exist
-
-		if (!hasDeclaration()) {
-			setDeclaration(new Declaration());
+	/**
+	 * Sets the <code>BagInfo</code> for this <code>Bag</code>.
+	 * 
+	 * @param aBagInfo The <code>BagInfo</code> for this <code>Bag</code>
+	 * @throws RuntimeException If the <code>Bag</code> to which the
+	 *         <code>BagInfo</code> is being added has already been validated
+	 */
+	public void setBagInfo(BagInfo aBagInfo) throws RuntimeException {
+		if (isValid) {
+			throw new RuntimeException(getI18n("bagit.validated"));
 		}
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(getI18n("bagit.debug.setting_info"));
+		}
+
+		myBagInfo = aBagInfo;
 	}
 
 	/**
@@ -360,32 +347,6 @@ public class Bag extends I18nObject implements BagConstants {
 		return builder.toString();
 	}
 
-	protected void finalize() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.debug.finalizing", myDir));
-		}
-		
-		clean();
-	}
-	
-	private File createWorkingDir(File aBagDir) {
-		String workDirPath = System.getProperty(BAGIT_WORK_DIR_PROPERTY);
-		String fileName = aBagDir.getName() + "_" + new Date().getTime();
-		File workDir;
-
-		// If we have a work directory, use that
-		if (workDirPath != null) {
-			workDir = new File(workDirPath);
-		}
-		else {
-			workDir = aBagDir.getParentFile();
-		}
-
-		// Create a temporary working directory for our bag
-		File tmpBagDir = new File(workDir, fileName);
-		return new File(tmpBagDir, aBagDir.getName());
-	}
-
 	/**
 	 * Cleans up all the temporary files created during the manipulation of the
 	 * bag. The JVM will not reliably call this method, so if the work files
@@ -402,7 +363,7 @@ public class Bag extends I18nObject implements BagConstants {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug(getI18n("bagit.debug.cleaned_up", workDir));
 				}
-				
+
 				return;
 			}
 
@@ -418,16 +379,38 @@ public class Bag extends I18nObject implements BagConstants {
 		}
 	}
 
-	boolean hasDeclaration() {
-		return myDeclaration != null;
+	private File createWorkingDir(File aBagDir) {
+		String workDirPath = System.getProperty(Bag.WORK_DIR);
+		String fileName = aBagDir.getName() + "_" + new Date().getTime();
+		File workDir;
+
+		// If we have a work directory, use that
+		if (workDirPath != null) {
+			workDir = new File(workDirPath);
+		}
+		else {
+			workDir = aBagDir.getParentFile();
+		}
+
+		// Create a temporary working directory for our bag
+		File tmpBagDir = new File(workDir, fileName);
+		return new File(tmpBagDir, aBagDir.getName());
 	}
 
-	Declaration getDeclaration() {
+	private Declaration getDeclaration() {
 		if (myDeclaration == null) {
 			myDeclaration = new Declaration();
 		}
 
 		return myDeclaration;
+	}
+
+	protected void finalize() {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(getI18n("bagit.debug.finalizing", myDir));
+		}
+
+		clean();
 	}
 
 	PayloadManifest getManifest() {
@@ -438,16 +421,8 @@ public class Bag extends I18nObject implements BagConstants {
 		return myTagManifest;
 	}
 
-	void setDeclaration(Declaration aDeclaration) {
-		myDeclaration = aDeclaration;
-	}
-
-	void setManifest(PayloadManifest aManifest) throws RuntimeException {
-		myManifest = aManifest;
-	}
-
-	void setTagManifest(TagManifest aManifest) throws RuntimeException {
-		myTagManifest = aManifest;
+	boolean hasDeclaration() {
+		return myDeclaration != null;
 	}
 
 	void validate() {

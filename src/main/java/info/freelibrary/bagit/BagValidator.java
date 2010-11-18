@@ -115,40 +115,6 @@ public class BagValidator extends I18nObject {
 	}
 
 	/**
-	 * Checks the structure of the bag directory to make sure it is complete.
-	 * 
-	 * @param aBag A bag to check for completeness
-	 * @throws BagException If there is a structural problem with the bag
-	 * @throws IOException If there is trouble reading or writing files in the
-	 *         bag
-	 */
-	private void checkStructure(Bag aBag) throws BagException, IOException {
-		checkRequiredFiles(aBag);
-		checkPayload(aBag.getManifest(), aBag.getDataDir());
-		checkTagManifest(aBag.getTagManifest(), aBag.myDir);
-	}
-
-	private void checkRequiredFiles(Bag aBag) throws BagException {
-		if (!aBag.hasDeclaration()) {
-			throw new BagException(BagException.MISSING_BAGIT_TXT_FILE);
-		}
-
-		if (aBag.getManifest().countEntries() < 1) {
-			throw new BagException(BagException.MISSING_MANIFEST);
-		}
-	}
-
-	private void checkTagManifest(TagManifest aTagManifest, File aBagDir)
-			throws BagException, IOException {
-		for (File tagFile : aTagManifest.getFiles()) {
-			if (!tagFile.exists()) {
-				throw new BagException(
-						BagException.TAG_MANIFEST_DIFFERS_FROM_BAG_DIR, tagFile);
-			}
-		}
-	}
-
-	/**
 	 * Checks the payload and payload manifest to make sure they are in sync.
 	 * 
 	 * @param aManifest A manifest representing the payload files
@@ -189,6 +155,40 @@ public class BagValidator extends I18nObject {
 			if (!fPath.equals(mPath)) {
 				throw new BagException(
 						BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR);
+			}
+		}
+	}
+
+	private void checkRequiredFiles(Bag aBag) throws BagException {
+		if (!aBag.hasDeclaration()) {
+			throw new BagException(BagException.MISSING_BAGIT_TXT_FILE);
+		}
+
+		if (aBag.getManifest().countEntries() < 1) {
+			throw new BagException(BagException.MISSING_MANIFEST);
+		}
+	}
+
+	/**
+	 * Checks the structure of the bag directory to make sure it is complete.
+	 * 
+	 * @param aBag A bag to check for completeness
+	 * @throws BagException If there is a structural problem with the bag
+	 * @throws IOException If there is trouble reading or writing files in the
+	 *         bag
+	 */
+	private void checkStructure(Bag aBag) throws BagException, IOException {
+		checkRequiredFiles(aBag);
+		checkPayload(aBag.getManifest(), new File(aBag.myDir, "data"));
+		checkTagManifest(aBag.getTagManifest(), aBag.myDir);
+	}
+
+	private void checkTagManifest(TagManifest aTagManifest, File aBagDir)
+			throws BagException, IOException {
+		for (File tagFile : aTagManifest.getFiles()) {
+			if (!tagFile.exists()) {
+				throw new BagException(
+						BagException.TAG_MANIFEST_DIFFERS_FROM_BAG_DIR, tagFile);
 			}
 		}
 	}
