@@ -191,9 +191,13 @@ public class Bag extends I18nObject implements BagConstants {
 			throw new IOException(getI18n("bagit.dir_create", dataDir));
 		}
 
-		// Add a cleanup thread (doesn't use resources until it's run)
+		// Add a cleanup thread to catch whatever isn't explicitly finalized
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("bagit.debug.shutdown_hook", myDir);
+				}
+
 				clean();
 			}
 		});
@@ -356,6 +360,14 @@ public class Bag extends I18nObject implements BagConstants {
 		return builder.toString();
 	}
 
+	protected void finalize() {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(getI18n("bagit.debug.finalizing", myDir));
+		}
+		
+		clean();
+	}
+	
 	private File createWorkingDir(File aBagDir) {
 		String workDirPath = System.getProperty(BAGIT_WORK_DIR_PROPERTY);
 		String fileName = aBagDir.getName() + "_" + new Date().getTime();
@@ -387,6 +399,10 @@ public class Bag extends I18nObject implements BagConstants {
 			File workDir = myBagIsOverwritten ? myDir : myDir.getParentFile();
 
 			if (!workDir.exists()) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(getI18n("bagit.debug.cleaned_up", workDir));
+				}
+				
 				return;
 			}
 

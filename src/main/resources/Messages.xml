@@ -72,6 +72,9 @@
 	<entry key="bagit.debug.gz_delete">Unable to delete temporary tar.gz file: {}</entry>
 	<entry key="bagit.debug.tar_delete">Unable to delete temporary tar file: {}</entry>
 	<entry key="bagit.debug.get_new_file">Getting a new file: {}</entry>
+	<entry key="bagit.debug.cleaned_up">Getting ready to clean, but '{}' seems to already have been cleaned up</entry>
+	<entry key="bagit.debug.finalizing">Finalizing (i.e., garbage collecting) the bag at: {}</entry>
+	<entry key="bagit.debug.shutdown_hook">Running the shutdown hook for the bag at: {}</entry>
 
 	<!-- Messages related to testing -->
 	<entry key="bagit.test.directory">Failed to notice BagIt directory was a file: {}</entry>
