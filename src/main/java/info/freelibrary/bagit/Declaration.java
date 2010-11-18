@@ -10,9 +10,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 class Declaration extends I18nObject {
 
 	public static final String ENCODING = "UTF-8";
@@ -22,9 +19,6 @@ class Declaration extends I18nObject {
 	private static final String ENCODING_TAG = "Tag-File-Character-Encoding";
 
 	private static final String FILE_NAME = "bagit.txt";
-
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(Declaration.class);
 
 	private static final String VERSION_TAG = "BagIt-Version";
 
