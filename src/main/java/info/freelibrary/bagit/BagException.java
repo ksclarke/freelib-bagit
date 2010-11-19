@@ -7,8 +7,8 @@ import java.io.File;
 import java.util.ResourceBundle;
 
 /**
- * An exception thrown during the <code>Bag</code> validation process. It may
- * contain a specific reason why the validation failed in addition to an
+ * An optionally typed exception thrown during the bag validation process. It
+ * may contain a specific reason why the validation failed in addition to an
  * internationalized message that provides more human-readable details.
  * 
  * @author Kevin S. Clarke &lt;<a

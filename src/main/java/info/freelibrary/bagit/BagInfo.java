@@ -19,9 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A tag file that contains metadata elements describing the bag and the
- * payload; the metadata elements, all optional, are intended primarily for
- * human readability.
+ * Metadata elements describing the bag and payload. The metadata elements,
+ * all optional, are intended primarily for human readability.
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;

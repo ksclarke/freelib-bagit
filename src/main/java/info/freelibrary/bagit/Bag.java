@@ -21,7 +21,7 @@ import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
 /**
- * A package structure for conveying data files and metadata about them.
+ * Package structure that encapsulates descriptive tags and a payload.
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
@@ -31,7 +31,7 @@ public class Bag extends I18nObject {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Bag.class);
 
 	static final String WORK_DIR = "bagit.workdir";
-	
+
 	private boolean isValid;
 
 	private BagInfo myBagInfo;
@@ -64,9 +64,9 @@ public class Bag extends I18nObject {
 	 * place or not. An overwrite value of &quot;true&quot; only makes sense for
 	 * bag directories; it is ignored for tar, zip, tar.gz, and tar.bz2 bags.
 	 * 
-	 * @param aBag A <code>Bag</code>
+	 * @param aBag A <code>Bag</code> in file or directory form
 	 * @throws IOException An exception indicating there was problem reading or
-	 *         writing the <code>Bag</code>
+	 *         writing the bag
 	 */
 	public Bag(File aBag, boolean aOverwrite) throws IOException {
 		myBagIsOverwritten = aOverwrite;
@@ -209,12 +209,12 @@ public class Bag extends I18nObject {
 	}
 
 	/**
-	 * Add files and directories to the <code>Bag</code> payload.
+	 * Add files and directories to the bag's payload.
 	 * 
-	 * @param aFiles File to add to the <code>Bag</code> payload.
+	 * @param aFiles File to add to the bag payload.
 	 * @throws IOException If there is difficulty writing the new files
-	 * @throws RuntimeException If the <code>Bag</code> to which we're adding
-	 *         files has already been validated
+	 * @throws RuntimeException If the bag to which we're adding files has
+	 *         already been validated
 	 */
 	public void addData(File... aFiles) throws IOException, RuntimeException {
 		File dataDir = new File(myDir, "data");
@@ -232,6 +232,11 @@ public class Bag extends I18nObject {
 		}
 	}
 
+	/**
+	 * Completes the bag structure.
+	 * 
+	 * @throws IOException If there is difficulty writing the missing files
+	 */
 	public void complete() throws IOException {
 		File dataDir = new File(myDir, "data");
 
@@ -245,9 +250,9 @@ public class Bag extends I18nObject {
 	}
 
 	/**
-	 * Returns the <code>BagInfo</code> for this <code>Bag</code>.
+	 * Returns the <code>BagInfo</code> for this bag.
 	 * 
-	 * @return The <code>BagInfo</code> for this <code>Bag</code>
+	 * @return The <code>BagInfo</code> for this bag
 	 */
 	public BagInfo getBagInfo() {
 		if (myBagInfo == null) {
@@ -258,8 +263,7 @@ public class Bag extends I18nObject {
 	}
 
 	/**
-	 * Saves this <code>Bag</code> to the file system in the form of a bag
-	 * directory.
+	 * Saves to the file system in the form of a bag directory.
 	 * 
 	 * @return A directory representing this bag package
 	 * @throws IOException If there is a problem writing the bag to the file
@@ -288,11 +292,11 @@ public class Bag extends I18nObject {
 	}
 
 	/**
-	 * Sets the <code>BagInfo</code> for this <code>Bag</code>.
+	 * Sets the <code>BagInfo</code> for this bag.
 	 * 
-	 * @param aBagInfo The <code>BagInfo</code> for this <code>Bag</code>
-	 * @throws RuntimeException If the <code>Bag</code> to which the
-	 *         <code>BagInfo</code> is being added has already been validated
+	 * @param aBagInfo The <code>BagInfo</code> for this bag
+	 * @throws RuntimeException If the bag to which the <code>BagInfo</code> is
+	 *         being added has already been validated
 	 */
 	public void setBagInfo(BagInfo aBagInfo) throws RuntimeException {
 		if (isValid) {
@@ -307,9 +311,9 @@ public class Bag extends I18nObject {
 	}
 
 	/**
-	 * Returns an XML representation of the <code>Bag</code> object.
+	 * Returns an XML representation of the bag.
 	 * 
-	 * @return An XML representation of the <code>Bag</code> object
+	 * @return An XML representation of the bag
 	 */
 	public String toString() {
 		String eol = System.getProperty("line.separator");
