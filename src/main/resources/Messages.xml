@@ -32,6 +32,7 @@
 	<entry key="bagit.invalid_tag_checksum">Invalid tag checksum for: {} ({} vs. {})</entry>
 	<entry key="bagit.invalid_data_checksum">Invalid data checksum for: {} ({} vs. {})</entry>
 	<entry key="bagit.missing_manifest">Missing the required payload manifest file</entry>
+	<entry key="bagit.data_dir">Problem with the bag's data directory</entry>
 
 	<!-- Messages related to debugging -->
 	<entry key="bagit.debug.file_count">Data file count: {}; file entries in payload manifest:
@@ -75,6 +76,10 @@
 	<entry key="bagit.debug.cleaned_up">Getting ready to clean, but '{}' seems to already have been cleaned up</entry>
 	<entry key="bagit.debug.finalizing">Finalizing (i.e., garbage collecting) the bag at: {}</entry>
 	<entry key="bagit.debug.shutdown_hook">Running the shutdown hook for the bag at: {}</entry>
+	<entry key="bagit.debug.paths_found">Number of matching paths found: {}</entry>
+	<entry key="bagit.debug.testing_file">Testing {} regex against file names</entry>
+	<entry key="bagit.debug.testing_path">Testing {} regex against file paths</entry>
+	<entry key="bagit.debug.testing_exts">Testing file extensions {} against file names</entry>
 
 	<!-- Messages related to testing -->
 	<entry key="bagit.test.directory">Failed to notice BagIt directory was a file: {}</entry>

@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +33,8 @@ public class Bag extends I18nObject {
 	private boolean isValid;
 
 	private BagInfo myBagInfo;
+
+	private BagData myBagData;
 
 	private boolean myBagIsOverwritten;
 
@@ -209,6 +209,21 @@ public class Bag extends I18nObject {
 	}
 
 	/**
+	 * Gets a representation of the bag's payload. However, files can be added
+	 * to the bag by using <code>addData(File)</code> without having to get the
+	 * <code>BagData</code> object.
+	 * 
+	 * @return
+	 */
+	public BagData getBagData() {
+		if (myBagData == null) {
+			myBagData = new BagData(new File(myDir, "data"));
+		}
+
+		return myBagData;
+	}
+
+	/**
 	 * Add files and directories to the bag's payload.
 	 * 
 	 * @param aFiles File to add to the bag payload.
@@ -224,11 +239,14 @@ public class Bag extends I18nObject {
 		}
 
 		for (File fromFile : aFiles) {
+			File toFile = new File(dataDir, fromFile.getName());
+			
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("bagit.debug.add_data", fromFile.getName());
 			}
 
-			FileUtils.copy(fromFile, new File(dataDir, fromFile.getName()));
+			FileUtils.copy(fromFile, toFile);
+			myManifest.updateWith(toFile);
 		}
 	}
 
@@ -317,33 +335,16 @@ public class Bag extends I18nObject {
 	 */
 	public String toString() {
 		String eol = System.getProperty("line.separator");
-		String systemPath = myDir.getAbsolutePath();
 		StringBuilder builder = new StringBuilder();
-		File dataDir = new File(myDir, "data");
-		String dataDirXML;
 
 		DOMUtils.brokenUp(true); // pretty-print(ish) our XML
-
-		try {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.debug.reading", dataDir));
-			}
-
-			dataDirXML = FileUtils.toXML(dataDir.getAbsolutePath(), true);
-			dataDirXML = dataDirXML.replace(systemPath + "/", "");
-		}
-		catch (ParserConfigurationException details) {
-			throw new RuntimeException(details);
-		}
-		catch (FileNotFoundException details) {
-			throw new RuntimeException(details);
-		}
 
 		builder.append("<bag name=\"").append(myDir.getName()).append("\">");
 		builder.append(eol).append(getDeclaration().toString());
 		builder.append(getBagInfo().toString());
 		builder.append(getManifest().toString());
-		builder.append(getTagManifest().toString()).append(dataDirXML);
+		builder.append(getTagManifest().toString());
+		builder.append(getBagData().toString());
 		builder.append("</bag>");
 
 		return builder.toString();
@@ -429,7 +430,11 @@ public class Bag extends I18nObject {
 
 	void validate() {
 		isValid = true;
+		myBagData.isValid = true;
 		myBagInfo.isValid = true;
 	}
 
+	public static final void main(String... args) throws Exception {
+		System.out.println(new Bag("/home/kevin/Desktop/dryad_20780").toString());
+	}
 }
