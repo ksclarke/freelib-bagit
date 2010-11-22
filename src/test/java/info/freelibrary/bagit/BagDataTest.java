@@ -1,6 +1,7 @@
 package info.freelibrary.bagit;
 
 import java.io.File;
+import java.io.IOException;
 
 import info.freelibrary.util.FileUtils;
 
@@ -8,6 +9,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.AfterClass;
 import org.junit.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,25 @@ public class BagDataTest {
 		FileUtils.delete(new File(WORK_DIR));
 	}
 
+	@Test
+	public void testGetAsUTF8StringString() {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Running testGetAsUTF8StringString");
+		}
+		
+		try {
+			BagData data = myBag.getBagData();
+			String xml = data.getAsUTF8String("datafile-3/dryadfile-3.xml");
+			
+			if (!xml.startsWith("<?xml version") || !xml.endsWith("</DryadDataFile>")) {
+				Assert.fail(xml);
+			}
+		}
+		catch (IOException details) {
+			Assert.fail(details.getMessage());
+		}
+	}
+	
 	@Test
 	public void testGetFilePaths() {
 		if (LOGGER.isDebugEnabled()) {

@@ -433,8 +433,4 @@ public class Bag extends I18nObject {
 		myBagData.isValid = true;
 		myBagInfo.isValid = true;
 	}
-
-	public static final void main(String... args) throws Exception {
-		System.out.println(new Bag("/home/kevin/Desktop/dryad_20780").toString());
-	}
 }

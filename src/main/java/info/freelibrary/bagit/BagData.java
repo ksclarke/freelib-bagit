@@ -4,10 +4,16 @@ import info.freelibrary.util.FileExtFileFilter;
 import info.freelibrary.util.FileUtils;
 import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.RegexFileFilter;
+import info.freelibrary.util.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -167,6 +173,106 @@ public class BagData extends I18nObject {
 		}
 
 		return dataDirXML;
+	}
+
+	/**
+	 * An <code>InputStream</code> from which the contents of the file of
+	 * the supplied path can be read.
+	 * 
+	 * @param aPath The path of the file from which we want to read
+	 * @return A character reader for the file represented by the supplied path
+	 * @throws FileNotFoundException If the file for the supplied path cannot be
+	 *         found or it is a directory
+	 */
+	public InputStream getInputStream(String aPath)
+			throws FileNotFoundException {
+		File file = new File(myDataDir, aPath);
+
+		if (file.exists() && file.isFile()) {
+			return new FileInputStream(file);
+		}
+		else {
+			throw new FileNotFoundException(aPath);
+		}
+	}
+
+	/**
+	 * A character <code>Reader</code> from which the contents of the file of
+	 * the supplied path can be read.
+	 * 
+	 * @param aPath The path of the file from which we want to read
+	 * @return A character reader for the file represented by the supplied path
+	 * @throws FileNotFoundException If the file for the supplied path cannot be
+	 *         found or it is a directory
+	 */
+	public Reader getReader(String aPath) throws FileNotFoundException {
+		File file = new File(myDataDir, aPath);
+
+		if (file.exists() && file.isFile()) {
+			return new FileReader(file);
+		}
+		else {
+			throw new FileNotFoundException(aPath);
+		}
+	}
+
+	/**
+	 * Reads the supplied file path into a string. The system determines the
+	 * encoding.
+	 * 
+	 * @param aPath A path to a file in the bag's payload
+	 * @return A string with the contents from the supplied path's file
+	 * @throws FileNotFoundException If the supplied file path cannot be found
+	 *         or it is a directory
+	 * @throws IOException If there is trouble reading the file of the supplied
+	 *         path
+	 */
+	public String getAsString(String aPath) throws FileNotFoundException,
+			IOException {
+		File file = new File(myDataDir, aPath);
+
+		if (file.exists() && file.isFile()) {
+			return StringUtils.read(file);
+		}
+		else {
+			throw new FileNotFoundException(aPath);
+		}
+	}
+
+	/**
+	 * Reads the supplied file path into a UTF-8 string.
+	 * 
+	 * @param aPath A path to a file in the bag's payload
+	 * @return A UTF-8 string with the contents from the supplied path's file
+	 * @throws FileNotFoundException If the supplied file path cannot be found
+	 *         or it is a directory
+	 * @throws IOException If there is trouble reading the file of the supplied
+	 *         path
+	 */
+	public String getAsUTF8String(String aPath) throws FileNotFoundException,
+			IOException {
+		File file = new File(myDataDir, aPath);
+
+		if (file.exists() && file.isFile()) {
+			return StringUtils.readAsUTF8(file);
+		}
+		else {
+			throw new FileNotFoundException(aPath);
+		}
+	}
+
+	/**
+	 * Remove a path (file or directory) from the bag's payload.
+	 * 
+	 * @param aPath A path (file or directory) to remove from the payload
+	 */
+	public void removeFile(String aPath) {
+		if (aPath != null && aPath.length() > 0) {
+			FileUtils.delete(new File(myDataDir, aPath));
+		}
+		else {
+			throw new NullPointerException();
+		}
 	}
 
 	/**
