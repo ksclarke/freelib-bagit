@@ -7,20 +7,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Metadata elements describing the bag and payload. The metadata elements,
- * all optional, are intended primarily for human readability.
+ * Metadata elements describing the bag and payload. The metadata elements, all
+ * optional, are intended primarily for human readability.
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
@@ -31,35 +28,34 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagInfo.class);
 
+	private static class Metadata {
+
+		private String myTag;
+		private String myValue;
+
+		private Metadata(String aTag, String aValue) {
+			if (aTag == null || aValue == null) {
+				throw new NullPointerException();
+			}
+
+			myTag = aTag;
+			myValue = aValue;
+		}
+
+	}
+
+	private ArrayList<Metadata> myMetadata;
+
 	/**
-	 * A tag translator so &quot;Bag-Size&quot;, &quot;bag-size&quot;, &quot;bag
-	 * size&quot;, and &quot;Bag_size&quot;, etc. are all seen as the same tag.
+	 * Whether the bag-info has been validated or not yet.
 	 */
-	private static final TreeSet<String> myTagTranslator = new TreeSet<String>(
-			new Comparator<String>() {
-
-				@Override
-				public int compare(String aFirstString, String aSecondString) {
-					String first = aFirstString.replaceAll("[-_\\.]", " ");
-					String second = aSecondString.replaceAll("[-_\\.]", " ");
-					return first.compareToIgnoreCase(second);
-				}
-
-			});
-
-	/**
-	 * Properties, or metadata tags/values, stored in this <code>BagInfo</code>.
-	 */
-	private Properties myProperties;
-
 	boolean isValid;
 
 	/**
 	 * Creates a new <code>BagInfo</code> for <code>Bag</code> metadata.
 	 */
 	public BagInfo() {
-		myProperties = new Properties();
-		initTagTranslator();
+		myMetadata = new ArrayList<Metadata>();
 	}
 
 	/**
@@ -70,16 +66,22 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 *        <code>BagInfo</code>
 	 */
 	public BagInfo(Properties aProperties) {
-		myProperties = new Properties(aProperties); // doesn't copy properties
-
 		Iterator<String> props = aProperties.stringPropertyNames().iterator();
+		
+		myMetadata = new ArrayList<Metadata>();
 
 		while (props.hasNext()) {
 			String name = props.next();
-			myProperties.put(name, aProperties.getProperty(name));
-		}
+			String value = aProperties.getProperty(name);
 
-		initTagTranslator();
+			if (!value.equals("")) {
+				myMetadata.add(new Metadata(name, value));
+			}
+		}
+	}
+
+	public BagInfo(BagInfo aBagInfo) {
+
 	}
 
 	/**
@@ -94,8 +96,7 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 */
 	BagInfo(File aFile) throws IOException {
 		File bagInfo = new File(aFile, FILE_NAME);
-
-		myProperties = new Properties();
+		myMetadata = new ArrayList<Metadata>();
 
 		if (bagInfo.exists()) {
 			readFrom(bagInfo);
@@ -105,16 +106,13 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 				throw new IOException(getI18n("bagit.baginfo_create", bagInfo));
 			}
 		}
-
-		initTagTranslator();
 	}
 
 	/**
 	 * Creates a new <code>BagInfo</code> from this one.
 	 */
 	public BagInfo clone() throws CloneNotSupportedException {
-		super.clone();
-		return new BagInfo(myProperties);
+		return new BagInfo(this);
 	}
 
 	/**
@@ -124,7 +122,13 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 * @return True if the supplied tag can be found; else, false
 	 */
 	public boolean containsTag(String aTag) {
-		return myProperties.containsKey(aTag);
+		for (int index = 0; index < myMetadata.size(); index++) {
+			if (aTag.equals(myMetadata.get(index).myTag)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -133,7 +137,7 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 * @return The number of tags found in tihs <code>BagInfo</code>
 	 */
 	public int countTags() {
-		return myProperties.size();
+		return myMetadata.size();
 	}
 
 	/**
@@ -142,18 +146,62 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 * @return An array of tags
 	 */
 	public String[] getTags() {
-		Set<String> tagSet = myProperties.stringPropertyNames();
-		return tagSet.toArray(new String[myProperties.size()]);
+		String[] tags = new String[myMetadata.size()];
+
+		for (int index = 0; index < tags.length; index++) {
+			tags[index] = myMetadata.get(index).myTag;
+		}
+
+		return tags;
 	}
 
 	/**
-	 * Returns the value for the supplied tag.
+	 * Returns the value for the supplied tag or null if the tag isn't found.
 	 * 
 	 * @param aTag The tag whose value we want to learn
 	 * @return The value for the supplied tag
 	 */
 	public String getValue(String aTag) {
-		return myProperties.getProperty(aTag);
+		for (int index = 0; index < myMetadata.size(); index++) {
+			Metadata metadata = myMetadata.get(index);
+
+			if (aTag.equals(metadata.myTag)) {
+				return metadata.myValue;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the number of values found for a particular tag.
+	 * 
+	 * @param aTag The tag to locate
+	 * @return The number of values found for the supplied tag
+	 */
+	public int countTags(String aTag) {
+		return getValues(aTag).length;
+	}
+
+	/**
+	 * Returns all the values for the supplied tag or an empty array if the tag
+	 * isn't found.
+	 * 
+	 * @param aTag The tag whose value we want to learn
+	 * @return The value for the supplied tag
+	 */
+	public String[] getValues(String aTag) {
+		ArrayList<String> matches = new ArrayList<String>();
+
+		for (int index = 0; index < myMetadata.size(); index++) {
+			Metadata metadata = myMetadata.get(index);
+
+			if (aTag.equals(metadata.myTag)) {
+				matches.add(metadata.myValue);
+			}
+		}
+
+		return matches.toArray(new String[matches.size()]);
 	}
 
 	/**
@@ -166,21 +214,57 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 * @return The value for the supplied tag or the default value
 	 */
 	public String getValue(String aTag, String aDefaultValue) {
-		return myProperties.getProperty(aTag, aDefaultValue);
+		String value = getValue(aTag);
+		return value == null ? aDefaultValue : value;
 	}
 
 	/**
-	 * Removes the metadata element for the supplied tag.
+	 * Returns the value of the metadata element at the supplied index position.
+	 * 
+	 * @param aIndex The index position from which we want the value
+	 * @return The value of the metadata element at the supplied index position
+	 */
+	public String getValue(int aIndex) {
+		return myMetadata.get(aIndex).myValue;
+	}
+
+	/**
+	 * Returns the tag of the metadata element at the supplied index position.
+	 * 
+	 * @param aIndex The index position from which we want the tag
+	 * @return The tag of the metadata element at the supplied index position
+	 */
+	public String getTag(int aIndex) {
+		return myMetadata.get(aIndex).myTag;
+	}
+
+	/**
+	 * Removes all metadata elements that match the supplied tag.
 	 * 
 	 * @param aTag The tag whose metadata element we want to remove
-	 * @return True if the metadata was successfully removed; else, false
+	 * @return True if the metadata elements were successfully removed; else,
+	 *         false
 	 */
 	public boolean removeMetadata(String aTag) {
+		int totalCount = myMetadata.size();
+
 		if (isValid) {
 			throw new RuntimeException(getI18n("bagit.validated"));
 		}
 
-		return myProperties.remove(aTag) != null;
+		for (int index = 0; index < totalCount; index++) {
+			Metadata metadata = myMetadata.get(index);
+
+			if (aTag.equals(metadata.myTag)) {
+				if (myMetadata.remove(index) == null) {
+					return false;
+				}
+
+				totalCount -= 1;
+			}
+		}
+
+		return totalCount < myMetadata.size();
 	}
 
 	/**
@@ -189,12 +273,12 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 * @param aTag A metadata tag
 	 * @param aValue A metadata value
 	 */
-	public void setMetadata(String aTag, String aValue) {
+	public boolean addMetadata(String aTag, String aValue) {
 		if (isValid) {
 			throw new RuntimeException(getI18n("bagit.validated"));
 		}
 
-		myProperties.setProperty(aTag, aValue);
+		return myMetadata.add(new Metadata(aTag, aValue));
 	}
 
 	/**
@@ -205,17 +289,16 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 */
 	public String toString() {
 		String eol = System.getProperty("line.separator");
-		Enumeration<?> keys = myProperties.keys();
+		Iterator<Metadata> iterator = myMetadata.iterator();
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("<bagInfo>").append(eol);
 
-		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
-			String value = myProperties.getProperty(key);
+		while (iterator.hasNext()) {
+			Metadata metadata = iterator.next();
 
-			builder.append("<metadata tag=\"").append(key);
-			builder.append("\" value=\"").append(value);
+			builder.append("<metadata tag=\"").append(metadata.myTag);
+			builder.append("\" value=\"").append(metadata.myValue);
 			builder.append("\" />").append(eol);
 		}
 
@@ -224,45 +307,30 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 		return builder.toString();
 	}
 
-	/**
-	 * A tag translator to treat variations in tag name consistently.
-	 */
-	private void initTagTranslator() {
-		if (myTagTranslator.size() == 0) {
-			myTagTranslator.addAll(Arrays.asList(new String[] { SOURCE_ORG_TAG,
-					SENDER_IDENTIFIER_TAG, SENDER_DESCRIPTION_TAG,
-					PAYLOAD_OXUM_TAG, ORG_ADDRESS_TAG, EXT_IDENTIFIER_TAG,
-					EXT_DESCRIPTION_TAG, CONTACT_PHONE_TAG, CONTACT_NAME_TAG,
-					CONTACT_EMAIL_TAG, BAGGING_DATE_TAG, BAG_SIZE_TAG,
-					BAG_GROUP_ID_TAG, BAG_COUNT_TAG }));
-		}
-	}
-
 	private void readFrom(File aBagInfoFile) throws IOException {
 		FileReader fileReader = new FileReader(aBagInfoFile);
 		BufferedReader reader = new BufferedReader(fileReader);
 		String whitespacePattern = "^\\s.*";
-		String lastProperty = null;
+		String lastProp = null;
 		String line;
 
 		try {
 			while ((line = reader.readLine()) != null) {
 				if (line.matches(whitespacePattern)) {
-					if (lastProperty != null) {
-						setMetadata(lastProperty, getValue(lastProperty)
-								+ line.replaceFirst(whitespacePattern, " "));
+					if (lastProp != null) {
+						line = line.replaceFirst(whitespacePattern, " ");
+						addMetadata(lastProp, getValue(lastProp) + line);
 					}
 				}
 				else {
 					String[] parts = line.split(": ");
 
 					if (parts.length == 2) {
-						lastProperty = parts[0].trim();
-						setMetadata(lastProperty, parts[1]);
+						lastProp = parts[0].trim();
+						addMetadata(lastProp, parts[1]);
 					}
 					else {
-						// won't throw exception here, postpone to validation
-
+						// don't throw exception here; postpone to validation
 						if (LOGGER.isWarnEnabled()) {
 							LOGGER.warn("bagit.invalid_baginfo", new String[] {
 									aBagInfoFile.getAbsolutePath(), line });
@@ -280,14 +348,15 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 		BufferedFileWriter writer = new BufferedFileWriter(aBagInfoFile);
 
 		try {
-			for (String tag : getTags()) {
-				String value = myProperties.getProperty(tag);
+			for (int index = 0; index < myMetadata.size(); index++) {
+				Metadata metadata = myMetadata.get(index);
 
-				writer.append(tag).append(": ").append(value);
+				writer.append(metadata.myTag).append(": ");
+				writer.append(metadata.myValue);
 
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug(getI18n("bagit.debug.metadata"), new String[] {
-							tag, value });
+							metadata.myTag, metadata.myValue });
 				}
 
 				writer.newLine();

@@ -59,8 +59,8 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 	public void testSetMetadata() {
 		BagInfo bagInfo = new BagInfo();
 
-		bagInfo.setMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		bagInfo.setMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
+		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
+		bagInfo.addMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
 
 		assertEquals(bagInfo.getValue(CONTACT_EMAIL_TAG), "ksclarke@gmail.com");
 		assertEquals(bagInfo.getValue(CONTACT_NAME_TAG), "Kevin S. Clarke");
@@ -72,14 +72,14 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 		String emailAddress = "ksclarke@gmail.com";
 		BagInfo bagInfo = new BagInfo();
 
-		bagInfo.setMetadata(CONTACT_EMAIL_TAG, emailAddress);
+		bagInfo.addMetadata(CONTACT_EMAIL_TAG, emailAddress);
 		assertEquals(emailAddress, bagInfo.getValue(CONTACT_EMAIL_TAG));
 	}
 
 	@Test
 	public void testRemoveMetadata() {
 		BagInfo bagInfo = new BagInfo();
-		bagInfo.setMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
+		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
 		assertEquals(bagInfo.countTags(), 1);
 		bagInfo.removeMetadata(CONTACT_EMAIL_TAG);
 		assertEquals(bagInfo.countTags(), 0);
@@ -92,7 +92,7 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 		BagInfo bagInfo = new BagInfo();
 		String result;
 
-		bagInfo.setMetadata(CONTACT_EMAIL_TAG, emailAddress1);
+		bagInfo.addMetadata(CONTACT_EMAIL_TAG, emailAddress1);
 		result = bagInfo.getValue(CONTACT_EMAIL_TAG, emailAddress2);
 		assertEquals(result, emailAddress1);
 
@@ -105,9 +105,9 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 	public void testGetTags() {
 		BagInfo bagInfo = new BagInfo();
 
-		bagInfo.setMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		bagInfo.setMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
-		bagInfo.setMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
+		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
+		bagInfo.addMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
+		bagInfo.addMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
 		assertEquals(3, bagInfo.countTags());
 
 		String[] tags = bagInfo.getTags();
@@ -125,9 +125,9 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 	public void testWriteToFile() {
 		File testBagInfo = new File(DIR_PATH + "bag-info.txt");
 		BagInfo bagInfo = new BagInfo();
-		bagInfo.setMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		bagInfo.setMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
-		bagInfo.setMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
+		bagInfo.addMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
+		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
+		bagInfo.addMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
 
 		try {
 			bagInfo.writeTo(testBagInfo);
