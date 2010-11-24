@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<mets:METS xmlns:mets="http://www.loc.gov/METS/" xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" OBJEDIT="/admin/item?itemID=731" OBJID="/handle/10255/dryad.630" PROFILE="DSPACE METS SIP Profile 1.0" LABEL="DSpace Item" ID="hdl:10255/dryad.630"> 
+    <mets:dmdSec GROUPID="group_dmd_0" ID="dmd_1"> 
+        <mets:mdWrap MDTYPE="OTHER" OTHERMDTYPE="DIM"> 
+            <mets:xmlData> 
+                <dim:dim dspaceType="ITEM"> 
+                    <dim:field element="contributor" qualifier="author" language="en" mdschema="dc">Cameron, Sydney A.</dim:field> 
+                    <dim:field element="contributor" qualifier="author" language="en" mdschema="dc">Mardulyn, Patrick</dim:field> 
+                    <dim:field element="date" qualifier="accessioned" language="" mdschema="dc">2009-06-21T00:58:21Z</dim:field> 
+                    <dim:field element="date" qualifier="available" language="" mdschema="dc">2009-06-21T00:58:21Z</dim:field> 
+                    <dim:field element="date" qualifier="issued" language="en" mdschema="dc">2001</dim:field> 
+                    <dim:field element="identifier" language="*" mdschema="dc">doi:10.5061/dryad.630</dim:field> 
+                    <dim:field element="identifier" qualifier="citation" language="en" mdschema="dc">Cameron, Sydney A. and Mardulyn, Patrick. 'Multiple Molecular Data Sets Suggest Independent Origins of Highly Eusocial Behavior in Bees (Hymenoptera:Apinae)', Systematic Biology, 50:2, 194-214</dim:field> 
+                    <dim:field element="identifier" qualifier="uri" language="" mdschema="dc">http://hdl.handle.net/10255/dryad.630</dim:field> 
+                    <dim:field element="description" language="en" mdschema="dc">Different views of the pattern of social evolution among the highly eusocial bees have arisen as a result of discordance between past molecular and morphology-based phylogenies. Here we present new data and taxa for four molecular data sets and reassess the morphological characters available to date. We show that there is no significant character incongruence between four molecular data sets (two nuclear and two mitochondrial) but that there is highly significant character incongruence, which leads to topological incongruence, between the molecular and morphological data. We investigate the effects of using different outgroup combinations to root the estimated tree. We also consider various ways in which biases in the sequence data could be misleading, employing several maximum likelihood models, LogDet corrections, and spectral analyses. Ultimately, we concede that there is strong discordance between the molecular and morphological data partitions, and that the conditional combination approach is appropriately applied in this case. We also find for the molecular trees that there are two equally well supported placements of the root, one supported by 16S and 28S sequences, the other supported by cyt b and opsin. The strength of the evidence leads us to accept two equally well supported hypotheses based on analyses of the molecular data sets. These are the most rigorously supported hypotheses of corbiculate bee relationships at this time, and frame our argument that highly eusocial behavior within the corbiculate bees evolved twice independently.</dim:field> 
+                    <dim:field element="relation" qualifier="ispartofseries" language="en" mdschema="dc">Systematic Biology</dim:field> 
+                    <dim:field element="relation" qualifier="haspart" language="en" mdschema="dc">http://hdl.handle.net/10255/dryad.633</dim:field> 
+                    <dim:field element="relation" qualifier="haspart" language="en" mdschema="dc">http://hdl.handle.net/10255/dryad.634</dim:field> 
+                    <dim:field element="relation" qualifier="haspart" language="en" mdschema="dc">http://hdl.handle.net/10255/dryad.631</dim:field> 
+                    <dim:field element="relation" qualifier="haspart" language="en" mdschema="dc">http://hdl.handle.net/10255/dryad.632</dim:field> 
+                    <dim:field element="relation" qualifier="haspart" language="en" mdschema="dc">http://hdl.handle.net/10255/dryad.635</dim:field> 
+                    <dim:field element="relation" qualifier="isreferencedby" language="" mdschema="dc">doi:10.1080/10635150120230</dim:field> 
+                    <dim:field element="subject" language="en" mdschema="dc">molecular phylogeny</dim:field> 
+                    <dim:field element="subject" language="en" mdschema="dc">insects</dim:field> 
+                    <dim:field element="subject" language="en" mdschema="dc">apines</dim:field> 
+                    <dim:field element="subject" language="en" mdschema="dc">Corbiculate bees</dim:field> 
+                    <dim:field element="subject" language="en" mdschema="dc">combined phylogenetic analysis</dim:field> 
+                    <dim:field element="title" language="en" mdschema="dc">Data from: Multiple Molecular Data Sets Suggest Independent Origins of Highly Eusocial Behavior in Bees (Hymenoptera:Apinae)</dim:field> 
+                    <dim:field element="type" language="en" mdschema="dc">Article</dim:field> 
+                    <dim:field element="ScientificName" language="en" mdschema="dwc">Hymenoptera</dim:field> 
+                    <dim:field element="contributor" qualifier="correspondingAuthor" language="en" mdschema="dc">Cameron, Sydney A.</dim:field> 
+                    <dim:field element="identifier" qualifier="manuscriptNumber" language="en" mdschema="dc">new-1245544997956</dim:field> 
+                    <dim:field element="publicationName" language="" mdschema="prism">Systematic Biology</dim:field> 
+                </dim:dim> 
+            </mets:xmlData> 
+        </mets:mdWrap> 
+    </mets:dmdSec> 
+    <mets:fileSec/> 
+    <mets:structMap LABEL="DSpace" TYPE="LOGICAL"> 
+        <mets:div DMDID="dmd_1" TYPE="DSpace Item"/> 
+    </mets:structMap> 
+</mets:METS> 
