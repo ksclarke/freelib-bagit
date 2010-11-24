@@ -1,5 +1,7 @@
 package info.freelibrary.bagit;
 
+import java.io.File;
+
 /**
  * Resolves resources in the <code>fetch.txt</code> file found in a <code>Bag</code>.
  * 
@@ -8,4 +10,7 @@ package info.freelibrary.bagit;
  */
 class Fetcher {
 
+	Fetcher(File aFile) {
+		
+	}
 }
