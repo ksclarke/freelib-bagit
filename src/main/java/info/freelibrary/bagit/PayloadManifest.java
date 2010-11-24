@@ -64,10 +64,6 @@ class PayloadManifest extends AbstractManifest {
 	void updateWith(File aFile) throws IOException {
 		RegexFileFilter fileFilter = new RegexFileFilter(".*");
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("updating with: " + aFile.getAbsolutePath());
-		}
-		
 		for (File file : FileUtils.listFiles(aFile, fileFilter, true)) {
 			try {
 				add(file);
@@ -76,5 +72,7 @@ class PayloadManifest extends AbstractManifest {
 				throw new RuntimeException(details); // should not happen
 			}
 		}
+		
+		// TODO: add tests to make sure this does what I think it does
 	}
 }
