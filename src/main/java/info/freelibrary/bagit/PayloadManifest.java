@@ -65,7 +65,7 @@ class PayloadManifest extends AbstractManifest {
 		RegexFileFilter fileFilter = new RegexFileFilter(".*");
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("updating with: " + aFile.getAbsolutePath());
+			LOGGER.debug(getI18n("bagit.debug.add_data", aFile));
 		}
 		
 		for (File file : FileUtils.listFiles(aFile, fileFilter, true)) {
