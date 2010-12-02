@@ -11,10 +11,8 @@
 	<url>http://freelibrary.info/freelib-bagit/</url>
 	<licenses>
 		<license>
-			<name>GNU Lesser General Public License, Version 3.0</name>
-			<url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
-			<comments>Licensed under GNU LGPL 2.1 or 3.0 (at your option)
-			</comments>
+			<name>GNU Lesser General Public License, Version 2.1</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
 		</license>
 	</licenses>
 	<scm>
