@@ -44,11 +44,11 @@ or add metadata via Java Properties:
     File properties = new File("my.properties");
     
     try {
-	    metadata.load(new FileReader(properties));
-	}
-	catch (IOException details) {
+        metadata.load(new FileReader(properties));
+    }
+    catch (IOException details) {
         System.out.println(details.getMessage());
-	}
+    }
 
     Bag bag = new Bag("bag_new", metadata);
 
@@ -67,7 +67,7 @@ And you can validate the bag:
     ValidatedBag validBag;
 
     try {
-	    validBag = validator.validate(bag);
+        validBag = validator.validate(bag);
     }
     catch (BagException details) {
         switch (details.getReason()) {
@@ -97,8 +97,8 @@ You can also write a valid bag to a compressed file for transport:
     BagValidator validator = new BagValidator();
 
     try {
-	    ValidatedBag validBag = validator.validate(bag);
-	    File bz2Bag = validBag.toTarBZip2();
+        ValidatedBag validBag = validator.validate(bag);
+        File bz2Bag = validBag.toTarBZip2();
     }
     catch (BagException details) {
         System.out.println(details.getMessage());
