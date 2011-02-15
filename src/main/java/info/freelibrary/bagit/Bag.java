@@ -66,6 +66,8 @@ public class Bag extends I18nObject {
 	 * bag directories; it is ignored for tar, zip, tar.gz, and tar.bz2 bags.
 	 * 
 	 * @param aBag A <code>Bag</code> in file or directory form
+	 * @param aOverwrite A boolean indicating whether an existing directory
+	 *        should be overwritten
 	 * @throws IOException An exception indicating there was problem reading or
 	 *         writing the bag
 	 */
@@ -211,6 +213,21 @@ public class Bag extends I18nObject {
 	}
 
 	/**
+	 * Creates a new package from scratch or from an existing bag. The overwrite
+	 * option indicates whether an existing bad directory should be changed in
+	 * place or not. An overwrite value of &quot;true&quot; only makes sense for
+	 * bag directories; it is ignored for tar, zip, tar.gz, and tar.bz2 bags.
+	 * 
+	 * @param aBagName The name of a bag (either a bag directory, new or
+	 *        existing, or a tar, tar.bz, zip, or tar.gz file)
+	 * @throws IOException An exception indicating there was problem reading or
+	 *         writing the bag
+	 */
+	public Bag(String aBagName, boolean aOverwrite) throws IOException {
+		this(new File(aBagName), aOverwrite);
+	}
+
+	/**
 	 * Creates a new package from scratch or from an existing bag and populates
 	 * the bag-info.txt with values from the supplied <code>Properties</code>.
 	 * 
@@ -224,7 +241,22 @@ public class Bag extends I18nObject {
 		this(new File(aBagName));
 		setBagInfo(new BagInfo(aProperties));
 	}
-	
+
+	/**
+	 * Creates a new package from scratch or from an existing bag and populates
+	 * the bag-info.txt with values from the supplied <code>Properties</code>.
+	 * 
+	 * @param aBag A bag (either a bag directory, new or existing, or a tar,
+	 *        tar.bz, zip, or tar.gz file)
+	 * @param aProperties Metadata values to be added to the bag-info.txt
+	 * @throws IOException An exception indicating there was problem reading or
+	 *         writing the bag
+	 */
+	public Bag(File aBag, Properties aProperties) throws IOException {
+		this(aBag);
+		setBagInfo(new BagInfo(aProperties));
+	}
+
 	/**
 	 * Gets a representation of the bag's payload. However, files can be added
 	 * to the bag by using <code>addData(File)</code> without having to get the
@@ -254,7 +286,7 @@ public class Bag extends I18nObject {
 		if (isValid) {
 			throw new RuntimeException(getI18n("bagit.validated"));
 		}
-		
+
 		for (File fromFile : aFiles) {
 			File toFile = new File(dataDir, fromFile.getName());
 
@@ -353,11 +385,12 @@ public class Bag extends I18nObject {
 		for (String fileName : bagData.getFilePaths()) {
 			try {
 				long size = bagData.getSize(fileName);
-			
+
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.debug.oxum_file"), size, fileName);
+					LOGGER.debug(getI18n("bagit.debug.oxum_file"), size,
+							fileName);
 				}
-			
+
 				bytes += size;
 				count += 1;
 			}
@@ -436,7 +469,7 @@ public class Bag extends I18nObject {
 		File workDir;
 
 		// TODO: check system space to confirm we'll have space to continue
-		
+
 		// If we have a work directory, use that
 		if (workDirPath != null) {
 			workDir = new File(workDirPath);
