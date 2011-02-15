@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,6 +210,21 @@ public class Bag extends I18nObject {
 		this(new File(aBagName));
 	}
 
+	/**
+	 * Creates a new package from scratch or from an existing bag and populates
+	 * the bag-info.txt with values from the supplied <code>Properties</code>.
+	 * 
+	 * @param aBagName The name of a bag (either a bag directory, new or
+	 *        existing, or a tar, tar.bz, zip, or tar.gz file)
+	 * @param aProperties Metadata values to be added to the bag-info.txt
+	 * @throws IOException An exception indicating there was problem reading or
+	 *         writing the bag
+	 */
+	public Bag(String aBagName, Properties aProperties) throws IOException {
+		this(new File(aBagName));
+		setBagInfo(new BagInfo(aProperties));
+	}
+	
 	/**
 	 * Gets a representation of the bag's payload. However, files can be added
 	 * to the bag by using <code>addData(File)</code> without having to get the

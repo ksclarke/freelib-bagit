@@ -41,7 +41,7 @@ You can add metadata to the bag:
 or add metadata via Java Properties:
 
     Properties metadata = new Properties();
-    File properties = new File("properties.txt");
+    File properties = new File("my.properties");
     
     try {
 	    metadata.load(new FileReader(properties));
@@ -50,7 +50,7 @@ or add metadata via Java Properties:
         System.out.println(details.getMessage());
 	}
 
-    Bag bag = new Bag("dryad_630.tar.gz", metadata);
+    Bag bag = new Bag("bag_new", metadata);
 
 You can add data to the bag:
 
@@ -58,7 +58,7 @@ You can add data to the bag:
     File dataFile = new File("/home/kevin/data_file.csv");
     File dataDir = new File("/home/kevin/csv_files/");
 
-    bag.addData(new File[] { dataFile, dataDir });
+    bag.addData(dataFile, dataDir);
 
 And you can validate the bag:
 
