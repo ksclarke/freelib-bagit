@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
  */
 public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 
-	private static final String FILE_NAME = "bag-info.txt";
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagInfo.class);
 
+	static final String FILE_NAME = "bag-info.txt";
+	
 	private static class Metadata implements Cloneable {
 
 		private String myTag;

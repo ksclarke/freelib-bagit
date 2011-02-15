@@ -1,8 +1,116 @@
 FreeLib BagIt (version 0.0.1-SNAPSHOT)
 ===============================================================================
 
-FreeLib BagIt is a Java library for working with and creating BagIt packages.
+FreeLib-BagIt is a Java library for working with and creating BagIt packages.
+It supports most of the BagIt spec, but does not yet support fetch.txt files.
 
-It's not in a usable state yet... still in the early stages of development.
+For more on the BagIt spec, start with: http://en.wikipedia.org/wiki/BagIt
 
-Development is taking place on github (http://github.com/ksclarke/freelib-bagit).
+FreeLib-BagIt's development is taking place on github:
+    http://github.com/ksclarke/freelib-bagit
+    
+FreeLib-BagIt's project page (with test results, javadocs, etc.) is at:
+    http://freelibrary.info/freelib-bagit/
+
+===============================================================================
+
+How to use FreeLib-BagIt:
+
+
+From within a Java program, you can create a new bag:
+
+    Bag bag = new Bag("dryad_630");
+
+or create a bag from an existing BagIt directory:
+
+    Bag bag = new Bag("/home/kevin/dryad_630");
+
+or open a pre-existing gz, bzip2, or zip compressed bag:
+
+    Bag bag = new Bag("dryad_630.tar.gz");
+
+You can add metadata to the bag:
+
+    Bag bag = new Bag("dryad_630");
+    BagInfo bagInfo = bag.getBagInfo();
+
+    bagInfo.addMetadata(BagInfo.CONTACT_NAME_TAG, "Kevin S. Clarke");
+    bagInfo.addMetadata(BagInfo.CONTACT_PHONE_TAG, "ksclarke@gmail.com");
+    bagInfo.addMetadata("Alt-Email", "thetrashcan@gmail.com");
+    
+or add metadata via Java Properties:
+
+    Properties metadata = new Properties();
+    File properties = new File("properties.txt");
+    
+    try {
+	    metadata.load(new FileReader(properties));
+	}
+	catch (IOException details) {
+        System.out.println(details.getMessage());
+	}
+
+    Bag bag = new Bag("dryad_630.tar.gz", metadata);
+
+You can add data to the bag:
+
+    Bag bag = new Bag("dryad_630");
+    File dataFile = new File("/home/kevin/data_file.csv");
+    File dataDir = new File("/home/kevin/csv_files/");
+
+    bag.addData(new File[] { dataFile, dataDir });
+
+And you can validate the bag:
+
+    Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
+    BagValidator validator = new BagValidator();
+    ValidatedBag validBag;
+
+    try {
+	    validBag = validator.validate(bag);
+    }
+    catch (BagException details) {
+        switch (details.getReason()) {
+        case BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR:
+            // do something
+            break;
+        default:
+            System.out.println(details.getMessage());
+        }
+    }
+    
+or, simply, check a bag's validity:
+
+    Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
+    BagValidator validator = new BagValidator();
+
+    if (validator.isValid(bag)) {
+        System.out.println("Bag is valid");
+    }
+    else {
+        System.out.println("Bag isn't valid");
+    }
+    
+You can also write a valid bag to a compressed file for transport:
+
+    Bag bag = new Bag("/home/kevin/dryad_630");
+    BagValidator validator = new BagValidator();
+
+    try {
+	    ValidatedBag validBag = validator.validate(bag);
+	    File bz2Bag = validBag.toTarBZip2();
+    }
+    catch (BagException details) {
+        System.out.println(details.getMessage());
+    }
+    catch (IOException details) {
+        System.out.println(details.getMessage());
+    }
+    
+===============================================================================
+
+FreeLib-BagIt is licensed under GNU LGPL, Version 2.1 (or later).  Feel free to
+try it out, kick the tires, and have some fun with it.
+
+You can direct questions and comments to: Kevin S. Clarke <ksclarke@gmail.com>
+or to the github issues tracker: http://github.com/ksclarke/freelib-bagit/issues

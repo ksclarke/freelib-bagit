@@ -26,6 +26,8 @@ public class BagData extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagData.class);
 
+	static final String FILE_NAME = "data";
+	
 	private File myDataDir;
 
 	boolean isValid;
@@ -37,7 +39,7 @@ public class BagData extends I18nObject {
 	 * @param aDataDir The data directory of a bag structure
 	 */
 	BagData(File aDataDir) {
-		if (!aDataDir.isDirectory() || !aDataDir.getName().equals("data")) {
+		if (!aDataDir.isDirectory() || !aDataDir.getName().equals(FILE_NAME)) {
 			throw new RuntimeException(getI18n("bagit.data_dir"));
 		}
 
@@ -217,6 +219,24 @@ public class BagData extends I18nObject {
 	}
 
 	/**
+	 * Returns the byte size of the file corresponding to the supplied file path.
+	 * 
+	 * @param aPath The path, relative to the bag's data directory, of the desired file
+	 * @return The size, in bytes, of the requested file
+	 * @throws FileNotFoundException If the supplied path doesn't correspond to a file
+	 */
+	public long getSize(String aPath) throws FileNotFoundException {
+		File file = new File(myDataDir, aPath);
+		
+		if (file.exists()) {
+			return file.length();
+		}
+		else {
+			throw new FileNotFoundException(aPath);
+		}
+	}
+	
+	/**
 	 * Reads the supplied file path into a string. The system determines the
 	 * encoding.
 	 * 
@@ -274,7 +294,7 @@ public class BagData extends I18nObject {
 			throw new NullPointerException();
 		}
 	}
-
+	
 	/**
 	 * Gets the path of the supplied <code>File</code>, relative to the bag's
 	 * data directory.

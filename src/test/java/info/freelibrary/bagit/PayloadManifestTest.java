@@ -29,7 +29,7 @@ public class PayloadManifestTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		System.setProperty(Bag.WORK_DIR, "src/test/resources/bagTests");
+		System.setProperty(Bag.WORK_DIR, WORK_DIR);
 		BAG = new Bag(BAGS_DIR + "dryad_630");
 	}
 

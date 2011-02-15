@@ -1,6 +1,7 @@
 package info.freelibrary.bagit;
 
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 import info.freelibrary.util.I18nObject;
 
@@ -30,6 +31,17 @@ public class BagTest extends I18nObject {
 		new File("src/test/resources/bagTests").delete();
 	}
 
+	@Test
+	public void testGetPayloadOxum() {
+		try {
+			Bag bag = new Bag(BAGS_DIR + "dryad_630");
+			assertEquals("133387.12", bag.getPayloadOxum());
+		}
+		catch (IOException details) {
+			fail(details.getMessage());
+		}
+	}
+	
 	@Test
 	public void testBagFile() {
 		if (LOGGER.isDebugEnabled()) {

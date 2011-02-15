@@ -32,7 +32,7 @@ public class BagValidatorTest extends I18nObject {
 	}
 
 	@AfterClass
-	public static void onTimeTearDown() throws Exception {
+	public static void oneTimeTearDown() throws Exception {
 		FileUtils.delete(new File(BAGS_TEST_DIR));
 	}
 

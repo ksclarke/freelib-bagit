@@ -28,7 +28,7 @@ public class BagValidator extends I18nObject {
 	 * Creates a new bag validator.
 	 */
 	public BagValidator() {}
-	
+
 	/**
 	 * Checks whether a supplied bag is complete or not.
 	 * 
@@ -42,8 +42,10 @@ public class BagValidator extends I18nObject {
 		}
 		catch (BagException details) {
 			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn(getI18n("bagit.not_complete", new String[] {
-						aBag.myDir.getName(), details.getMessage() }), details);
+				LOGGER.warn(
+						getI18n("bagit.not_complete",
+								new String[] { aBag.myDir.getName(),
+										details.getMessage() }), details);
 			}
 
 			return false;
@@ -122,6 +124,30 @@ public class BagValidator extends I18nObject {
 			}
 		}
 
+		// If we have a BagInfo, let's supply Payload-Oxum and Bag-Size
+		BagInfo bagInfo = aBag.getBagInfo();
+
+		if (bagInfo.countTags() > 0) {
+			bagInfo.removeMetadata(BagInfo.BAG_SIZE_TAG);
+			bagInfo.removeMetadata(BagInfo.PAYLOAD_OXUM_TAG);
+
+			bagInfo.addMetadata(BagInfo.BAG_SIZE_TAG,
+					FileUtils.sizeFromBytes(aBag.getSize(), true));
+			bagInfo.addMetadata(BagInfo.PAYLOAD_OXUM_TAG, aBag.getPayloadOxum());
+
+			// If we change, we need to recalculate the file's checksum
+			try {
+				File bagInfoFile = new File(aBag.myDir, BagInfo.FILE_NAME);
+
+				bagInfo.writeTo(bagInfoFile);
+				tagManifest.remove(bagInfoFile);
+				tagManifest.add(bagInfoFile);
+			}
+			catch (NoSuchAlgorithmException details) {
+				throw new RuntimeException(details); // shouldn't see this
+			}
+		}
+
 		return new ValidatedBag(aBag);
 	}
 
@@ -142,9 +168,10 @@ public class BagValidator extends I18nObject {
 
 		if (files.length != payloadFiles.length) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.debug.file_count", new String[] {
-						Integer.toString(files.length),
-						Integer.toString(payloadFiles.length) }));
+				LOGGER.debug(getI18n(
+						"bagit.debug.file_count",
+						new String[] { Integer.toString(files.length),
+								Integer.toString(payloadFiles.length) }));
 			}
 
 			throw new BagException(
@@ -190,7 +217,7 @@ public class BagValidator extends I18nObject {
 	 */
 	private void checkStructure(Bag aBag) throws BagException, IOException {
 		checkRequiredFiles(aBag);
-		checkPayload(aBag.getManifest(), new File(aBag.myDir, "data"));
+		checkPayload(aBag.getManifest(), new File(aBag.myDir, BagData.FILE_NAME));
 		checkTagManifest(aBag.getTagManifest(), aBag.myDir);
 	}
 

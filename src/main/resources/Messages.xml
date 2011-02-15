@@ -36,7 +36,8 @@
 
 	<!-- Messages related to debugging -->
 	<entry key="bagit.debug.file_count">Data file count: {}; file entries in payload manifest:
-		{}</entry>
+	{}</entry>
+	<entry key="bagit.debug.oxum_file">Getting {} bytes for oxum from file: {}</entry>
 	<entry key="bagit.debug.creating">Creating new Bag object: {}</entry>
 	<entry key="bagit.debug.existing">Using bag's existing data files</entry>
 	<entry key="bagit.debug.new_dir">Creating new directory: {}</entry>

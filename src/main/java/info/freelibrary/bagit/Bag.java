@@ -169,7 +169,7 @@ public class Bag extends I18nObject {
 			LOGGER.debug(getI18n("bagit.debug.data_dir"));
 		}
 
-		File dataDir = new File(myDir, "data");
+		File dataDir = new File(myDir, BagData.FILE_NAME);
 
 		if (!dataDir.exists() && !dataDir.mkdir()) {
 			try {
@@ -185,6 +185,7 @@ public class Bag extends I18nObject {
 		}
 
 		// Add a cleanup thread to catch whatever isn't caught by finalize
+		// This has small footprint, doesn't use many resources until it's run
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				if (LOGGER.isDebugEnabled()) {
@@ -217,7 +218,7 @@ public class Bag extends I18nObject {
 	 */
 	public BagData getBagData() {
 		if (myBagData == null) {
-			myBagData = new BagData(new File(myDir, "data"));
+			myBagData = new BagData(new File(myDir, BagData.FILE_NAME));
 		}
 
 		return myBagData;
@@ -232,15 +233,15 @@ public class Bag extends I18nObject {
 	 *         already been validated
 	 */
 	public void addData(File... aFiles) throws IOException, RuntimeException {
-		File dataDir = new File(myDir, "data");
+		File dataDir = new File(myDir, BagData.FILE_NAME);
 
 		if (isValid) {
 			throw new RuntimeException(getI18n("bagit.validated"));
 		}
-
+		
 		for (File fromFile : aFiles) {
 			File toFile = new File(dataDir, fromFile.getName());
-			
+
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("bagit.debug.add_data", fromFile.getName());
 			}
@@ -256,7 +257,7 @@ public class Bag extends I18nObject {
 	 * @throws IOException If there is difficulty writing the missing files
 	 */
 	public void complete() throws IOException {
-		File dataDir = new File(myDir, "data");
+		File dataDir = new File(myDir, BagData.FILE_NAME);
 
 		if (!dataDir.mkdir()) {
 			throw new IOException(getI18n("bagit.dir_create", dataDir));
@@ -328,6 +329,39 @@ public class Bag extends I18nObject {
 		myBagInfo = aBagInfo;
 	}
 
+	public String getPayloadOxum() {
+		BagData bagData = getBagData();
+		long bytes = 0;
+		int count = 0;
+
+		for (String fileName : bagData.getFilePaths()) {
+			try {
+				long size = bagData.getSize(fileName);
+			
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(getI18n("bagit.debug.oxum_file"), size, fileName);
+				}
+			
+				bytes += size;
+				count += 1;
+			}
+			catch (FileNotFoundException details) {
+				throw new RuntimeException(details); // shouldn't be possible
+			}
+		}
+
+		return bytes + "." + count;
+	}
+
+	/**
+	 * Returns the size of the bag in bytes.
+	 * 
+	 * @return The size of the bag in bytes
+	 */
+	public long getSize() {
+		return FileUtils.getSize(myDir);
+	}
+
 	/**
 	 * Returns an XML representation of the bag.
 	 * 
@@ -352,9 +386,7 @@ public class Bag extends I18nObject {
 
 	/**
 	 * Cleans up all the temporary files created during the manipulation of the
-	 * bag. The JVM will not reliably call this method, so if the work files
-	 * should be removed, this method needs to be called explicitly or as a part
-	 * of the serialization of the bag.
+	 * bag.
 	 */
 	private void clean() {
 		String clean = System.getProperty("bagit.autoclean", "true");
@@ -387,6 +419,8 @@ public class Bag extends I18nObject {
 		String fileName = aBagDir.getName() + "_" + new Date().getTime();
 		File workDir;
 
+		// TODO: check system space to confirm we'll have space to continue
+		
 		// If we have a work directory, use that
 		if (workDirPath != null) {
 			workDir = new File(workDirPath);
