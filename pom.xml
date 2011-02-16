@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>info.freelibrary</groupId>
 			<artifactId>freelib-utils</artifactId>
-			<version>0.2.3-SNAPSHOT</version>
+			<version>0.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.medsea.mimeutil</groupId>
