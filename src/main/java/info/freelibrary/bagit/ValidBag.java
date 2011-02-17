@@ -9,20 +9,21 @@ import java.io.IOException;
  * changes to it, you must clone it and make changes there. Otherwise, the bag
  * is ready for packaging and transmission.
  * 
- * <div>A <code>ValidatedBag</code> is constructed using a
- * <code>BagValidator</code>.  For instance: <blockquote>
- * <code>ValidatedBag bag = new BagValidator().validate(new Bag("my_bag"));</code>
- * </blockquote> A validated bag can then be used to create a bag file that
- * is ready for transmission.</div>
+ * <div>A <code>ValidBag</code> is constructed using a <code>BagValidator</code>
+ * . For instance: <blockquote>
+ * <code>Bag bag = new Bag("papas_got_a_brand_new").complete();</code>
+ * <code>ValidBag validBag = new BagValidator().validate(bag);</code>
+ * </blockquote> A validated bag can then be used to create a bag file that is
+ * ready for transmission.</div>
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
-public class ValidatedBag {
+public class ValidBag {
 
 	private Bag myBag;
 
-	ValidatedBag(Bag aBag) {
+	ValidBag(Bag aBag) {
 		aBag.validate();
 		myBag = aBag;
 	}

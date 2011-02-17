@@ -27,7 +27,7 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagInfo.class);
 
 	static final String FILE_NAME = "bag-info.txt";
-	
+
 	private static class Metadata implements Cloneable {
 
 		private String myTag;
@@ -70,7 +70,7 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 	 */
 	public BagInfo(Properties aProperties) {
 		Iterator<String> props = aProperties.stringPropertyNames().iterator();
-		
+
 		myMetadata = new ArrayList<Metadata>();
 
 		while (props.hasNext()) {
@@ -83,11 +83,15 @@ public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
 		}
 	}
 
+	/**
+	 * Creates a <code>BagInfo</code> for <code>Bag</code> metadata from the
+	 * metadata of another <code>BagInfo</code>.
+	 */
 	public BagInfo(BagInfo aBagInfo) {
 		Iterator<Metadata> iterator = aBagInfo.myMetadata.iterator();
-		
+
 		myMetadata = new ArrayList<Metadata>();
-		
+
 		while (iterator.hasNext()) {
 			Metadata metadata = iterator.next();
 			myMetadata.add(metadata.clone());

@@ -81,7 +81,7 @@ public class BagValidator extends I18nObject {
 	 * @throws IOException If there is a problem reading or writing the files in
 	 *         the bag
 	 */
-	public ValidatedBag validate(Bag aBag) throws BagException, IOException {
+	public ValidBag validate(Bag aBag) throws BagException, IOException {
 		checkStructure(aBag);
 
 		// Validity is determined by whether the checksums are actually correct
@@ -148,7 +148,7 @@ public class BagValidator extends I18nObject {
 			}
 		}
 
-		return new ValidatedBag(aBag);
+		return new ValidBag(aBag);
 	}
 
 	/**

@@ -304,7 +304,7 @@ public class Bag extends I18nObject {
 	 * 
 	 * @throws IOException If there is difficulty writing the missing files
 	 */
-	public void complete() throws IOException {
+	public Bag complete() throws IOException {
 		File dataDir = new File(myDir, BagData.FILE_NAME);
 
 		if (!dataDir.mkdir()) {
@@ -314,6 +314,8 @@ public class Bag extends I18nObject {
 		if (!hasDeclaration()) {
 			myDeclaration = new Declaration();
 		}
+		
+		return this;
 	}
 
 	/**
@@ -377,6 +379,14 @@ public class Bag extends I18nObject {
 		myBagInfo = aBagInfo;
 	}
 
+	/**
+	 * Gets the &quot;octetstream sum&quot; of the payload, namely, a two- part
+	 * number of the form "OctetCount.StreamCount", where OctetCount is the
+	 * total number of octets (8-bit bytes) across all payload file content and
+	 * StreamCount is the total number of payload files.
+	 * 
+	 * @return The &quot;octetstream sum&quot; of the payload
+	 */
 	public String getPayloadOxum() {
 		BagData bagData = getBagData();
 		long bytes = 0;

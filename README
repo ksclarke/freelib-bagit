@@ -64,7 +64,7 @@ And you can validate the bag:
 
     Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
     BagValidator validator = new BagValidator();
-    ValidatedBag validBag;
+    ValidBag validBag;
 
     try {
         validBag = validator.validate(bag);
@@ -97,7 +97,7 @@ You can also write a valid bag to a compressed file for transport:
     BagValidator validator = new BagValidator();
 
     try {
-        ValidatedBag validBag = validator.validate(bag);
+        ValidBag validBag = validator.validate(bag);
         File bz2Bag = validBag.toTarBZip2();
     }
     catch (BagException details) {

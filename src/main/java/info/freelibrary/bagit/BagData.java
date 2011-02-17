@@ -22,12 +22,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handle for working with files in the package's data directory.
+ * 
+ * @author Kevin S. Clarke &lt;<a
+ *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ */
 public class BagData extends I18nObject {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BagData.class);
 
 	static final String FILE_NAME = "data";
-	
+
 	private File myDataDir;
 
 	boolean isValid;
@@ -178,8 +184,10 @@ public class BagData extends I18nObject {
 	}
 
 	/**
-	 * An <code>InputStream</code> from which the contents of the file of
-	 * the supplied path can be read.
+	 * An <code>InputStream</code> from which the contents of the file of the
+	 * supplied path can be read. The stream is just a raw stream that you might
+	 * want to wrap with an <code>InputStreamReader</code> (for encoding) and/or
+	 * <code>BufferedReader</code>.
 	 * 
 	 * @param aPath The path of the file from which we want to read
 	 * @return A character reader for the file represented by the supplied path
@@ -200,7 +208,8 @@ public class BagData extends I18nObject {
 
 	/**
 	 * A character <code>Reader</code> from which the contents of the file of
-	 * the supplied path can be read.
+	 * the supplied path can be read. The reader is a <code>FileReader</code>
+	 * that you might want to wrap with a <code>BufferedReader</code>.
 	 * 
 	 * @param aPath The path of the file from which we want to read
 	 * @return A character reader for the file represented by the supplied path
@@ -219,15 +228,18 @@ public class BagData extends I18nObject {
 	}
 
 	/**
-	 * Returns the byte size of the file corresponding to the supplied file path.
+	 * Returns the byte size of the file corresponding to the supplied file
+	 * path.
 	 * 
-	 * @param aPath The path, relative to the bag's data directory, of the desired file
+	 * @param aPath The path, relative to the bag's data directory, of the
+	 *        desired file
 	 * @return The size, in bytes, of the requested file
-	 * @throws FileNotFoundException If the supplied path doesn't correspond to a file
+	 * @throws FileNotFoundException If the supplied path doesn't correspond to
+	 *         a file
 	 */
 	public long getSize(String aPath) throws FileNotFoundException {
 		File file = new File(myDataDir, aPath);
-		
+
 		if (file.exists()) {
 			return file.length();
 		}
@@ -235,7 +247,7 @@ public class BagData extends I18nObject {
 			throw new FileNotFoundException(aPath);
 		}
 	}
-	
+
 	/**
 	 * Reads the supplied file path into a string. The system determines the
 	 * encoding.
@@ -294,7 +306,7 @@ public class BagData extends I18nObject {
 			throw new NullPointerException();
 		}
 	}
-	
+
 	/**
 	 * Gets the path of the supplied <code>File</code>, relative to the bag's
 	 * data directory.

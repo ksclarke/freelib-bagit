@@ -47,7 +47,7 @@ public class ExamplesTest {
 			fail(details.getMessage());
 		}
 	}
-
+	
 	@Test
 	public void testAddMetadata() {
 		try {
@@ -104,7 +104,7 @@ public class ExamplesTest {
 		try {
 			Bag bag = new Bag("src/test/resources/bags/dryad_630.tar.gz");
 			BagValidator validator = new BagValidator();
-			ValidatedBag validBag;
+			ValidBag validBag;
 
 			try {
 				validBag = validator.validate(bag);
@@ -149,7 +149,7 @@ public class ExamplesTest {
 			BagValidator validator = new BagValidator();
 
 			try {
-				ValidatedBag validBag = validator.validate(bag);
+				ValidBag validBag = validator.validate(bag);
 				File bz2Bag = validBag.toTarBZip2();
 			}
 			catch (BagException details) {
