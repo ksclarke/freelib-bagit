@@ -149,8 +149,7 @@ public class ExamplesTest {
 			BagValidator validator = new BagValidator();
 
 			try {
-				ValidBag validBag = validator.validate(bag);
-				File bz2Bag = validBag.toTarBZip2();
+				validator.validate(bag).toTarBZip2();
 			}
 			catch (BagException details) {
 				fail(details.getMessage());

@@ -12,12 +12,8 @@ import info.freelibrary.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PayloadManifestTest {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(PayloadManifestTest.class);
 
 	private static final String BAGS_DIR = "src/test/resources/bags/";
 

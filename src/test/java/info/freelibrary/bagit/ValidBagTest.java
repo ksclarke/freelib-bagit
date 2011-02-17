@@ -29,7 +29,7 @@ public class ValidBagTest {
 	public void testValidBag() {
 		try {
 			Bag bag = new Bag("papas_got_a_brand_new").complete();
-			ValidBag validBag = new BagValidator().validate(bag);
+			new BagValidator().validate(bag);
 		}
 		catch (IOException details) {
 			fail(details.getMessage());
