@@ -13,7 +13,7 @@
 		<file>target/bagit_log.out</file>
 	</appender>-->
 
-  <!--<logger name="info.freelibrary.bagit.Bag" level="DEBUG"/>-->
+  <!--<logger name="info.freelibrary.bagit.BagValidator" level="DEBUG"/>-->
   <logger name="ch.qos.logback" level="ERROR"/>
 
   <root level="ERROR">

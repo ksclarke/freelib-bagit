@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import info.freelibrary.util.BufferedFileReader;
 import info.freelibrary.util.BufferedFileWriter;
@@ -19,12 +20,16 @@ import info.freelibrary.util.RegexFileFilter;
 import info.freelibrary.util.StringUtils;
 
 /**
- * An abstract manifest class from which other specific manifests are implemented.
+ * An abstract manifest class from which other specific manifests are
+ * implemented.
  * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
 abstract class AbstractManifest extends I18nObject {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(AbstractManifest.class);
 
 	private static class Entry implements Comparable<Entry> {
 		private File myFile;
@@ -46,7 +51,8 @@ abstract class AbstractManifest extends I18nObject {
 		}
 
 		public boolean equals(Object aObject) {
-			if (aObject == this) return true;
+			if (aObject == this)
+				return true;
 
 			if (aObject instanceof Entry) {
 				return myFile.getAbsolutePath().equals(
@@ -151,7 +157,7 @@ abstract class AbstractManifest extends I18nObject {
 	public String getHashAlgorithm() {
 		return myHashAlgorithm;
 	}
-	
+
 	/**
 	 * Returns the number of entries in the manifest file.
 	 * 
@@ -160,7 +166,7 @@ abstract class AbstractManifest extends I18nObject {
 	public int countEntries() {
 		return myHashes.size();
 	}
-	
+
 	public String toString() {
 		String eol = System.getProperty("line.separator");
 		StringBuilder builder = new StringBuilder();
@@ -272,7 +278,7 @@ abstract class AbstractManifest extends I18nObject {
 	 * 
 	 * @throws IOException If there is a problem writing the manifest file
 	 */
-	void write() throws IOException {
+	void writeToFile() throws IOException {
 		File manifestFile = new File(myBagDir, myFileName);
 		BufferedFileWriter writer = null;
 		Iterator<Entry> iterator;
@@ -284,6 +290,10 @@ abstract class AbstractManifest extends I18nObject {
 		iterator = myHashes.iterator();
 
 		try {
+			if (manifestFile.exists()) {
+				manifestFile.delete();
+			}
+
 			writer = new BufferedFileWriter(manifestFile);
 
 			while (iterator.hasNext()) {
@@ -296,7 +306,9 @@ abstract class AbstractManifest extends I18nObject {
 			}
 		}
 		finally {
-			writer.close();
+			if (writer != null) {
+				writer.close();
+			}
 		}
 	}
 }

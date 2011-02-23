@@ -51,8 +51,8 @@ public class BagValidatorTest extends I18nObject {
 			}
 			else {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.test.expected", details
-							.getMessage()));
+					LOGGER.debug(getI18n("bagit.test.expected",
+							details.getMessage()));
 				}
 			}
 		}
@@ -73,31 +73,34 @@ public class BagValidatorTest extends I18nObject {
 			fail(details.getMessage());
 		}
 		catch (BagException details) {
+			String message = details.getMessage();
+
 			if (!(details.getReason() == BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR)) {
-				fail(getI18n("bagit.test.failed", details.getMessage()));
+				// This is a successful catch....
 			}
 			else {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.test.expected", details
-							.getMessage()));
+					LOGGER.debug(getI18n("bagit.test.expected", message));
 				}
+
+				fail(message);
 			}
 		}
 	}
 
 	@Test
 	public void testIsComplete() {
-	// fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 	@Test
 	public void testIsValid() {
-	// fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 	@Test
 	public void testValidate() {
-	// fail("Not yet implemented");
+		// fail("Not yet implemented");
 	}
 
 }

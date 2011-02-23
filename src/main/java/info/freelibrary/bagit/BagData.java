@@ -64,6 +64,15 @@ public class BagData extends I18nObject {
 	}
 
 	/**
+	 * Returns the number of files in the data directory.
+	 * 
+	 * @return The number of files in the data directory
+	 */
+	public int fileCount() {
+		return getFilePaths().length;
+	}
+	
+	/**
 	 * Returns a list of file paths (relative to the data directory) whose file
 	 * extensions match those supplied in the parameter strings.
 	 * 

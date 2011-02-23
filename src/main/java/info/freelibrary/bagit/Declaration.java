@@ -36,7 +36,7 @@ class Declaration extends I18nObject {
 
 	private String myVersion;
 
-	Declaration() {
+	Declaration() throws IOException {
 		myVersion = VERSION;
 		myEncoding = ENCODING;
 	}
@@ -144,7 +144,7 @@ class Declaration extends I18nObject {
 			}
 		}
 		else {
-			write(); // We shouldn't be able to write an invalid file
+			writeToFile(); // We shouldn't be able to write an invalid file
 		}
 	}
 
@@ -175,7 +175,7 @@ class Declaration extends I18nObject {
 	 * @throws IOException If there is trouble writing the
 	 *         <code>bagit.txt</code> file
 	 */
-	void write() throws IOException {
+	void writeToFile() throws IOException {
 		File bagItTxt = new File(myBagDir, FILE_NAME);
 		BufferedFileWriter writer = null;
 

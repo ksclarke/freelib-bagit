@@ -12,6 +12,7 @@ FreeLib-BagIt's development is taking place on github:
 FreeLib-BagIt's project page (with test results, javadocs, etc.) is at:
     http://freelibrary.info/freelib-bagit/
 
+Note: This library is not ready for real use... it's still just in alpha stage
 ===============================================================================
 
 How to use FreeLib-BagIt:

@@ -201,8 +201,29 @@ public class BagValidator extends I18nObject {
 		if (!aBag.hasDeclaration()) {
 			throw new BagException(BagException.MISSING_BAGIT_TXT_FILE);
 		}
+		else {
+			try {
+				Declaration declaration = aBag.getDeclaration();
+				declaration.validate();
+				declaration.writeToFile();
+			}
+			catch (IOException details) {
+				throw new BagException("unable to write bagit.txt", details);
+			}
+		}
 
-		if (aBag.getManifest().countEntries() < 1) {
+		// We check actual files in the checkPayload method, run after this one
+		int entryCount = aBag.getManifest().countEntries();
+		int dataFileCount = aBag.getBagData().fileCount();
+
+		if (entryCount != dataFileCount) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug(getI18n(
+						"bagit.debug.file_count",
+						new String[] { Integer.toString(dataFileCount),
+								Integer.toString(entryCount) }));
+			}
+
 			throw new BagException(BagException.MISSING_MANIFEST);
 		}
 	}
@@ -217,7 +238,8 @@ public class BagValidator extends I18nObject {
 	 */
 	private void checkStructure(Bag aBag) throws BagException, IOException {
 		checkRequiredFiles(aBag);
-		checkPayload(aBag.getManifest(), new File(aBag.myDir, BagData.FILE_NAME));
+		checkPayload(aBag.getManifest(),
+				new File(aBag.myDir, BagData.FILE_NAME));
 		checkTagManifest(aBag.getTagManifest(), aBag.myDir);
 	}
 

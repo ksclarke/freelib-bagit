@@ -125,13 +125,6 @@ public class Bag extends I18nObject {
 					myBagIsOverwritten = true;
 				}
 				else {
-					String errorMessage = getI18n("bagit.unknown_mime_type",
-							new String[] { aBag.getAbsolutePath(), mimeType });
-
-					if (LOGGER.isErrorEnabled()) {
-						LOGGER.error(errorMessage);
-					}
-
 					try {
 						clean();
 					}
@@ -139,7 +132,8 @@ public class Bag extends I18nObject {
 						LOGGER.warn(throwable.getMessage());
 					}
 
-					throw new IOException(errorMessage);
+					throw new IOException(getI18n("bagit.unknown_mime_type",
+							new String[] { aBag.getAbsolutePath(), mimeType }));
 				}
 			}
 
@@ -163,6 +157,7 @@ public class Bag extends I18nObject {
 			}
 
 			myDeclaration = new Declaration();
+			myDeclaration.writeToFile();
 		}
 
 		myManifest = new PayloadManifest(myDir);
@@ -307,14 +302,17 @@ public class Bag extends I18nObject {
 	public Bag complete() throws IOException {
 		File dataDir = new File(myDir, BagData.FILE_NAME);
 
-		if (!dataDir.mkdir()) {
+		if (!dataDir.exists() && !dataDir.mkdirs()) {
 			throw new IOException(getI18n("bagit.dir_create", dataDir));
 		}
 
 		if (!hasDeclaration()) {
 			myDeclaration = new Declaration();
+			myDeclaration.writeToFile();
 		}
-		
+
+		getManifest().writeToFile();
+
 		return this;
 	}
 
@@ -433,7 +431,15 @@ public class Bag extends I18nObject {
 		DOMUtils.brokenUp(true); // pretty-print(ish) our XML
 
 		builder.append("<bag name=\"").append(myDir.getName()).append("\">");
-		builder.append(eol).append(getDeclaration().toString());
+		builder.append(eol);
+
+		try {
+			builder.append(getDeclaration().toString());
+		}
+		catch (IOException details) {
+			throw new RuntimeException(details);
+		}
+
 		builder.append(getBagInfo().toString());
 		builder.append(getManifest().toString());
 		builder.append(getTagManifest().toString());
@@ -493,7 +499,7 @@ public class Bag extends I18nObject {
 		return new File(tmpBagDir, aBagDir.getName());
 	}
 
-	private Declaration getDeclaration() {
+	Declaration getDeclaration() throws IOException {
 		if (myDeclaration == null) {
 			myDeclaration = new Declaration();
 		}
@@ -510,10 +516,28 @@ public class Bag extends I18nObject {
 	}
 
 	PayloadManifest getManifest() {
+		if (myManifest == null) {
+			try {
+				myManifest = new PayloadManifest(myDir);
+			}
+			catch (IOException details) {
+				throw new RuntimeException(details); // shouldn't happen
+			}
+		}
+
 		return myManifest;
 	}
 
 	TagManifest getTagManifest() {
+		if (myTagManifest == null) {
+			try {
+				myTagManifest = new TagManifest(myDir);
+			}
+			catch (IOException details) {
+				throw new RuntimeException(details); // shouldn't happen
+			}
+		}
+
 		return myTagManifest;
 	}
 
