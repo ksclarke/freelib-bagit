@@ -63,12 +63,11 @@ You can add data to the bag:
 
 And you can validate the bag:
 
-    Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
     BagValidator validator = new BagValidator();
-    ValidBag validBag;
+    Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
 
     try {
-        validBag = validator.validate(bag);
+        ValidBag validBag = validator.validate(bag);
     }
     catch (BagException details) {
         switch (details.getReason()) {
@@ -82,8 +81,8 @@ And you can validate the bag:
     
 or, simply, check a bag's validity:
 
-    Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
     BagValidator validator = new BagValidator();
+    Bag bag = new Bag("/home/kevin/dryad_630.tar.gz");
 
     if (validator.isValid(bag)) {
         System.out.println("Bag is valid");
@@ -94,8 +93,8 @@ or, simply, check a bag's validity:
     
 You can also write a valid bag to a compressed file for transport:
 
-    Bag bag = new Bag("/home/kevin/dryad_630");
     BagValidator validator = new BagValidator();
+    Bag bag = new Bag("/home/kevin/dryad_630");
 
     try {
         ValidBag validBag = validator.validate(bag);
