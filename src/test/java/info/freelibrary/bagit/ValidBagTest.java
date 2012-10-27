@@ -2,6 +2,9 @@ package info.freelibrary.bagit;
 
 import static org.junit.Assert.*;
 
+import info.freelibrary.util.FileUtils;
+
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.AfterClass;
@@ -23,7 +26,7 @@ public class ValidBagTest {
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		//FileUtils.delete(new File(WORK_DIR));
+		FileUtils.delete(new File(WORK_DIR));
 	}
 
 	@Test

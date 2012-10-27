@@ -48,7 +48,7 @@ public class ExamplesTest {
 		}
 	}
 	
-/*	@Test
+	@Test
 	public void testAddMetadata() {
 		try {
 			Bag bag = new Bag("new_bag_metadata");
@@ -156,5 +156,5 @@ public class ExamplesTest {
 		catch (IOException details) {
 			fail(details.getMessage());
 		}
-	}*/
+	}
 }
