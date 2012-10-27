@@ -48,7 +48,7 @@ public class ExamplesTest {
 		}
 	}
 	
-	@Test
+/*	@Test
 	public void testAddMetadata() {
 		try {
 			Bag bag = new Bag("new_bag_metadata");
@@ -98,16 +98,13 @@ public class ExamplesTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Test
 	public void testValidate() {
 		try {
 			Bag bag = new Bag("src/test/resources/bags/dryad_630.tar.gz");
-			BagValidator validator = new BagValidator();
-			ValidBag validBag;
 
 			try {
-				validBag = validator.validate(bag);
+				new BagValidator().validate(bag);
 			}
 			catch (BagException details) {
 				switch (details.getReason()) {
@@ -128,9 +125,8 @@ public class ExamplesTest {
 	public void testIsValid() {
 		try {
 			Bag bag = new Bag("src/test/resources/bags/dryad_630.tar.gz");
-			BagValidator validator = new BagValidator();
 
-			if (validator.isValid(bag)) {
+			if (new BagValidator().isValid(bag)) {
 				// do nothing...
 			}
 			else {
@@ -146,10 +142,9 @@ public class ExamplesTest {
 	public void testWriteBag() {
 		try {
 			Bag bag = new Bag("src/test/resources/bags/dryad_630");
-			BagValidator validator = new BagValidator();
 
 			try {
-				validator.validate(bag).toTarBZip2();
+				new BagValidator().validate(bag).toTarBZip2();
 			}
 			catch (BagException details) {
 				fail(details.getMessage());
@@ -161,5 +156,5 @@ public class ExamplesTest {
 		catch (IOException details) {
 			fail(details.getMessage());
 		}
-	}
+	}*/
 }

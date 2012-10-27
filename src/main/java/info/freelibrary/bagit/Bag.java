@@ -156,7 +156,7 @@ public class Bag extends I18nObject {
 				throw new IOException(getI18n("bagit.dir_create", myDir));
 			}
 
-			myDeclaration = new Declaration();
+			myDeclaration = new Declaration(myDir, false);
 			myDeclaration.writeToFile();
 		}
 
@@ -307,7 +307,7 @@ public class Bag extends I18nObject {
 		}
 
 		if (!hasDeclaration()) {
-			myDeclaration = new Declaration();
+			myDeclaration = new Declaration(myDir, false);
 			myDeclaration.writeToFile();
 		}
 
@@ -501,7 +501,7 @@ public class Bag extends I18nObject {
 
 	Declaration getDeclaration() throws IOException {
 		if (myDeclaration == null) {
-			myDeclaration = new Declaration();
+			myDeclaration = new Declaration(myDir, false);
 		}
 
 		return myDeclaration;

@@ -6,6 +6,7 @@
     </encoder>
   </appender>
 
+  <!-- <logger name="info.freelibrary.bagit.Bag" level="DEBUG"/> -->
   <!-- <logger name="info.freelibrary.bagit.BagDataTest" level="DEBUG"/> -->
 
   <logger name="ch.qos.logback" level="ERROR"/>

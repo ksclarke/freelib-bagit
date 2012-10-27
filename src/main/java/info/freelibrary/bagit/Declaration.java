@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 
 /**
- * A bag's required <code>BagIt</code> declaration. 
- *  
+ * A bag's required <code>BagIt</code> declaration.
+ * 
  * @author Kevin S. Clarke &lt;<a
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
@@ -36,9 +36,8 @@ class Declaration extends I18nObject {
 
 	private String myVersion;
 
-	Declaration() throws IOException {
-		myVersion = VERSION;
-		myEncoding = ENCODING;
+	Declaration(File aBagDir) throws IOException {
+		this(aBagDir, true);
 	}
 
 	/**
@@ -46,50 +45,56 @@ class Declaration extends I18nObject {
 	 * Contains tags necessary for bootstrapping the reading and processing of
 	 * the rest of a bag.
 	 * 
-	 * @param aBagDir The working directory of the declaration's
-	 *        <code>Bag</code>
-	 * @throws IOException If there is trouble writing the
-	 *         <code>BagItDeclaration</code>
+	 * @param aBagDir
+	 *            The working directory of the declaration's <code>Bag</code>
+	 * @throws IOException
+	 *             If there is trouble writing the <code>BagItDeclaration</code>
 	 */
-	Declaration(File aBagDir) throws IOException {
-		File bagItTxt = new File(aBagDir, FILE_NAME);
-
-		// Keep a reference to our working directory
+	Declaration(File aBagDir, boolean aExisting) throws IOException {
 		myBagDir = aBagDir;
+		
+		if (aExisting) {
+			File bagItTxt = new File(aBagDir, FILE_NAME);
 
-		if (!bagItTxt.exists()) {
-			throw new FileNotFoundException(bagItTxt.getAbsolutePath());
+			if (!bagItTxt.exists()) {
+				throw new FileNotFoundException(bagItTxt.getAbsolutePath());
+			}
+			else {
+				FileReader fileReader = new FileReader(bagItTxt);
+				LineNumberReader reader = null;
+				String line;
+
+				try {
+					reader = new LineNumberReader(
+							new BufferedReader(fileReader));
+
+					while ((line = reader.readLine()) != null) {
+						int start = line.indexOf(":") + 1;
+
+						if (reader.getLineNumber() == 1
+								&& line.startsWith(VERSION_TAG + ": ")) {
+							myVersion = line.substring(start).trim();
+						}
+						else if (reader.getLineNumber() == 2
+								&& line.startsWith(ENCODING_TAG + ": ")) {
+							myEncoding = line.substring(start).trim();
+						}
+						else {
+							// Spec says MUST consist of only two lines (above)
+							isValid = false;
+						}
+					}
+				}
+				finally {
+					if (reader != null) {
+						reader.close();
+					}
+				}
+			}
 		}
 		else {
-			FileReader fileReader = new FileReader(bagItTxt);
-			LineNumberReader reader = null;
-			String line;
-
-			try {
-				reader = new LineNumberReader(new BufferedReader(fileReader));
-
-				while ((line = reader.readLine()) != null) {
-					int start = line.indexOf(":") + 1;
-
-					if (reader.getLineNumber() == 1
-							&& line.startsWith(VERSION_TAG + ": ")) {
-						myVersion = line.substring(start).trim();
-					}
-					else if (reader.getLineNumber() == 2
-							&& line.startsWith(ENCODING_TAG + ": ")) {
-						myEncoding = line.substring(start).trim();
-					}
-					else {
-						// Spec says MUST consist of only two lines (above)
-						isValid = false;
-					}
-				}
-			}
-			finally {
-				if (reader != null) {
-					reader.close();
-				}
-			}
+			myVersion = VERSION;
+			myEncoding = ENCODING;
 		}
 	}
 
@@ -115,8 +120,9 @@ class Declaration extends I18nObject {
 	 * Attempts to validate this BagIt declaration. It throws a
 	 * <code>BagException</code> if there is a problem with it.
 	 * 
-	 * @throws BagException A problem preventing the declaration from being a
-	 *         valid BagIt declaration
+	 * @throws BagException
+	 *             A problem preventing the declaration from being a valid BagIt
+	 *             declaration
 	 */
 	void validate() throws BagException, IOException {
 		if (new File(myBagDir, FILE_NAME).exists()) {
@@ -172,8 +178,8 @@ class Declaration extends I18nObject {
 	 * write a new one. This method uses this library's defaults and will
 	 * overwrite a declaration from another bagit library.
 	 * 
-	 * @throws IOException If there is trouble writing the
-	 *         <code>bagit.txt</code> file
+	 * @throws IOException
+	 *             If there is trouble writing the <code>bagit.txt</code> file
 	 */
 	void writeToFile() throws IOException {
 		File bagItTxt = new File(myBagDir, FILE_NAME);
