@@ -57,7 +57,7 @@ public class BagPackagerTest extends I18nObject {
 
 	@Test
 	public void testFromTar() {
-		File tarFile = new File("src/test/resources/packager/dryad_630.tar");
+		File tarFile = new File("src/test/resources/packages/dryad_630.tar");
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(getI18n("bagit.test.starting_test", "testFromTar"));
@@ -76,13 +76,6 @@ public class BagPackagerTest extends I18nObject {
 			}
 
 			fail(throwable.getMessage());
-		}
-
-		if (!tarFile.delete()) {
-			fail(getI18n("bagit.test.failed_tar_delete", tarFile));
-		}
-		else if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.tar_deleted", tarFile));
 		}
 	}
 
@@ -110,7 +103,7 @@ public class BagPackagerTest extends I18nObject {
 
 	@Test
 	public void testFromZip() {
-		File zipFile = new File("src/test/resources/packager/dryad_630.zip");
+		File zipFile = new File("src/test/resources/packages/dryad_630.zip");
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(getI18n("bagit.test.starting_test", "testFromZip"));
@@ -129,13 +122,6 @@ public class BagPackagerTest extends I18nObject {
 			}
 
 			fail(throwable.getMessage());
-		}
-
-		if (!zipFile.delete()) {
-			fail(getI18n("bagit.test.failed_zip_delete", zipFile));
-		}
-		else if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.zip_deleted", zipFile));
 		}
 	}
 
@@ -160,7 +146,7 @@ public class BagPackagerTest extends I18nObject {
 	@Test
 	public void testFromTarBZip2() {
 		File tarBz2File = new File(
-				"src/test/resources/packager/dryad_630.tar.bz2");
+				"src/test/resources/packages/dryad_630.tar.bz2");
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER
@@ -181,13 +167,6 @@ public class BagPackagerTest extends I18nObject {
 			}
 
 			fail(throwable.getMessage());
-		}
-
-		if (!tarBz2File.delete()) {
-			fail(getI18n("bagit.test.failed_bz2_delete", tarBz2File));
-		}
-		else if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.bz2_deleted", tarBz2File));
 		}
 	}
 
@@ -212,7 +191,7 @@ public class BagPackagerTest extends I18nObject {
 	@Test
 	public void testFromTarGz() {
 		File tarGzFile = new File(
-				"src/test/resources/packager/dryad_630.tar.gz");
+				"src/test/resources/packages/dryad_630.tar.gz");
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(getI18n("bagit.test.starting_test", "testFromTarGz"));
@@ -231,13 +210,6 @@ public class BagPackagerTest extends I18nObject {
 			}
 
 			fail(throwable.getMessage());
-		}
-
-		if (!tarGzFile.delete()) {
-			fail(getI18n("bagit.test.failed_gz_delete", tarGzFile));
-		}
-		else if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.gz_deleted", tarGzFile));
 		}
 	}
 

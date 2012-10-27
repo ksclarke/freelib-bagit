@@ -85,15 +85,9 @@
 	<!-- Messages related to testing -->
 	<entry key="bagit.test.directory">Failed to notice BagIt directory was a file: {}</entry>
 	<entry key="bagit.test.tar_written">Tar file written to: {}</entry>
-	<entry key="bagit.test.failed_tar_delete">Failed to delete created tar file: {}</entry>
 	<entry key="bagit.test.failed_baginfo_delete">Failed to delete created bag-info.txt file:
 		{}</entry>
-	<entry key="bagit.test.tar_deleted">Tar file '{}' successfully deleted</entry>
 	<entry key="bagit.test.zip_written">Zip file written to: {}</entry>
-	<entry key="bagit.test.failed_zip_delete">Failed to delete created zip file: {}</entry>
-	<entry key="bagit.test.zip_deleted">Zip file '{}' successfully deleted</entry>
-	<entry key="bagit.test.bz2_deleted">Tar BZip2 file '{}' successfully deleted</entry>
-	<entry key="bagit.test.gz_deleted">Tar Gzip file '{}' successfully deleted</entry>
 	<entry key="bagit.test.created_bag">Created bag directory: {}</entry>
 	<entry key="bagit.test.starting_test">Starting test: {}</entry>
 	<entry key="bagit.test.bag_info_tag">Failed to find expected bag-info tag: {}</entry>
