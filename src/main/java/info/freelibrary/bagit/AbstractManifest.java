@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import info.freelibrary.util.BufferedFileReader;
 import info.freelibrary.util.BufferedFileWriter;
@@ -27,9 +26,6 @@ import info.freelibrary.util.StringUtils;
  *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
 abstract class AbstractManifest extends I18nObject {
-
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(AbstractManifest.class);
 
 	private static class Entry implements Comparable<Entry> {
 		private File myFile;
@@ -188,8 +184,9 @@ abstract class AbstractManifest extends I18nObject {
 	 * Gets the path of the supplied <code>File</code>, relative to the BagIt
 	 * working directory.
 	 * 
-	 * @param aFile A file to get the relative path of (relative to the working
-	 *        directory)
+	 * @param aFile
+	 *            A file to get the relative path of (relative to the working
+	 *            directory)
 	 */
 	private String getRelativePath(File aFile) {
 		int start = myBagDir.getAbsolutePath().length() + 1;
@@ -247,7 +244,8 @@ abstract class AbstractManifest extends I18nObject {
 	/**
 	 * Deletes the manifest file(s).
 	 * 
-	 * @throws IOException If there is trouble deleting the manifest file(s)
+	 * @throws IOException
+	 *             If there is trouble deleting the manifest file(s)
 	 */
 	void delete() throws IOException {
 		String pattern = StringUtils.formatMessage(getNamePattern(), "[.*]");
@@ -276,7 +274,8 @@ abstract class AbstractManifest extends I18nObject {
 	 * Writes the contents of the manifest to a file in the BagIt working
 	 * directory.
 	 * 
-	 * @throws IOException If there is a problem writing the manifest file
+	 * @throws IOException
+	 *             If there is a problem writing the manifest file
 	 */
 	void writeToFile() throws IOException {
 		File manifestFile = new File(myBagDir, myFileName);

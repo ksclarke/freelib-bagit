@@ -150,6 +150,8 @@ public class BagInfoTest extends I18nObject implements BagInfoConstants {
 			while ((line = reader.readLine()) != null) {
 				buffer.append(line).append(EOL);
 			}
+			
+			reader.close();
 
 			expected += "Organization-Address: FreeLibrary.INFO" + EOL;
 			expected += "Contact-Email: ksclarke@gmail.com" + EOL;

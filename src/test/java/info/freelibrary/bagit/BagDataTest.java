@@ -2,8 +2,10 @@ package info.freelibrary.bagit;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.StringUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -40,12 +42,13 @@ public class BagDataTest {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Running testGetAsUTF8StringString");
 		}
-		
+
 		try {
 			BagData data = myBag.getBagData();
 			String xml = data.getAsUTF8String("datafile-3/dryadfile-3.xml");
-			
-			if (!xml.startsWith("<?xml version") || !xml.endsWith("</DryadDataFile>")) {
+
+			if (!xml.startsWith("<?xml version")
+					|| !xml.endsWith("</DryadDataFile>")) {
 				Assert.fail(xml);
 			}
 		}
@@ -53,26 +56,40 @@ public class BagDataTest {
 			Assert.fail(details.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testGetFilePaths() {
+		String[] expected = new String[] { "dryadpub.xml",
+				"datafile-5/ApineOPSIN.nexus", "datafile-5/dryadfile-5.xml",
+				"datafile-1/ApineCYTB.nexus", "datafile-1/dryadfile-1.xml",
+				"dryadpkg.xml", "datafile-3/dryadfile-3.xml",
+				"datafile-3/Apine16S.nexus", "datafile-4/dryadfile-4.xml",
+				"datafile-4/Apine28S.nexus", "datafile-2/dryadfile-2.xml",
+				"datafile-2/ApineDNA.morph.nexus" };
+
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Running testGetFilePaths");
 		}
 
 		String[] paths = myBag.getBagData().getFilePaths();
 
-		Assert.assertArrayEquals(paths, new String[] { "dryadpub.xml",
-				"datafile-5/ApineOPSIN.nexus", "datafile-5/dryadfile-5.xml",
-				"datafile-1/ApineCYTB.nexus", "datafile-1/dryadfile-1.xml",
-				"dryadpkg.xml", "datafile-3/dryadfile-3.xml",
-				"datafile-3/Apine16S.nexus", "datafile-4/dryadfile-4.xml",
-				"datafile-4/Apine28S.nexus", "datafile-2/dryadfile-2.xml",
-				"datafile-2/ApineDNA.morph.nexus" });
+		Arrays.sort(paths);
+		Arrays.sort(expected);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Found paths: {}", StringUtils.toString(paths, '|'));
+		}
+
+		Assert.assertArrayEquals(paths, expected);
 	}
 
 	@Test
 	public void testGetFilePathsString() {
+		String[] expected = new String[] { "dryadpub.xml",
+				"datafile-5/dryadfile-5.xml", "datafile-1/dryadfile-1.xml",
+				"dryadpkg.xml", "datafile-3/dryadfile-3.xml",
+				"datafile-4/dryadfile-4.xml", "datafile-2/dryadfile-2.xml" };
+
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Running testGetFilePathsRegex");
 		}
@@ -80,14 +97,22 @@ public class BagDataTest {
 		BagData data = myBag.getBagData();
 		String[] paths = data.getFilePaths("^d.*");
 
-		Assert.assertArrayEquals(paths, new String[] { "dryadpub.xml",
-				"datafile-5/dryadfile-5.xml", "datafile-1/dryadfile-1.xml",
-				"dryadpkg.xml", "datafile-3/dryadfile-3.xml",
-				"datafile-4/dryadfile-4.xml", "datafile-2/dryadfile-2.xml" });
+		Arrays.sort(paths);
+		Arrays.sort(expected);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Found paths: {}", StringUtils.toString(paths, '|'));
+		}
+
+		Assert.assertArrayEquals(paths, expected);
 	}
 
 	@Test
 	public void testGetFilePathsStringString() {
+		String[] expected = new String[] { "datafile-5/dryadfile-5.xml",
+				"datafile-1/dryadfile-1.xml", "datafile-3/dryadfile-3.xml",
+				"datafile-4/dryadfile-4.xml", "datafile-2/dryadfile-2.xml" };
+
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Running testGetFilePathsRegexRegex");
 		}
@@ -95,9 +120,13 @@ public class BagDataTest {
 		BagData data = myBag.getBagData();
 		String[] paths = data.getFilePaths("^datafile.*", ".*\\.xml");
 
-		Assert.assertArrayEquals(paths, new String[] {
-				"datafile-5/dryadfile-5.xml", "datafile-1/dryadfile-1.xml",
-				"datafile-3/dryadfile-3.xml", "datafile-4/dryadfile-4.xml",
-				"datafile-2/dryadfile-2.xml" });
+		Arrays.sort(paths);
+		Arrays.sort(expected);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Found paths: {}", StringUtils.toString(paths, '|'));
+		}
+
+		Assert.assertArrayEquals(paths, expected);
 	}
 }
