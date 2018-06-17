@@ -1,11 +1,5 @@
-package info.freelibrary.bagit;
 
-import info.freelibrary.util.FileUtils;
-import info.freelibrary.util.I18nObject;
-import info.freelibrary.util.IOUtils;
-import info.freelibrary.util.RegexFileFilter;
-import info.freelibrary.util.bzip2.CBZip2InputStream;
-import info.freelibrary.util.bzip2.CBZip2OutputStream;
+package info.freelibrary.bagit;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,352 +7,379 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 import org.xeustechnologies.jtar.TarOutputStream;
 
+import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.IOUtils;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.RegexFileFilter;
+
 /**
  * A bag packager that prepares bags for transmission.
- * 
- * @author Kevin S. Clarke &lt;<a
- *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
-class BagPackager extends I18nObject {
+final class BagPackager {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BagPackager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagPackager.class, Constants.BUNDLE_NAME);
 
-	private static final BagPackager PKGR = new BagPackager();
+    private static final String PATTERN = ".*";
 
-	private BagPackager() {}
+    private static final String TAR_EXT = ".tar";
 
-	static File toTarBZip2(Bag aBag) throws FileNotFoundException, IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar_bz2", aBag.myDir));
-		}
+    private static final String ZIP_EXT = ".zip";
 
-		File tarFile = toTar(aBag);
-		File newFile = getNewFile(aBag.myDir);
-		String fileName = newFile.getName() + ".tar.bz2";
-		File tarBz2File = new File(newFile.getParentFile(), fileName);
-		CBZip2OutputStream bz2Stream = null;
-		FileOutputStream outStream = null;
-		FileInputStream inStream = null;
+    private BagPackager() {
+        super();
+    }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.to_bz2", tarFile));
-		}
+    static File toTarBZip2(final Bag aBag) throws FileNotFoundException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_039, aBag.myDir);
+        }
 
-		try {
-			outStream = new FileOutputStream(tarBz2File);
-			inStream = new FileInputStream(tarFile);
-			bz2Stream = new CBZip2OutputStream(outStream);
+        final File newFile = getNewFile(aBag.myDir);
+        final File parent = newFile.getParentFile();
 
-			IOUtils.copyStream(inStream, bz2Stream);
-		}
-		finally {
-			IOUtils.closeQuietly(inStream);
-			IOUtils.closeQuietly(bz2Stream);
-		}
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+        }
 
-		if (!tarFile.delete()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.tar_delete", tarFile));
-		}
+        final File tarFile = toTar(aBag);
+        final String fileName = newFile.getName() + ".tar.bz2";
+        final File tarBz2File = new File(parent, fileName);
 
-		return tarBz2File;
-	}
+        BZip2CompressorOutputStream bz2Stream = null;
+        FileOutputStream outStream = null;
+        FileInputStream inStream = null;
 
-	static Bag fromTarBZip2(File aBZip2File) throws FileNotFoundException,
-			IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar_bz2", aBZip2File));
-		}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_044, tarFile);
+        }
 
-		File newFile = getNewFile(aBZip2File);
-		String fileName = newFile.getName() + ".tar";
-		File tarFile = new File(newFile.getParentFile(), fileName);
-		FileInputStream fileInputStream = new FileInputStream(aBZip2File);
-		CBZip2InputStream bz2Stream = new CBZip2InputStream(fileInputStream);
-		FileOutputStream fileOutputStream = new FileOutputStream(tarFile);
-		IOUtils.copyStream(bz2Stream, fileOutputStream);
-		Bag bag = fromTar(tarFile);
+        try {
+            outStream = new FileOutputStream(tarBz2File);
+            inStream = new FileInputStream(tarFile);
+            bz2Stream = new BZip2CompressorOutputStream(outStream);
 
-		if (!tarFile.delete() && LOGGER.isWarnEnabled()) {
-			LOGGER.warn(PKGR.getI18n("bagit.debug.tar_delete", tarFile));
-		}
+            IOUtils.copyStream(inStream, bz2Stream);
+        } finally {
+            IOUtils.closeQuietly(inStream);
+            IOUtils.closeQuietly(bz2Stream);
+        }
 
-		return bag;
-	}
+        if (!tarFile.delete()) {
+            LOGGER.debug(MessageCodes.BAGIT_045, tarFile);
+        }
 
-	static File toZip(Bag aBag) throws FileNotFoundException, IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.to_zip", aBag.myDir));
-		}
+        return tarBz2File;
+    }
 
-		File newFile = getNewFile(aBag.myDir);
-		String fileName = newFile.getName() + ".zip";
-		File zipFile = new File(newFile.getParentFile(), fileName);
-		FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
-		ZipOutputStream zipStream = new ZipOutputStream(fileOutputStream);
-		FilenameFilter filter = new RegexFileFilter(".*");
-		File[] files = FileUtils.listFiles(aBag.myDir, filter, true);
+    static Bag fromTarBZip2(final File aBZip2File) throws FileNotFoundException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_038, aBZip2File);
+        }
 
-		for (File file : files) {
-			String entryName = getEntryName(aBag.myDir, file);
+        final File newFile = getNewFile(aBZip2File);
+        final File parent = newFile.getParentFile();
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(PKGR.getI18n("bagit.debug.writing_zip_entry",
-						entryName));
-			}
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+        }
 
-			zipStream.putNextEntry(new ZipEntry(entryName));
-			
-			FileInputStream inputStream = new FileInputStream(file);
-			
-			try {
-				IOUtils.copyStream(inputStream, zipStream);
-			}
-			finally {
-				IOUtils.closeQuietly(inputStream);
-			}
-		}
+        final String fileName = newFile.getName() + TAR_EXT;
+        final File tarFile = new File(newFile.getParentFile(), fileName);
+        final FileInputStream fileInputStream = new FileInputStream(aBZip2File);
+        final BZip2CompressorInputStream bz2Stream = new BZip2CompressorInputStream(fileInputStream);
+        final FileOutputStream fileOutputStream = new FileOutputStream(tarFile);
+        IOUtils.copyStream(bz2Stream, fileOutputStream);
+        final Bag bag = fromTar(tarFile);
 
-		IOUtils.closeQuietly(zipStream);
+        if (!tarFile.delete() && LOGGER.isWarnEnabled()) {
+            LOGGER.warn(MessageCodes.BAGIT_045, tarFile);
+        }
 
-		return zipFile;
-	}
+        return bag;
+    }
 
-	static Bag fromZip(File aZipFile) throws FileNotFoundException, IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.from_zip", aZipFile));
-		}
+    static File toZip(final Bag aBag) throws FileNotFoundException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_041, aBag.myDir);
+        }
 
-		File bagDir = getNewFile(aZipFile);
-		File workDir = bagDir.getParentFile(); // get parent b/c zip has dir
-		FileInputStream fileInputStream = new FileInputStream(aZipFile);
-		ZipInputStream zipStream = new ZipInputStream(fileInputStream);
-		ZipEntry entry;
+        final File newFile = getNewFile(aBag.myDir);
+        final File parent = newFile.getParentFile();
 
-		while ((entry = zipStream.getNextEntry()) != null) {
-			if (entry.isDirectory()) {
-				continue; // We create dirs for files; no empty dirs allowed
-			}
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+        }
 
-			String entryName = entry.getName();
-			File file = new File(workDir, entryName);
-			File parent = file.getParentFile();
+        final String fileName = newFile.getName() + ZIP_EXT;
+        final File zipFile = new File(parent, fileName);
+        final FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
+        final ZipOutputStream zipStream = new ZipOutputStream(fileOutputStream);
+        final FilenameFilter filter = new RegexFileFilter(PATTERN);
+        final File[] files = FileUtils.listFiles(aBag.myDir, filter, true);
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(PKGR.getI18n("bagit.debug.reading_zip_entry",
-						new String[] { entryName, file.getAbsolutePath() }));
-			}
+        for (final File file : files) {
+            final String entryName = getEntryName(aBag.myDir, file);
 
-			// Create the dirs needed for file
-			if (!parent.exists() && !parent.mkdirs()) {
-				throw new IOException(PKGR.getI18n("bagit.dir_create", parent));
-			}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_047, entryName);
+            }
 
-			FileOutputStream outputStream = new FileOutputStream(file);
-			
-			try {
-				IOUtils.copyStream(zipStream, outputStream);
-			}
-			finally {
-				IOUtils.closeQuietly(outputStream);
-			}
-		}
+            zipStream.putNextEntry(new ZipEntry(entryName));
 
-		return new Bag(bagDir, true);
-	}
+            final FileInputStream inputStream = new FileInputStream(file);
 
-	static File toTar(Bag aBag) throws FileNotFoundException, IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar", aBag.myDir));
-		}
+            try {
+                IOUtils.copyStream(inputStream, zipStream);
+            } finally {
+                IOUtils.closeQuietly(inputStream);
+            }
+        }
 
-		File newFile = getNewFile(aBag.myDir);
-		String fileName = newFile.getName() + ".tar";
-		File tarFile = new File(newFile.getParentFile(), fileName);
-		FileOutputStream tarStream = new FileOutputStream(tarFile);
-		TarOutputStream outputStream = new TarOutputStream(tarStream);
-		FilenameFilter filter = new RegexFileFilter(".*");
-		File[] files = FileUtils.listFiles(aBag.myDir, filter, true);
+        IOUtils.closeQuietly(zipStream);
 
-		for (File file : files) {
-			String entryName = getEntryName(aBag.myDir, file);
+        return zipFile;
+    }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(PKGR.getI18n("bagit.debug.writing_tar_entry",
-						entryName));
-			}
+    static Bag fromZip(final File aZipFile) throws FileNotFoundException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_040, aZipFile);
+        }
 
-			outputStream.putNextEntry(new TarEntry(file, entryName));
-			
-			FileInputStream inputStream = new FileInputStream(file);
-			
-			try {
-				IOUtils.copyStream(inputStream, outputStream);
-			}
-			finally {
-				IOUtils.closeQuietly(inputStream);
-			}
-		}
+        final File bagDir = getNewFile(aZipFile);
+        final File workDir = bagDir.getParentFile(); // get parent b/c zip has dir
+        final FileInputStream fileInputStream = new FileInputStream(aZipFile);
+        final ZipInputStream zipStream = new ZipInputStream(fileInputStream);
+        ZipEntry entry;
 
-		IOUtils.closeQuietly(outputStream);
+        while ((entry = zipStream.getNextEntry()) != null) {
+            if (entry.isDirectory()) {
+                continue; // We create dirs for files; no empty dirs allowed
+            }
 
-		return tarFile;
-	}
+            final String entryName = entry.getName();
+            final File file = new File(workDir, entryName);
+            final File parent = file.getParentFile();
 
-	static Bag fromTar(File aTarFile) throws FileNotFoundException, IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar", aTarFile));
-		}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_065, entryName, file.getAbsolutePath());
+            }
 
-		File bagDir = getNewFile(aTarFile);
-		File workDir = bagDir.getParentFile(); // get parent b/c tar has dir
+            if (!parent.exists() && !parent.mkdirs()) {
+                throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+            }
 
-		FileInputStream fileStream = new FileInputStream(aTarFile);
-		TarInputStream tarStream = new TarInputStream(fileStream);
-		TarEntry entry;
+            final FileOutputStream outputStream = new FileOutputStream(file);
 
-		while ((entry = tarStream.getNextEntry()) != null) {
-			if (entry.isDirectory()) {
-				continue; // We create dirs for files; no empty dirs allowed
-			}
+            try {
+                IOUtils.copyStream(zipStream, outputStream);
+            } finally {
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
 
-			String entryName = entry.getName();
-			File file = new File(workDir, entryName);
-			File parent = file.getParentFile();
+        return new Bag(bagDir, true);
+    }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(PKGR.getI18n("bagit.debug.reading_tar_entry",
-						new String[] { entryName, file.getAbsolutePath() }));
-			}
+    static File toTar(final Bag aBag) throws FileNotFoundException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_043, aBag.myDir);
+        }
 
-			// Create the dirs needed for file
-			if (!parent.exists() && !parent.mkdirs()) {
-				throw new IOException(PKGR.getI18n("bagit.dir_create", parent));
-			}
+        final File newFile = getNewFile(aBag.myDir);
+        final File parent = newFile.getParentFile();
 
-			FileOutputStream outputStream = new FileOutputStream(file);
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+        }
 
-			try {
-				IOUtils.copyStream(tarStream, outputStream);
-			}
-			finally {
-				IOUtils.closeQuietly(outputStream);
-			}
-		}
+        final String fileName = newFile.getName() + TAR_EXT;
+        final File tarFile = new File(newFile.getParentFile(), fileName);
+        final FileOutputStream tarStream = new FileOutputStream(tarFile);
+        final TarOutputStream outputStream = new TarOutputStream(tarStream);
+        final FilenameFilter filter = new RegexFileFilter(PATTERN);
+        final File[] files = FileUtils.listFiles(aBag.myDir, filter, true);
 
-		return new Bag(bagDir, true);
-	}
+        for (final File file : files) {
+            final String entryName = getEntryName(aBag.myDir, file);
 
-	static File toTarGz(Bag aBag) throws IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.to_tar_gz", aBag.myDir));
-		}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_046, entryName);
+            }
 
-		File newFile = getNewFile(aBag.myDir);
-		String fileName = newFile.getName() + ".tar.gz";
-		File tarGzipFile = new File(newFile.getParentFile(), fileName);
-		FileOutputStream tarStream = new FileOutputStream(tarGzipFile);
-		GZIPOutputStream gzipStream = null;
-		FileInputStream inStream = null;
+            outputStream.putNextEntry(new TarEntry(file, entryName));
 
-		try {
-			gzipStream = new GZIPOutputStream(tarStream);
-			inStream = new FileInputStream(toTar(aBag));
+            final FileInputStream inputStream = new FileInputStream(file);
 
-			IOUtils.copyStream(inStream, gzipStream);
-		}
-		finally {
-			IOUtils.closeQuietly(inStream);
-			IOUtils.closeQuietly(gzipStream);
-		}
+            try {
+                IOUtils.copyStream(inputStream, outputStream);
+            } finally {
+                IOUtils.closeQuietly(inputStream);
+            }
+        }
 
-		return tarGzipFile;
-	}
+        IOUtils.closeQuietly(outputStream);
 
-	/**
-	 * Takes a bag in a tar gzip file and unpacks it into a Bag object.
-	 * 
-	 * @param aTarGzipFile
-	 * @return A <code>Bag</code> object
-	 * @throws IOException
-	 */
-	static Bag fromTarGz(File aTarGzipFile) throws IOException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.from_tar_gz", aTarGzipFile));
-		}
+        return tarFile;
+    }
 
-		File newFile = getNewFile(aTarGzipFile);
-		String fileName = newFile.getName() + ".tar";
-		File tarFile = new File(newFile.getParentFile(), fileName);
-		FileInputStream inStream = new FileInputStream(aTarGzipFile);
-		GZIPInputStream gzipStream = new GZIPInputStream(inStream);
-		FileOutputStream tarStream = new FileOutputStream(tarFile);
-		IOUtils.copyStream(gzipStream, tarStream);
-		Bag bag = fromTar(tarFile);
+    static Bag fromTar(final File aTarFile) throws FileNotFoundException, IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_042, aTarFile);
+        }
 
-		if (!tarFile.delete() && LOGGER.isWarnEnabled()) {
-			LOGGER.warn(PKGR.getI18n("bagit.debug.tar_delete", tarFile));
-		}
+        final File bagDir = getNewFile(aTarFile);
+        final File workDir = bagDir.getParentFile(); // get parent b/c tar has dir
 
-		return bag;
-	}
+        final FileInputStream fileStream = new FileInputStream(aTarFile);
+        final TarInputStream tarStream = new TarInputStream(fileStream);
+        TarEntry entry;
 
-	/**
-	 * Gets the file name relative to the path that is being put into the tar.
-	 * file.
-	 * 
-	 * @param aRoot A directory serving as the tar file's root directory
-	 * @param aFile A file to be put into the tar file
-	 * @return The path of the file to be included, relative to the tar's root
-	 */
-	private static String getEntryName(File aRoot, File aFile) {
-		String context = aRoot.getParentFile().getAbsolutePath();
-		return aFile.getAbsolutePath().substring(context.length() + 1);
-	}
+        while ((entry = tarStream.getNextEntry()) != null) {
+            if (entry.isDirectory()) {
+                continue; // We create dirs for files; no empty dirs allowed
+            }
 
-	/**
-	 * Returns a file stub for the supplied file; the stub may need to be
-	 * adjusted to add a '.tar', '.tar.gz', '.zip', '.tar.bz2', etc.
-	 * 
-	 * @param aFile A file from which to create our new file
-	 * @return A new file stub we can use to create a new file
-	 */
-	private static File getNewFile(File aFile) {
-		String workDir = System.getProperty(Bag.WORK_DIR);
-		String fileName = aFile.getName();
-		int end = fileName.indexOf(".");
-		File newFile;
+            final String entryName = entry.getName();
+            final File file = new File(workDir, entryName);
+            final File parent = file.getParentFile();
 
-		if (end != -1) {
-			fileName = fileName.substring(0, end);
-		}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_066, entryName, file.getAbsolutePath());
+            }
 
-		if (workDir != null) {
-			newFile = new File(workDir, fileName);
-		}
-		else {
-			newFile = new File(aFile.getParentFile(), fileName);
-		}
+            if (!parent.exists() && !parent.mkdirs()) {
+                throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+            }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(PKGR.getI18n("bagit.debug.get_new_file", newFile));
-		}
+            final FileOutputStream outputStream = new FileOutputStream(file);
 
-		return newFile;
-	}
+            try {
+                IOUtils.copyStream(tarStream, outputStream);
+            } finally {
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
 
+        return new Bag(bagDir, true);
+    }
+
+    static File toTarGz(final Bag aBag) throws IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_068, aBag.myDir);
+        }
+
+        final File newFile = getNewFile(aBag.myDir);
+        final File parent = newFile.getParentFile();
+
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+        }
+
+        final String fileName = newFile.getName() + ".tar.gz";
+        final File tarGzipFile = new File(newFile.getParentFile(), fileName);
+        final FileOutputStream tarStream = new FileOutputStream(tarGzipFile);
+        GZIPOutputStream gzipStream = null;
+        FileInputStream inStream = null;
+
+        try {
+            gzipStream = new GZIPOutputStream(tarStream);
+            inStream = new FileInputStream(toTar(aBag));
+
+            IOUtils.copyStream(inStream, gzipStream);
+        } finally {
+            IOUtils.closeQuietly(inStream);
+            IOUtils.closeQuietly(gzipStream);
+        }
+
+        return tarGzipFile;
+    }
+
+    /**
+     * Takes a bag in a tar gzip file and unpacks it into a Bag object.
+     *
+     * @param aTarGzipFile
+     * @return A <code>Bag</code> object
+     * @throws IOException
+     */
+    static Bag fromTarGz(final File aTarGzipFile) throws IOException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_067, aTarGzipFile);
+        }
+
+        final File newFile = getNewFile(aTarGzipFile);
+        final File parent = newFile.getParentFile();
+
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_005, parent));
+        }
+
+        final String fileName = newFile.getName() + TAR_EXT;
+        final File tarFile = new File(newFile.getParentFile(), fileName);
+        final FileInputStream inStream = new FileInputStream(aTarGzipFile);
+        final GZIPInputStream gzipStream = new GZIPInputStream(inStream);
+        final FileOutputStream tarStream = new FileOutputStream(tarFile);
+        IOUtils.copyStream(gzipStream, tarStream);
+        final Bag bag = fromTar(tarFile);
+
+        if (!tarFile.delete() && LOGGER.isWarnEnabled()) {
+            LOGGER.warn(MessageCodes.BAGIT_045, tarFile);
+        }
+
+        return bag;
+    }
+
+    /**
+     * Gets the file name relative to the path that is being put into the tar. file.
+     *
+     * @param aRoot A directory serving as the tar file's root directory
+     * @param aFile A file to be put into the tar file
+     * @return The path of the file to be included, relative to the tar's root
+     */
+    private static String getEntryName(final File aRoot, final File aFile) {
+        final String context = aRoot.getParentFile().getAbsolutePath();
+        return aFile.getAbsolutePath().substring(context.length() + 1);
+    }
+
+    /**
+     * Returns a file stub for the supplied file; the stub may need to be adjusted to add a '.tar', '.tar.gz', '.zip',
+     * '.tar.bz2', etc.
+     *
+     * @param aFile A file from which to create our new file
+     * @return A new file stub we can use to create a new file
+     */
+    private static File getNewFile(final File aFile) {
+        final String workDir = System.getProperty(Bag.WORK_DIR);
+        String fileName = aFile.getName();
+        final int end = fileName.indexOf('.');
+        final File newFile;
+
+        if (end != -1) {
+            fileName = fileName.substring(0, end);
+        }
+
+        if (workDir != null) {
+            newFile = new File(workDir, fileName);
+        } else {
+            newFile = new File(aFile.getParentFile(), fileName);
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_048, newFile);
+        }
+
+        return newFile;
+    }
 }

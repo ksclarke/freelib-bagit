@@ -1,106 +1,107 @@
+
 package info.freelibrary.bagit;
 
-import static org.junit.Assert.*;
-
-import info.freelibrary.util.FileUtils;
-import info.freelibrary.util.I18nObject;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.BeforeClass;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 
-public class BagValidatorTest extends I18nObject {
+public class BagValidatorTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BagTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagValidatorTest.class, Constants.BUNDLE_NAME);
 
-	private static final String BAGS_DIR = "src/test/resources/bags/";
+    private static final String BAGS_DIR = "src/test/resources/bags/";
 
-	private static final String BAGS_TEST_DIR = "src/test/resources/bagTests";
+    private static final String BAGS_TEST_DIR = "target/tests/bag-validator-tests";
 
-	private static BagValidator VALIDATOR;
+    private static BagValidator VALIDATOR;
 
-	@BeforeClass
-	public static void oneTimeSetUp() throws Exception {
-		System.setProperty(Bag.WORK_DIR, BAGS_TEST_DIR);
-		VALIDATOR = new BagValidator();
-	}
+    /**
+     * Setup for running tests.
+     *
+     * @throws Exception If the setup fails
+     */
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
+        System.setProperty(Bag.WORK_DIR, BAGS_TEST_DIR);
+        VALIDATOR = new BagValidator();
+    }
 
-	@AfterClass
-	public static void oneTimeTearDown() throws Exception {
-		FileUtils.delete(new File(BAGS_TEST_DIR));
-	}
+    /**
+     * Cleanup after running tests.
+     *
+     * @throws Exception If the cleanup fails
+     */
+    @AfterClass
+    public static void oneTimeTearDown() throws Exception {
+        FileUtils.delete(new File(BAGS_TEST_DIR));
+    }
 
-	@Test
-	public void testCheckPayloadDataFiles() {
-		try {
-			Bag bag = new Bag(BAGS_DIR + "dryad_632");
-			VALIDATOR.validate(bag);
-		}
-		catch (IOException details) {
-			fail(details.getMessage());
-		}
-		catch (BagException details) {
-			if (!(details.getReason() == BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR)) {
-				fail(getI18n("bagit.test.failed", details.getMessage()));
-			}
-			else {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.test.expected",
-							details.getMessage()));
-				}
-			}
-		}
-	}
+    /**
+     * Tests checking payload data files.
+     */
+    @Test
+    public void testCheckPayloadDataFiles() {
+        try {
+            final Bag bag = new Bag(BAGS_DIR + "dryad_632");
+            VALIDATOR.validate(bag);
+        } catch (final IOException details) {
+            fail(details.getMessage());
+        } catch (final BagException details) {
+            if (!details.getMessage().equals(LOGGER.getMessage(MessageCodes.BAGIT_018))) {
+                fail(LOGGER.getMessage(MessageCodes.BAGIT_062, details.getMessage()));
+            }
+        }
+    }
 
-	@Test
-	public void testCheckPayloadDataFileCount() {
-		try {
-			Bag bag = new Bag(BAGS_DIR + "dryad_631");
-			VALIDATOR.validate(bag);
-			fail(getI18n("bagit.test.file_mismatch"));
-		}
-		catch (IOException details) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(details.getMessage(), details);
-			}
+    @Test
+    public void testCheckPayloadDataFileCount() {
+        try {
+            final Bag bag = new Bag(BAGS_DIR + "dryad_631");
+            VALIDATOR.validate(bag);
+            fail(LOGGER.getMessage(MessageCodes.BAGIT_018));
+        } catch (final IOException details) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(details.getMessage(), details);
+            }
 
-			fail(details.getMessage());
-		}
-		catch (BagException details) {
-			String message = details.getMessage();
+            fail(details.getMessage());
+        } catch (final BagException details) {
+            final String message = details.getMessage();
 
-			if (!(details.getReason() == BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR)) {
-				// This is a successful catch....
-			}
-			else {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.test.expected", message));
-				}
+            if (!details.getMessage().equals(LOGGER.getMessage(MessageCodes.BAGIT_018))) {
+                // This is a successful catch....
+            } else {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(MessageCodes.BAGIT_064, message);
+                }
 
-				fail(message);
-			}
-		}
-	}
+                fail(message);
+            }
+        }
+    }
 
-	@Test
-	public void testIsComplete() {
-		// fail("Not yet implemented");
-	}
+    @Test
+    public void testIsComplete() {
+        // fail("Not yet implemented");
+    }
 
-	@Test
-	public void testIsValid() {
-		// fail("Not yet implemented");
-	}
+    @Test
+    public void testIsValid() {
+        // fail("Not yet implemented");
+    }
 
-	@Test
-	public void testValidate() {
-		// fail("Not yet implemented");
-	}
+    @Test
+    public void testValidate() {
+        // fail("Not yet implemented");
+    }
 
 }

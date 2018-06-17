@@ -1,9 +1,8 @@
+
 package info.freelibrary.bagit;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
-
-import info.freelibrary.util.I18nObject;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,184 +14,213 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 
-public class BagInfoTest extends I18nObject implements BagInfoConstants {
+public class BagInfoTest {
 
-	private static final String EOL = System.getProperty("line.separator");
+    private static final String EOL = System.getProperty("line.separator");
 
-	private static final String DIR_PATH = "src/test/resources/bagInfo/";
+    private static final String WORK_DIR = "target/tests/bag-info-tests";
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BagInfoTest.class);
+    private static final String EMAIL = "ksclarke@ksclarke.io";
 
-	@AfterClass
-	public static void oneTimeTearDown() throws Exception {
-		new File(DIR_PATH).delete();
-	}
-	
-	@BeforeClass
-	public static void oneTimeSetUp() throws Exception {
-		new File(DIR_PATH).mkdirs();
-	}
-	
-	@Test
-	public void testBagInfoProperties() {
-		Properties properties = new Properties();
-		BagInfo bagInfo;
+    private static final String NAME = "Kevin S. Clarke";
 
-		properties.setProperty(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		properties.setProperty(CONTACT_NAME_TAG, "Kevin S. Clarke");
-		properties.setProperty(SOURCE_ORG_TAG, "FreeLibrary.INFO");
+    private static final String ORG = "FreeLibrary.INFO";
 
-		bagInfo = new BagInfo(properties);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagInfoTest.class, Constants.BUNDLE_NAME);
 
-		assertEquals(bagInfo.getValue(CONTACT_EMAIL_TAG), "ksclarke@gmail.com");
-		assertEquals(bagInfo.getValue(CONTACT_NAME_TAG), "Kevin S. Clarke");
-		assertEquals(bagInfo.getValue(SOURCE_ORG_TAG), "FreeLibrary.INFO");
+    /**
+     * Cleans up after tests.
+     *
+     * @throws Exception If there is trouble cleaning up
+     */
+    @AfterClass
+    public static void oneTimeTearDown() throws Exception {
+        new File(WORK_DIR).delete();
+    }
 
-		assertEquals(3, bagInfo.countTags());
-	}
+    /**
+     * Sets up the tests.
+     *
+     * @throws Exception If there is trouble setting up for the tests
+     */
+    @BeforeClass
+    public static void oneTimeSetUp() throws Exception {
+        new File(WORK_DIR).mkdirs();
+    }
 
-	@Test
-	public void testSetMetadata() {
-		BagInfo bagInfo = new BagInfo();
+    /**
+     * Tests creating bag info from properties.
+     */
+    @Test
+    public void testBagInfoProperties() {
+        final Properties properties = new Properties();
+        final BagInfo bagInfo;
 
-		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		bagInfo.addMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
+        properties.setProperty(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        properties.setProperty(BagInfoTags.CONTACT_NAME_TAG, NAME);
+        properties.setProperty(BagInfoTags.SOURCE_ORG_TAG, ORG);
 
-		assertEquals(bagInfo.getValue(CONTACT_EMAIL_TAG), "ksclarke@gmail.com");
-		assertEquals(bagInfo.getValue(CONTACT_NAME_TAG), "Kevin S. Clarke");
-		assertEquals(bagInfo.countTags(), 2);
-	}
+        bagInfo = new BagInfo(properties);
 
-	@Test
-	public void testGetValueString() {
-		String emailAddress = "ksclarke@gmail.com";
-		BagInfo bagInfo = new BagInfo();
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG), EMAIL);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_NAME_TAG), NAME);
+        assertEquals(bagInfo.getValue(BagInfoTags.SOURCE_ORG_TAG), ORG);
 
-		bagInfo.addMetadata(CONTACT_EMAIL_TAG, emailAddress);
-		assertEquals(emailAddress, bagInfo.getValue(CONTACT_EMAIL_TAG));
-	}
+        assertEquals(3, bagInfo.countTags());
+    }
 
-	@Test
-	public void testRemoveMetadata() {
-		BagInfo bagInfo = new BagInfo();
-		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		assertEquals(bagInfo.countTags(), 1);
-		bagInfo.removeMetadata(CONTACT_EMAIL_TAG);
-		assertEquals(bagInfo.countTags(), 0);
-	}
+    /**
+     * Tests setting metadata.
+     */
+    @Test
+    public void testSetMetadata() {
+        final BagInfo bagInfo = new BagInfo();
 
-	@Test
-	public void testGetValueStringString() {
-		String emailAddress1 = "ksclarke@gmail.com";
-		String emailAddress2 = "thetrashcan@gmail.com";
-		BagInfo bagInfo = new BagInfo();
-		String result;
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, NAME);
 
-		bagInfo.addMetadata(CONTACT_EMAIL_TAG, emailAddress1);
-		result = bagInfo.getValue(CONTACT_EMAIL_TAG, emailAddress2);
-		assertEquals(result, emailAddress1);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG), EMAIL);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_NAME_TAG), NAME);
+        assertEquals(bagInfo.countTags(), 2);
+    }
 
-		bagInfo.removeMetadata(CONTACT_EMAIL_TAG);
-		result = bagInfo.getValue(CONTACT_EMAIL_TAG, emailAddress2);
-		assertEquals(result, emailAddress2);
-	}
+    /**
+     * Tests getting value.
+     */
+    @Test
+    public void testGetValueString() {
+        final BagInfo bagInfo = new BagInfo();
 
-	@Test
-	public void testGetTags() {
-		BagInfo bagInfo = new BagInfo();
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        assertEquals(EMAIL, bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG));
+    }
 
-		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		bagInfo.addMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
-		bagInfo.addMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
-		assertEquals(3, bagInfo.countTags());
+    /**
+     * Tests removing metadata.
+     */
+    @Test
+    public void testRemoveMetadata() {
+        final BagInfo bagInfo = new BagInfo();
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        assertEquals(bagInfo.countTags(), 1);
+        bagInfo.removeMetadata(BagInfoTags.CONTACT_EMAIL_TAG);
+        assertEquals(bagInfo.countTags(), 0);
+    }
 
-		String[] tags = bagInfo.getTags();
+    /**
+     * Tests getting value.
+     */
+    @Test
+    public void testGetValueStringString() {
+        final String email = "thetrashcan@gmail.com";
+        final BagInfo bagInfo = new BagInfo();
+        String result;
 
-		for (String tag : tags) {
-			if (!bagInfo.containsTag(tag)) {
-				fail(getI18n("bagit.test.bag_info_tag", tag));
-			}
-		}
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        result = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG, email);
+        assertEquals(result, EMAIL);
 
-		assertEquals(3, tags.length);
-	}
+        bagInfo.removeMetadata(BagInfoTags.CONTACT_EMAIL_TAG);
+        result = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG, email);
+        assertEquals(result, email);
+    }
 
-	@Test
-	public void testWriteToFile() {
-		File testBagInfo = new File(DIR_PATH + "bag-info.txt");
-		BagInfo bagInfo = new BagInfo();
-		bagInfo.addMetadata(ORG_ADDRESS_TAG, "FreeLibrary.INFO");
-		bagInfo.addMetadata(CONTACT_EMAIL_TAG, "ksclarke@gmail.com");
-		bagInfo.addMetadata(CONTACT_NAME_TAG, "Kevin S. Clarke");
+    /**
+     * Tests getting tags.
+     */
+    @Test
+    public void testGetTags() {
+        final BagInfo bagInfo = new BagInfo();
 
-		try {
-			bagInfo.writeTo(testBagInfo);
-		}
-		catch (IOException details) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(details.getMessage(), details);
-			}
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, NAME);
+        bagInfo.addMetadata(BagInfoTags.ORG_ADDRESS_TAG, ORG);
+        assertEquals(3, bagInfo.countTags());
 
-			fail(details.getMessage());
-		}
+        final String[] tags = bagInfo.getTags();
 
-		try {
-			FileReader fileReader = new FileReader(testBagInfo);
-			BufferedReader reader = new BufferedReader(fileReader);
-			StringBuilder buffer = new StringBuilder();
-			String expected = new String();
-			String line;
+        for (final String tag : tags) {
+            if (!bagInfo.containsTag(tag)) {
+                fail(LOGGER.getMessage(MessageCodes.BAGIT_061, tag));
+            }
+        }
 
-			while ((line = reader.readLine()) != null) {
-				buffer.append(line).append(EOL);
-			}
-			
-			reader.close();
+        assertEquals(3, tags.length);
+    }
 
-			expected += "Organization-Address: FreeLibrary.INFO" + EOL;
-			expected += "Contact-Email: ksclarke@gmail.com" + EOL;
-			expected += "Contact-Name: Kevin S. Clarke" + EOL;
+    /**
+     * Tests writing to file.
+     */
+    @Test
+    public void testWriteToFile() {
+        final File testBagInfo = new File(WORK_DIR, BagInfo.FILE_NAME);
+        final BagInfo bagInfo = new BagInfo();
 
-			assertEquals(expected.toString(), buffer.toString());
-		}
-		catch (IOException details) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(details.getMessage(), details);
-			}
+        bagInfo.addMetadata(BagInfoTags.ORG_ADDRESS_TAG, ORG);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, NAME);
 
-			fail(details.getMessage());
-		}
-	}
+        try {
+            bagInfo.writeTo(testBagInfo);
+        } catch (final IOException details) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(details.getMessage(), details);
+            }
 
-	@Test
-	public void testReadFrom() {
-		try {
-			File testBagInfo = new File(DIR_PATH + "bag-info.txt");
-			BagInfo bagInfo = new BagInfo(testBagInfo.getParentFile());
-			String contactName = bagInfo.getValue(CONTACT_NAME_TAG);
-			String orgAddress = bagInfo.getValue(ORG_ADDRESS_TAG);
-			String email = bagInfo.getValue(CONTACT_EMAIL_TAG);
+            fail(details.getMessage());
+        }
 
-			assertEquals("FreeLibrary.INFO", orgAddress);
-			assertEquals("ksclarke@gmail.com", email);
-			assertEquals("Kevin S. Clarke", contactName);
-			assertEquals(3, bagInfo.countTags());
+        try {
+            final FileReader fileReader = new FileReader(testBagInfo);
+            final BufferedReader reader = new BufferedReader(fileReader);
+            final StringBuilder buffer = new StringBuilder();
+            String expected = new String();
+            String line;
 
-			if (!testBagInfo.delete()) {
-				fail(getI18n("bagit.test.failed_baginfo_delete", testBagInfo));
-			}
-		}
-		catch (IOException details) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(details.getMessage(), details);
-			}
-			
-			fail(details.getMessage());
-		}
-	}
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append(EOL);
+            }
 
+            reader.close();
+
+            expected += "Organization-Address: " + ORG + EOL;
+            expected += "Contact-Email: " + EMAIL + EOL;
+            expected += "Contact-Name: " + NAME + EOL;
+
+            assertEquals(expected.toString(), buffer.toString());
+        } catch (final IOException details) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(details.getMessage(), details);
+            }
+
+            fail(details.getMessage());
+        }
+    }
+
+    /**
+     * Test reading from bag info.
+     */
+    @Test
+    public void testReadFrom() {
+        try {
+            final BagInfo bagInfo = new BagInfo(new File("src/test/resources/files/baginfo"));
+            final String contactName = bagInfo.getValue(BagInfoTags.CONTACT_NAME_TAG);
+            final String sourceOrg = bagInfo.getValue(BagInfoTags.SOURCE_ORG_TAG);
+            final String email = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG);
+
+            assertEquals(ORG, sourceOrg);
+            assertEquals(EMAIL, email);
+            assertEquals(NAME, contactName);
+            assertEquals(3, bagInfo.countTags());
+        } catch (final IOException details) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(details.getMessage(), details);
+            }
+
+            fail(details.getMessage());
+        }
+    }
 }

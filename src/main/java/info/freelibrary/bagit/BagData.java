@@ -1,10 +1,5 @@
-package info.freelibrary.bagit;
 
-import info.freelibrary.util.FileExtFileFilter;
-import info.freelibrary.util.FileUtils;
-import info.freelibrary.util.I18nObject;
-import info.freelibrary.util.RegexFileFilter;
-import info.freelibrary.util.StringUtils;
+package info.freelibrary.bagit;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,313 +12,283 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.compress.utils.Charsets;
+
+import info.freelibrary.util.FileExtFileFilter;
+import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.I18nRuntimeException;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.RegexFileFilter;
+import info.freelibrary.util.StringUtils;
 
 /**
  * Handle for working with files in the package's data directory.
- * 
- * @author Kevin S. Clarke &lt;<a
- *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
-public class BagData extends I18nObject {
+public class BagData {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BagData.class);
+    static final String FILE_NAME = "data";
 
-	static final String FILE_NAME = "data";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagData.class, Constants.BUNDLE_NAME);
 
-	private File myDataDir;
+    private static final String PATTERN = ".*";
 
-	boolean isValid;
+    private static final String SLASH = "/";
 
-	/**
-	 * Creates a new <code>BagData</code> object using the data directory of an
-	 * existing bag
-	 * 
-	 * @param aDataDir The data directory of a bag structure
-	 */
-	BagData(File aDataDir) {
-		if (!aDataDir.isDirectory() || !aDataDir.getName().equals(FILE_NAME)) {
-			throw new RuntimeException(getI18n("bagit.data_dir"));
-		}
+    boolean isValid;
 
-		myDataDir = aDataDir;
-	}
+    private final File myDataDir;
 
-	/**
-	 * Returns an array of all the data file paths (relative to the bag's data
-	 * directory).
-	 * 
-	 * @return An array of all the data file paths, relative to the bag's data
-	 *         directory
-	 */
-	public String[] getFilePaths() {
-		return getFilePaths(".*");
-	}
+    /**
+     * Creates a new <code>BagData</code> object using the data directory of an existing bag
+     *
+     * @param aDataDir The data directory of a bag structure
+     */
+    BagData(final File aDataDir) {
+        if (!aDataDir.isDirectory() || !aDataDir.getName().equals(FILE_NAME)) {
+            throw new I18nRuntimeException(Constants.BUNDLE_NAME, MessageCodes.BAGIT_023);
+        }
 
-	/**
-	 * Returns the number of files in the data directory.
-	 * 
-	 * @return The number of files in the data directory
-	 */
-	public int fileCount() {
-		return getFilePaths().length;
-	}
-	
-	/**
-	 * Returns a list of file paths (relative to the data directory) whose file
-	 * extensions match those supplied in the parameter strings.
-	 * 
-	 * @param aExtList A file extension filter list (txt, jpg, xml, etc.)
-	 * @return An array of all the data file paths, relative to the bag's data
-	 *         directory
-	 */
-	public String[] getFilePaths(String... aExtList) {
-		FilenameFilter filter = new FileExtFileFilter(aExtList);
-		ArrayList<String> paths = new ArrayList<String>();
+        myDataDir = aDataDir;
+    }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.debug.testing_exts", filter.toString()));
-		}
+    /**
+     * Returns an array of all the data file paths (relative to the bag's data directory).
+     *
+     * @return An array of all the data file paths, relative to the bag's data directory
+     */
+    public String[] getFilePaths() {
+        return getFilePaths(PATTERN);
+    }
 
-		try {
-			for (File file : FileUtils.listFiles(myDataDir, filter, true)) {
-				paths.add(getRelativePath(file));
-			}
-		}
-		catch (FileNotFoundException details) {
-			throw new RuntimeException(details); // should not happen
-		}
+    /**
+     * Returns the number of files in the data directory.
+     *
+     * @return The number of files in the data directory
+     */
+    public int fileCount() {
+        return getFilePaths().length;
+    }
 
-		return paths.toArray(new String[paths.size()]);
-	}
+    /**
+     * Returns a list of file paths (relative to the data directory) whose file extensions match those supplied in the
+     * parameter strings.
+     *
+     * @param aExtList A file extension filter list (txt, jpg, xml, etc.)
+     * @return An array of all the data file paths, relative to the bag's data directory
+     */
+    public String[] getFilePaths(final String... aExtList) {
+        final FilenameFilter filter = new FileExtFileFilter(aExtList);
+        final ArrayList<String> paths = new ArrayList<>();
 
-	/**
-	 * Returns an array of all the data file paths of files whose names match
-	 * the supplied file name regular expression; return paths are relative to
-	 * the bag's data directory.
-	 * 
-	 * @param aFileNameRegex A regular expression to match against the file's
-	 *        name
-	 * @return An array of all the data file paths, relative to the bag's data
-	 *         directory
-	 */
-	public String[] getFilePaths(String aFileNameRegex) {
-		return getFilePaths(".*", aFileNameRegex);
-	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_055, filter.toString());
+        }
 
-	/**
-	 * Returns an array of all the matching data file paths relative to the
-	 * bag's data directory.
-	 * 
-	 * @param aPathRegex A regular expression to match against the pull path,
-	 *        minus the file name
-	 * @param aFileNameRegex A regular expression to match against the file's
-	 *        name
-	 * @return An array of all the data file paths, relative to the bag's data
-	 *         directory
-	 */
-	public String[] getFilePaths(String aPathRegex, String aFileNameRegex) {
-		RegexFileFilter filter = new RegexFileFilter(aFileNameRegex);
-		ArrayList<String> paths = new ArrayList<String>();
+        try {
+            for (final File file : FileUtils.listFiles(myDataDir, filter, true)) {
+                paths.add(getRelativePath(file));
+            }
+        } catch (final FileNotFoundException details) {
+            throw new RuntimeException(details); // should not happen
+        }
 
-		if (LOGGER.isDebugEnabled()) {
-			if (!aPathRegex.equals(".*")) {
-				LOGGER.debug(getI18n("bagit.debug.testing_path", aPathRegex));
-			}
+        return paths.toArray(new String[paths.size()]);
+    }
 
-			LOGGER.debug(getI18n("bagit.debug.testing_file", aFileNameRegex));
-		}
+    /**
+     * Returns an array of all the data file paths of files whose names match the supplied file name regular
+     * expression; return paths are relative to the bag's data directory.
+     *
+     * @param aFileNameRegex A regular expression to match against the file's name
+     * @return An array of all the data file paths, relative to the bag's data directory
+     */
+    public String[] getFilePaths(final String aFileNameRegex) {
+        return getFilePaths(PATTERN, aFileNameRegex);
+    }
 
-		try {
-			for (File file : FileUtils.listFiles(myDataDir, filter, true)) {
-				String name = file.getName();
-				String path = getRelativePath(file);
-				String justPath = path.substring(0, path.lastIndexOf(name));
+    /**
+     * Returns an array of all the matching data file paths relative to the bag's data directory.
+     *
+     * @param aPathRegex A regular expression to match against the pull path, minus the file name
+     * @param aFileNameRegex A regular expression to match against the file's name
+     * @return An array of all the data file paths, relative to the bag's data directory
+     */
+    public String[] getFilePaths(final String aPathRegex, final String aFileNameRegex) {
+        final RegexFileFilter filter = new RegexFileFilter(aFileNameRegex);
+        final ArrayList<String> paths = new ArrayList<>();
 
-				if (justPath.endsWith("/")) {
-					justPath = justPath.substring(0, justPath.length() - 1);
-				}
+        if (LOGGER.isDebugEnabled()) {
+            if (!aPathRegex.equals(PATTERN)) {
+                LOGGER.debug(MessageCodes.BAGIT_054, aPathRegex);
+            }
 
-				if (Pattern.matches(aPathRegex, justPath)) {
-					paths.add(path);
-				}
-			}
-		}
-		catch (FileNotFoundException details) {
-			throw new RuntimeException(details); // should not happen
-		}
+            LOGGER.debug(MessageCodes.BAGIT_053, aFileNameRegex);
+        }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.debug.paths_found",
-					Integer.toString(paths.size())));
-		}
+        try {
+            for (final File file : FileUtils.listFiles(myDataDir, filter, true)) {
+                final String name = file.getName();
+                final String path = getRelativePath(file);
+                String justPath = path.substring(0, path.lastIndexOf(name));
 
-		return paths.toArray(new String[paths.size()]);
-	}
+                if (justPath.endsWith(SLASH)) {
+                    justPath = justPath.substring(0, justPath.length() - 1);
+                }
 
-	/**
-	 * Outputs an XML representation of the bag's data directory, useful for
-	 * debugging.
-	 * 
-	 * @return An XML representation of the bag's data directory
-	 */
-	public String toString() {
-		String systemPath = myDataDir.getAbsolutePath();
-		String dataDirXML;
+                if (Pattern.matches(aPathRegex, justPath)) {
+                    paths.add(path);
+                }
+            }
+        } catch (final FileNotFoundException details) {
+            throw new RuntimeException(details); // should not happen
+        }
 
-		try {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.debug.reading", myDataDir));
-			}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_052, Integer.toString(paths.size()));
+        }
 
-			dataDirXML = FileUtils.toXML(myDataDir.getAbsolutePath(), true);
-			dataDirXML = dataDirXML.replace(systemPath + "/", "");
-		}
-		catch (ParserConfigurationException details) {
-			throw new RuntimeException(details);
-		}
-		catch (FileNotFoundException details) {
-			throw new RuntimeException(details);
-		}
+        return paths.toArray(new String[paths.size()]);
+    }
 
-		return dataDirXML;
-	}
+    /**
+     * Outputs an XML representation of the bag's data directory, useful for debugging.
+     *
+     * @return An XML representation of the bag's data directory
+     */
+    @Override
+    public String toString() {
+        final String systemPath = myDataDir.getAbsolutePath();
+        String dataDirXML;
 
-	/**
-	 * An <code>InputStream</code> from which the contents of the file of the
-	 * supplied path can be read. The stream is just a raw stream that you might
-	 * want to wrap with an <code>InputStreamReader</code> (for encoding) and/or
-	 * <code>BufferedReader</code>.
-	 * 
-	 * @param aPath The path of the file from which we want to read
-	 * @return A character reader for the file represented by the supplied path
-	 * @throws FileNotFoundException If the file for the supplied path cannot be
-	 *         found or it is a directory
-	 */
-	public InputStream getInputStream(String aPath)
-			throws FileNotFoundException {
-		File file = new File(myDataDir, aPath);
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_035, myDataDir);
+            }
 
-		if (file.exists() && file.isFile()) {
-			return new FileInputStream(file);
-		}
-		else {
-			throw new FileNotFoundException(aPath);
-		}
-	}
+            dataDirXML = FileUtils.toXML(myDataDir.getAbsolutePath(), true);
+            dataDirXML = dataDirXML.replace(systemPath + SLASH, "");
+        } catch (final TransformerException details) {
+            throw new RuntimeException(details);
+        } catch (final FileNotFoundException details) {
+            throw new RuntimeException(details);
+        }
 
-	/**
-	 * A character <code>Reader</code> from which the contents of the file of
-	 * the supplied path can be read. The reader is a <code>FileReader</code>
-	 * that you might want to wrap with a <code>BufferedReader</code>.
-	 * 
-	 * @param aPath The path of the file from which we want to read
-	 * @return A character reader for the file represented by the supplied path
-	 * @throws FileNotFoundException If the file for the supplied path cannot be
-	 *         found or it is a directory
-	 */
-	public Reader getReader(String aPath) throws FileNotFoundException {
-		File file = new File(myDataDir, aPath);
+        return dataDirXML;
+    }
 
-		if (file.exists() && file.isFile()) {
-			return new FileReader(file);
-		}
-		else {
-			throw new FileNotFoundException(aPath);
-		}
-	}
+    /**
+     * An <code>InputStream</code> from which the contents of the file of the supplied path can be read. The stream is
+     * just a raw stream that you might want to wrap with an <code>InputStreamReader</code> (for encoding) and/or
+     * <code>BufferedReader</code>.
+     *
+     * @param aPath The path of the file from which we want to read
+     * @return A character reader for the file represented by the supplied path
+     * @throws FileNotFoundException If the file for the supplied path cannot be found or it is a directory
+     */
+    public InputStream getInputStream(final String aPath) throws FileNotFoundException {
+        final File file = new File(myDataDir, aPath);
 
-	/**
-	 * Returns the byte size of the file corresponding to the supplied file
-	 * path.
-	 * 
-	 * @param aPath The path, relative to the bag's data directory, of the
-	 *        desired file
-	 * @return The size, in bytes, of the requested file
-	 * @throws FileNotFoundException If the supplied path doesn't correspond to
-	 *         a file
-	 */
-	public long getSize(String aPath) throws FileNotFoundException {
-		File file = new File(myDataDir, aPath);
+        if (file.exists() && file.isFile()) {
+            return new FileInputStream(file);
+        } else {
+            throw new FileNotFoundException(aPath);
+        }
+    }
 
-		if (file.exists()) {
-			return file.length();
-		}
-		else {
-			throw new FileNotFoundException(aPath);
-		}
-	}
+    /**
+     * A character <code>Reader</code> from which the contents of the file of the supplied path can be read. The
+     * reader is a <code>FileReader</code> that you might want to wrap with a <code>BufferedReader</code>.
+     *
+     * @param aPath The path of the file from which we want to read
+     * @return A character reader for the file represented by the supplied path
+     * @throws FileNotFoundException If the file for the supplied path cannot be found or it is a directory
+     */
+    public Reader getReader(final String aPath) throws FileNotFoundException {
+        final File file = new File(myDataDir, aPath);
 
-	/**
-	 * Reads the supplied file path into a string. The system determines the
-	 * encoding.
-	 * 
-	 * @param aPath A path to a file in the bag's payload
-	 * @return A string with the contents from the supplied path's file
-	 * @throws FileNotFoundException If the supplied file path cannot be found
-	 *         or it is a directory
-	 * @throws IOException If there is trouble reading the file of the supplied
-	 *         path
-	 */
-	public String getAsString(String aPath) throws FileNotFoundException,
-			IOException {
-		File file = new File(myDataDir, aPath);
+        if (file.exists() && file.isFile()) {
+            return new FileReader(file);
+        } else {
+            throw new FileNotFoundException(aPath);
+        }
+    }
 
-		if (file.exists() && file.isFile()) {
-			return StringUtils.read(file);
-		}
-		else {
-			throw new FileNotFoundException(aPath);
-		}
-	}
+    /**
+     * Returns the byte size of the file corresponding to the supplied file path.
+     *
+     * @param aPath The path, relative to the bag's data directory, of the desired file
+     * @return The size, in bytes, of the requested file
+     * @throws FileNotFoundException If the supplied path doesn't correspond to a file
+     */
+    public long getSize(final String aPath) throws FileNotFoundException {
+        final File file = new File(myDataDir, aPath);
 
-	/**
-	 * Reads the supplied file path into a UTF-8 string.
-	 * 
-	 * @param aPath A path to a file in the bag's payload
-	 * @return A UTF-8 string with the contents from the supplied path's file
-	 * @throws FileNotFoundException If the supplied file path cannot be found
-	 *         or it is a directory
-	 * @throws IOException If there is trouble reading the file of the supplied
-	 *         path
-	 */
-	public String getAsUTF8String(String aPath) throws FileNotFoundException,
-			IOException {
-		File file = new File(myDataDir, aPath);
+        if (file.exists()) {
+            return file.length();
+        } else {
+            throw new FileNotFoundException(aPath);
+        }
+    }
 
-		if (file.exists() && file.isFile()) {
-			return StringUtils.readAsUTF8(file);
-		}
-		else {
-			throw new FileNotFoundException(aPath);
-		}
-	}
+    /**
+     * Reads the supplied file path into a string. The system determines the encoding.
+     *
+     * @param aPath A path to a file in the bag's payload
+     * @return A string with the contents from the supplied path's file
+     * @throws FileNotFoundException If the supplied file path cannot be found or it is a directory
+     * @throws IOException If there is trouble reading the file of the supplied path
+     */
+    public String getAsString(final String aPath) throws FileNotFoundException, IOException {
+        final File file = new File(myDataDir, aPath);
 
-	/**
-	 * Remove a path (file or directory) from the bag's payload.
-	 * 
-	 * @param aPath A path (file or directory) to remove from the payload
-	 */
-	public void removeFile(String aPath) {
-		if (aPath != null && aPath.length() > 0) {
-			FileUtils.delete(new File(myDataDir, aPath));
-		}
-		else {
-			throw new NullPointerException();
-		}
-	}
+        if (file.exists() && file.isFile()) {
+            return StringUtils.read(file);
+        } else {
+            throw new FileNotFoundException(aPath);
+        }
+    }
 
-	/**
-	 * Gets the path of the supplied <code>File</code>, relative to the bag's
-	 * data directory.
-	 * 
-	 * @param aFile A file from which to get the relative path
-	 */
-	private String getRelativePath(File aFile) {
-		int start = myDataDir.getAbsolutePath().length() + 1;
-		return aFile.getAbsolutePath().substring(start);
-	}
+    /**
+     * Reads the supplied file path into a UTF-8 string.
+     *
+     * @param aPath A path to a file in the bag's payload
+     * @return A UTF-8 string with the contents from the supplied path's file
+     * @throws FileNotFoundException If the supplied file path cannot be found or it is a directory
+     * @throws IOException If there is trouble reading the file of the supplied path
+     */
+    public String getAsUTF8String(final String aPath) throws FileNotFoundException, IOException {
+        final File file = new File(myDataDir, aPath);
+
+        if (file.exists() && file.isFile()) {
+            return StringUtils.read(file, Charsets.UTF_8);
+        } else {
+            throw new FileNotFoundException(aPath);
+        }
+    }
+
+    /**
+     * Remove a path (file or directory) from the bag's payload.
+     *
+     * @param aPath A path (file or directory) to remove from the payload
+     */
+    public void removeFile(final String aPath) {
+        final File file = new File(myDataDir, aPath);
+
+        if (file.exists()) {
+            FileUtils.delete(file);
+        }
+    }
+
+    /**
+     * Gets the path of the supplied <code>File</code>, relative to the bag's data directory.
+     *
+     * @param aFile A file from which to get the relative path
+     */
+    private String getRelativePath(final File aFile) {
+        final int start = myDataDir.getAbsolutePath().length() + 1;
+        return aFile.getAbsolutePath().substring(start);
+    }
 }

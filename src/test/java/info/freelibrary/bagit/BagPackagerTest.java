@@ -1,216 +1,203 @@
+
 package info.freelibrary.bagit;
 
 import static org.junit.Assert.fail;
 
-import info.freelibrary.util.FileUtils;
-import info.freelibrary.util.I18nObject;
-
 import java.io.File;
 
-import org.junit.Before;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 
-public class BagPackagerTest extends I18nObject {
+public class BagPackagerTest {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BagPackagerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagPackagerTest.class, Constants.BUNDLE_NAME);
 
-	private static final String PACKAGER_TEST_DIR = "src/test/resources/packager";
+    private static final String PACKAGER_TEST_DIR = "target/test-working-dir";
 
-	private static final String SOURCE_BAG_PATH = "src/test/resources/dryad_630";
+    private static final String SOURCE_BAG_PATH = "src/test/resources/dryad_630";
 
-	@Before
-	public void setUp() throws Exception {
-		System.setProperty(Bag.WORK_DIR, PACKAGER_TEST_DIR);
-	}
+    /**
+     * Setup before a test is run.
+     *
+     * @throws Exception If there is trouble setting up the test
+     */
+    @Before
+    public void setUp() throws Exception {
+        System.setProperty(Bag.WORK_DIR, PACKAGER_TEST_DIR);
+    }
 
-	@AfterClass
-	public static void oneTimeTearDown() throws Exception {
-		FileUtils.delete(new File(PACKAGER_TEST_DIR));
-	}
+    /**
+     * Clean up after tests have run.
+     *
+     * @throws Exception If there is trouble cleaning up
+     */
+    @AfterClass
+    public static void oneTimeTearDown() throws Exception {
+        FileUtils.delete(new File(PACKAGER_TEST_DIR));
+    }
 
-	@Test
-	public void testToTar() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testToTar"));
-		}
+    /**
+     * Test bag packager to tar.
+     */
+    @Test
+    public void testToTar() {
+        try {
+            final File file = BagPackager.toTar(new Bag(SOURCE_BAG_PATH));
 
-		try {
-			File file = BagPackager.toTar(new Bag(SOURCE_BAG_PATH));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_057, file);
+            }
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.tar_written", file));
-			}
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+            fail(throwable.getMessage());
+        }
+    }
 
-			fail(throwable.getMessage());
-		}
-	}
+    /**
+     * Test bag packager from tar.
+     */
+    @Test
+    public void testFromTar() {
+        final File tarFile = new File("src/test/resources/packages/dryad_630.tar");
 
-	@Test
-	public void testFromTar() {
-		File tarFile = new File("src/test/resources/packages/dryad_630.tar");
+        try {
+            final Bag bag = BagPackager.fromTar(tarFile);
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testFromTar"));
-		}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_060, bag.myDir);
+            }
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-		try {
-			Bag bag = BagPackager.fromTar(tarFile);
+            fail(throwable.getMessage());
+        }
+    }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
-			}
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+    /**
+     * Tests bag packer to zip.
+     */
+    @Test
+    public void testToZip() {
+        try {
+            final File zipFile = BagPackager.toZip(new Bag(SOURCE_BAG_PATH));
 
-			fail(throwable.getMessage());
-		}
-	}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_059, zipFile);
+            }
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-	@Test
-	public void testToZip() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testToZip"));
-		}
+            fail(throwable.getMessage());
+        }
+    }
 
-		try {
-			File zipFile = BagPackager.toZip(new Bag(SOURCE_BAG_PATH));
+    /**
+     * Tests bag packager from zip.
+     */
+    @Test
+    public void testFromZip() {
+        final File zipFile = new File("src/test/resources/packages/dryad_630.zip");
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.zip_written", zipFile));
-			}
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+        try {
+            final Bag bag = BagPackager.fromZip(zipFile);
 
-			fail(throwable.getMessage());
-		}
-	}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_060, bag.myDir);
+            }
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-	@Test
-	public void testFromZip() {
-		File zipFile = new File("src/test/resources/packages/dryad_630.zip");
+            fail(throwable.getMessage());
+        }
+    }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testFromZip"));
-		}
+    /**
+     * Tests bag packager to tar.bz2 file.
+     */
+    @Test
+    public void testToTarBZip2() {
+        try {
+            BagPackager.toTarBZip2(new Bag(SOURCE_BAG_PATH));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-		try {
-			Bag bag = BagPackager.fromZip(zipFile);
+            fail(throwable.getMessage());
+        }
+    }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
-			}
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+    /**
+     * Test bag packager from a tar.bz2 file.
+     */
+    @Test
+    public void testFromTarBZip2() {
+        final File tarBz2File = new File("src/test/resources/packages/dryad_630.tar.bz2");
 
-			fail(throwable.getMessage());
-		}
-	}
+        try {
+            final Bag bag = BagPackager.fromTarBZip2(tarBz2File);
 
-	@Test
-	public void testToTarBZip2() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testToTarBZip2"));
-		}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_060, bag.myDir);
+            }
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-		try {
-			BagPackager.toTarBZip2(new Bag(SOURCE_BAG_PATH));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+            fail(throwable.getMessage());
+        }
+    }
 
-			fail(throwable.getMessage());
-		}
-	}
+    /**
+     * Tests bag packager to tar.gz file.
+     */
+    @Test
+    public void testToTarGz() {
+       try {
+            BagPackager.toTarGz(new Bag(SOURCE_BAG_PATH));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-	@Test
-	public void testFromTarBZip2() {
-		File tarBz2File = new File(
-				"src/test/resources/packages/dryad_630.tar.bz2");
+            fail(throwable.getMessage());
+        }
+    }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER
-					.debug(getI18n("bagit.test.starting_test",
-							"testFromTarBZip2"));
-		}
+    /**
+     * Tests bag packager from tar.gz file.
+     */
+    @Test
+    public void testFromTarGz() {
+        final File tarGzFile = new File("src/test/resources/packages/dryad_630.tar.gz");
 
-		try {
-			Bag bag = BagPackager.fromTarBZip2(tarBz2File);
+        try {
+            final Bag bag = BagPackager.fromTarGz(tarGzFile);
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
-			}
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_060, bag.myDir);
+            }
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-			fail(throwable.getMessage());
-		}
-	}
-
-	@Test
-	public void testToTarGz() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testToTarGz"));
-		}
-
-		try {
-			BagPackager.toTarGz(new Bag(SOURCE_BAG_PATH));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
-
-			fail(throwable.getMessage());
-		}
-	}
-
-	@Test
-	public void testFromTarGz() {
-		File tarGzFile = new File(
-				"src/test/resources/packages/dryad_630.tar.gz");
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testFromTarGz"));
-		}
-
-		try {
-			Bag bag = BagPackager.fromTarGz(tarGzFile);
-
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.created_bag", bag.myDir));
-			}
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
-
-			fail(throwable.getMessage());
-		}
-	}
-
+            fail(throwable.getMessage());
+        }
+    }
 }

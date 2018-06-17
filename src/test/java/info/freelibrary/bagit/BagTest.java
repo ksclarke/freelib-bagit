@@ -1,9 +1,8 @@
+
 package info.freelibrary.bagit;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
-
-import info.freelibrary.util.I18nObject;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,138 +11,140 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 
-public class BagTest extends I18nObject {
+public class BagTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BagTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagTest.class, Constants.BUNDLE_NAME);
 
-	private static final String BAGS_DIR = "src/test/resources/bags/";
+    private static final String WORKING_DIR = "target/bagtest-tests";
 
-	@Before
-	public void setUp() throws Exception {
-		System.setProperty(Bag.WORK_DIR, "src/test/resources/bagTests");
-	}
+    private static final String BAGS_DIR = "src/test/resources/bags/";
 
-	@AfterClass
-	public static void oneTimeTearDown() throws Exception {
-		new File("src/test/resources/bagTests").delete();
-	}
+    /**
+     * Sets up the test.
+     *
+     * @throws Exception If the setup fails
+     */
+    @Before
+    public void setUp() throws Exception {
+        System.setProperty(Bag.WORK_DIR, WORKING_DIR);
+    }
 
-	@Test
-	public void testGetPayloadOxum() {
-		try {
-			Bag bag = new Bag(BAGS_DIR + "dryad_630");
-			assertEquals("133387.12", bag.getPayloadOxum());
-		}
-		catch (IOException details) {
-			fail(details.getMessage());
-		}
-	}
-	
-	@Test
-	public void testBagFile() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagFile"));
-		}
+    /**
+     * Cleans up after the test.
+     *
+     * @throws Exception If the clean up fails
+     */
+    @AfterClass
+    public static void oneTimeTearDown() throws Exception {
+        new File(WORKING_DIR).delete();
+    }
 
-		try {
-			Bag bag = new Bag(new File(BAGS_DIR + "bagFile1"));
-			fail(getI18n("bagit.test.directory", bag.myDir));
-		}
-		catch (IOException details) {}
-	}
+    /**
+     * Test get payload.
+     */
+    @Test
+    public void testGetPayloadOxum() {
+        try {
+            final Bag bag = new Bag(BAGS_DIR + "dryad_630");
+            assertEquals("133387.12", bag.getPayloadOxum());
+        } catch (final IOException details) {
+            fail(details.getMessage());
+        }
+    }
 
-	@Test
-	public void testBagDir() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagDir"));
-		}
+    /**
+     * Test creating bag from file.
+     */
+    @Test
+    public void testBagFile() {
+        try {
+            final Bag bag = new Bag(new File(BAGS_DIR, "bagFile1"));
+            fail(LOGGER.getMessage(MessageCodes.BAGIT_056, bag.myDir));
+        } catch (final IOException details) {
+            // Expected
+        }
+    }
 
-		try {
-			new Bag(new File("src/test/resources/dryad_630"));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+    /**
+     * Test creating bag from directory.
+     */
+    @Test
+    public void testBagDir() {
+        try {
+            new Bag(new File("src/test/resources/dryad_630"));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-			fail(throwable.getMessage());
-		}
-	}
+            fail(throwable.getMessage());
+        }
+    }
 
-	@Test
-	public void testBagTar() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTar"));
-		}
+    /**
+     * Test creating bag from tar file.
+     */
+    @Test
+    public void testBagTar() {
+        try {
+            new Bag(new File(BAGS_DIR + "dryad_630.tar"));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-		try {
-			new Bag(new File(BAGS_DIR + "dryad_630.tar"));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+            fail(throwable.getMessage());
+        }
+    }
 
-			fail(throwable.getMessage());
-		}
-	}
+    /**
+     * Test creating bag from tar.gz file
+     */
+    @Test
+    public void testBagTarGz() {
+        try {
+            new Bag(new File(BAGS_DIR + "dryad_630.tar.gz"));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-	@Test
-	public void testBagTarGz() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTarGz"));
-		}
+            fail(throwable.getMessage());
+        }
+    }
 
-		try {
-			new Bag(new File(BAGS_DIR + "dryad_630.tar.gz"));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
+    /**
+     * Tests creating bag from tar.bz2 file.
+     */
+    @Test
+    public void testBagTarBzip2() {
+        try {
+            new Bag(new File(BAGS_DIR + "dryad_630.tar.bz2"));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-			fail(throwable.getMessage());
-		}
-	}
+            fail(throwable.getMessage());
+        }
+    }
 
-	@Test
-	public void testBagTarBzip2() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER
-					.debug(getI18n("bagit.test.starting_test",
-							"testBagTarBzip2"));
-		}
+    /**
+     * Tests creating bag from zip file.
+     */
+    @Test
+    public void testBagZip() {
+        try {
+            new Bag(new File(BAGS_DIR + "dryad_630.zip"));
+        } catch (final Throwable throwable) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(throwable.getMessage(), throwable);
+            }
 
-		try {
-			new Bag(new File(BAGS_DIR + "dryad_630.tar.bz2"));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
-
-			fail(throwable.getMessage());
-		}
-	}
-
-	@Test
-	public void testBagZip() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.test.starting_test", "testBagTarGz"));
-		}
-
-		try {
-			new Bag(new File(BAGS_DIR + "dryad_630.zip"));
-		}
-		catch (Throwable throwable) {
-			if (LOGGER.isErrorEnabled()) {
-				LOGGER.error(throwable.getMessage(), throwable);
-			}
-
-			fail(throwable.getMessage());
-		}
-	}
+            fail(throwable.getMessage());
+        }
+    }
 }

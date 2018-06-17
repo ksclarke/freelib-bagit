@@ -1,52 +1,47 @@
+
 package info.freelibrary.bagit;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 
 /**
  * A manifest for describing metadata files contained within the bag.
- * 
- * @author Kevin S. Clarke &lt;<a
- *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
 class TagManifest extends AbstractManifest {
 
-	private static final String FILE_NAME = "tagmanifest-{}.txt";
+    private static final String FILE_NAME = "tagmanifest-{}.txt";
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(TagManifest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagManifest.class, Constants.BUNDLE_NAME);
 
-	TagManifest(File aBagDir) throws IOException {
-		super(aBagDir);
+    TagManifest(final File aBagDir) throws IOException {
+        super(aBagDir);
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(getI18n("bagit.debug.tag_manifest"));
-		}
-	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_033);
+        }
+    }
 
-	/**
-	 * Returns an XML representation of the <code>TagManifest</code>.
-	 */
-	public String toString() {
-		String eol = System.getProperty("line.separator");
-		StringBuilder builder = new StringBuilder();
-		
-		builder.append("<tagManifest>").append(eol).append(super.toString());
-		builder.append("</tagManifest>").append(eol);
-		
-		return builder.toString();
-	}
-	
-	@Override
-	protected Logger getLogger() {
-		return LOGGER;
-	}
+    /**
+     * Returns an XML representation of the <code>TagManifest</code>.
+     */
+    @Override
+    public String toString() {
+        final String eol = System.getProperty("line.separator");
 
-	@Override
-	protected String getNamePattern() {
-		return FILE_NAME;
-	}
+        return new StringBuilder(40).append("<tagManifest>").append(eol).append(super.toString()).append(
+                "</tagManifest>").append(eol).toString();
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
+    protected String getNamePattern() {
+        return FILE_NAME;
+    }
 }

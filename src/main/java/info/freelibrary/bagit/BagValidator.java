@@ -1,8 +1,5 @@
-package info.freelibrary.bagit;
 
-import info.freelibrary.util.FileUtils;
-import info.freelibrary.util.I18nObject;
-import info.freelibrary.util.RegexFileFilter;
+package info.freelibrary.bagit;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -10,246 +7,206 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.I18nRuntimeException;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.RegexFileFilter;
 
 /**
  * Bag validator that can determine whether bags are complete and/or valid.
- * 
- * @author Kevin S. Clarke &lt;<a
- *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
  */
-public class BagValidator extends I18nObject {
+public class BagValidator {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BagValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagValidator.class, Constants.BUNDLE_NAME);
 
-	/**
-	 * Creates a new bag validator.
-	 */
-	public BagValidator() {}
+    /**
+     * Checks whether a supplied bag is complete or not.
+     *
+     * @param aBag A bag to check for completeness
+     * @return True if the bag is complete; else, false
+     * @throws IOException If there is trouble reading or writing the bag
+     */
+    public boolean isComplete(final Bag aBag) throws IOException {
+        try {
+            checkStructure(aBag);
+        } catch (final BagException details) {
+            LOGGER.warn(MessageCodes.BAGIT_016, aBag.myDir.getName(), details.getMessage());
+            return false;
+        }
 
-	/**
-	 * Checks whether a supplied bag is complete or not.
-	 * 
-	 * @param aBag A bag to check for completeness
-	 * @return True if the bag is complete; else, false
-	 * @throws IOException If there is trouble reading or writing the bag
-	 */
-	public boolean isComplete(Bag aBag) throws IOException {
-		try {
-			checkStructure(aBag);
-		}
-		catch (BagException details) {
-			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn(
-						getI18n("bagit.not_complete",
-								new String[] { aBag.myDir.getName(),
-										details.getMessage() }), details);
-			}
+        return true;
+    }
 
-			return false;
-		}
+    /**
+     * Checks whether a supplied bag is valid or not.
+     *
+     * @param aBag A bag to check for validity
+     * @return True if the bag is valid; else, false
+     * @throws IOException If there is trouble reading or writing the bag
+     */
+    public boolean isValid(final Bag aBag) throws IOException {
+        try {
+            validate(aBag);
+            return true;
+        } catch (final BagException details) {
+            return false;
+        }
+    }
 
-		return true;
-	}
+    /**
+     * Validates a bag, throwing a <code>BagException</code> if the supplied bag isn't valid.
+     *
+     * @param aBag A bag to check for validity
+     * @return A validated bag which can be written in a variety of formats
+     * @throws BagException If the supplied bag doesn't validate
+     * @throws IOException If there is a problem reading or writing the files in the bag
+     */
+    public ValidBag validate(final Bag aBag) throws BagException, IOException {
+        checkStructure(aBag);
 
-	/**
-	 * Checks whether a supplied bag is valid or not.
-	 * 
-	 * @param aBag A bag to check for validity
-	 * @return True if the bag is valid; else, false
-	 * @throws IOException If there is trouble reading or writing the bag
-	 */
-	public boolean isValid(Bag aBag) throws IOException {
-		try {
-			validate(aBag);
-			return true;
-		}
-		catch (BagException details) {
-			return false;
-		}
-	}
+        // Validity is determined by whether the checksums are actually correct
+        final PayloadManifest payloadManifest = aBag.getManifest();
+        final String algorithm = payloadManifest.getHashAlgorithm();
 
-	/**
-	 * Validates a bag, throwing a <code>BagException</code> if the supplied bag
-	 * isn't valid.
-	 * 
-	 * @param aBag A bag to check for validity
-	 * @return A validated bag which can be written in a variety of formats
-	 * @throws BagException If the supplied bag doesn't validate
-	 * @throws IOException If there is a problem reading or writing the files in
-	 *         the bag
-	 */
-	public ValidBag validate(Bag aBag) throws BagException, IOException {
-		checkStructure(aBag);
+        for (final File payloadFile : payloadManifest.getFiles()) {
+            try {
+                final String hash = payloadManifest.getStoredHash(payloadFile);
+                final String check = FileUtils.hash(payloadFile, algorithm);
 
-		// Validity is determined by whether the checksums are actually correct
-		PayloadManifest payloadManifest = aBag.getManifest();
-		String algorithm = payloadManifest.getHashAlgorithm();
+                if (!hash.equals(check)) {
+                    throw new BagException(MessageCodes.BAGIT_021, payloadFile.getAbsolutePath(), hash, check);
+                }
+            } catch (final NoSuchAlgorithmException details) {
+                throw new I18nRuntimeException(details);
+            }
+        }
 
-		for (File payloadFile : payloadManifest.getFiles()) {
-			try {
-				String hash = payloadManifest.getStoredHash(payloadFile);
-				String check = FileUtils.hash(payloadFile, algorithm);
+        final TagManifest tagManifest = aBag.getTagManifest();
+        final String tagAlgorithm = tagManifest.getHashAlgorithm();
 
-				if (!hash.equals(check)) {
-					throw new BagException(
-							BagException.INVALID_PAYLOAD_CHECKSUM,
-							new String[] { payloadFile.getAbsolutePath(), hash,
-									check });
-				}
-			}
-			catch (NoSuchAlgorithmException details) {
-				throw new RuntimeException(details); // shouldn't see this here
-			}
-		}
+        for (final File tagFile : tagManifest.getFiles()) {
+            try {
+                final String hash = tagManifest.getStoredHash(tagFile);
+                final String check = FileUtils.hash(tagFile, tagAlgorithm);
 
-		TagManifest tagManifest = aBag.getTagManifest();
-		String tagAlgorithm = tagManifest.getHashAlgorithm();
+                if (!hash.equals(check)) {
+                    throw new BagException(MessageCodes.BAGIT_020, tagFile.getAbsolutePath(), hash, check);
+                }
+            } catch (final NoSuchAlgorithmException details) {
+                throw new I18nRuntimeException(details);
+            }
+        }
 
-		for (File tagFile : tagManifest.getFiles()) {
-			try {
-				String hash = tagManifest.getStoredHash(tagFile);
-				String check = FileUtils.hash(tagFile, tagAlgorithm);
+        // If we have a BagInfo, let's supply Payload-Oxum and Bag-Size
+        final BagInfo bagInfo = aBag.getBagInfo();
 
-				if (!hash.equals(check)) {
-					throw new BagException(BagException.INVALID_TAG_CHECKSUM,
-							new String[] { tagFile.getAbsolutePath(), hash,
-									check });
-				}
-			}
-			catch (NoSuchAlgorithmException details) {
-				throw new RuntimeException(details); // shouldn't see this here
-			}
-		}
+        if (bagInfo.countTags() > 0) {
+            bagInfo.removeMetadata(BagInfoTags.BAG_SIZE_TAG);
+            bagInfo.removeMetadata(BagInfoTags.PAYLOAD_OXUM_TAG);
 
-		// If we have a BagInfo, let's supply Payload-Oxum and Bag-Size
-		BagInfo bagInfo = aBag.getBagInfo();
+            bagInfo.addMetadata(BagInfoTags.BAG_SIZE_TAG, FileUtils.sizeFromBytes(aBag.getSize(), true));
+            bagInfo.addMetadata(BagInfoTags.PAYLOAD_OXUM_TAG, aBag.getPayloadOxum());
 
-		if (bagInfo.countTags() > 0) {
-			bagInfo.removeMetadata(BagInfo.BAG_SIZE_TAG);
-			bagInfo.removeMetadata(BagInfo.PAYLOAD_OXUM_TAG);
+            // If we change, we need to recalculate the file's checksum
+            try {
+                final File bagInfoFile = new File(aBag.myDir, BagInfo.FILE_NAME);
 
-			bagInfo.addMetadata(BagInfo.BAG_SIZE_TAG,
-					FileUtils.sizeFromBytes(aBag.getSize(), true));
-			bagInfo.addMetadata(BagInfo.PAYLOAD_OXUM_TAG, aBag.getPayloadOxum());
+                bagInfo.writeTo(bagInfoFile);
+                tagManifest.remove(bagInfoFile);
+                tagManifest.add(bagInfoFile);
+            } catch (final NoSuchAlgorithmException details) {
+                throw new I18nRuntimeException(details);
+            }
+        }
 
-			// If we change, we need to recalculate the file's checksum
-			try {
-				File bagInfoFile = new File(aBag.myDir, BagInfo.FILE_NAME);
+        return new ValidBag(aBag);
+    }
 
-				bagInfo.writeTo(bagInfoFile);
-				tagManifest.remove(bagInfoFile);
-				tagManifest.add(bagInfoFile);
-			}
-			catch (NoSuchAlgorithmException details) {
-				throw new RuntimeException(details); // shouldn't see this
-			}
-		}
+    /**
+     * Checks the payload and payload manifest to make sure they are in sync.
+     *
+     * @param aManifest A manifest representing the payload files
+     * @param aDataDir A bag data directory
+     * @throws BagException If there is a sync problem between manifest and payload
+     * @throws IOException If there is trouble reading or writing the payload
+     */
+    private void checkPayload(final PayloadManifest aManifest, final File aDataDir) throws BagException, IOException {
+        final FilenameFilter filter = new RegexFileFilter(".*");
+        final File[] files = FileUtils.listFiles(aDataDir, filter, true);
+        final File[] payloadFiles = aManifest.getFiles();
 
-		return new ValidBag(aBag);
-	}
+        if (files.length != payloadFiles.length) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_024, Integer.toString(files.length), Integer.toString(
+                        payloadFiles.length));
+            }
 
-	/**
-	 * Checks the payload and payload manifest to make sure they are in sync.
-	 * 
-	 * @param aManifest A manifest representing the payload files
-	 * @param aDataDir A bag data directory
-	 * @throws BagException If there is a sync problem between manifest and
-	 *         payload
-	 * @throws IOException If there is trouble reading or writing the payload
-	 */
-	private void checkPayload(PayloadManifest aManifest, File aDataDir)
-			throws BagException, IOException {
-		FilenameFilter filter = new RegexFileFilter(".*");
-		File[] files = FileUtils.listFiles(aDataDir, filter, true);
-		File[] payloadFiles = aManifest.getFiles();
+            throw new BagException(MessageCodes.BAGIT_018);
+        }
 
-		if (files.length != payloadFiles.length) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n(
-						"bagit.debug.file_count",
-						new String[] { Integer.toString(files.length),
-								Integer.toString(payloadFiles.length) }));
-			}
+        Arrays.sort(files);
+        Arrays.sort(payloadFiles);
 
-			throw new BagException(
-					BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR);
-		}
+        for (int index = 0; index < files.length; index++) {
+            final String fPath = files[index].getAbsolutePath();
+            final String mPath = payloadFiles[index].getAbsolutePath();
 
-		Arrays.sort(files);
-		Arrays.sort(payloadFiles);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_063, fPath, mPath);
+            }
 
-		for (int index = 0; index < files.length; index++) {
-			String fPath = files[index].getAbsolutePath();
-			String mPath = payloadFiles[index].getAbsolutePath();
+            if (!fPath.equals(mPath)) {
+                throw new BagException(MessageCodes.BAGIT_018);
+            }
+        }
+    }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n("bagit.test.file_compare", new String[] {
-						fPath, mPath }));
-			}
+    private void checkRequiredFiles(final Bag aBag) throws BagException {
+        if (!aBag.hasDeclaration()) {
+            throw new BagException(MessageCodes.BAGIT_070);
+        } else {
+            try {
+                final Declaration declaration = aBag.getDeclaration();
+                declaration.validate();
+                declaration.writeToFile();
+            } catch (final IOException details) {
+                throw new BagException(MessageCodes.BAGIT_003, details);
+            }
+        }
 
-			if (!fPath.equals(mPath)) {
-				throw new BagException(
-						BagException.PAYLOAD_MANIFEST_DIFFERS_FROM_DATADIR);
-			}
-		}
-	}
+        // We check actual files in the checkPayload method, run after this one
+        final int entryCount = aBag.getManifest().countEntries();
+        final int dataFileCount = aBag.getBagData().fileCount();
 
-	private void checkRequiredFiles(Bag aBag) throws BagException {
-		if (!aBag.hasDeclaration()) {
-			throw new BagException(BagException.MISSING_BAGIT_TXT_FILE);
-		}
-		else {
-			try {
-				Declaration declaration = aBag.getDeclaration();
-				declaration.validate();
-				declaration.writeToFile();
-			}
-			catch (IOException details) {
-				throw new BagException("unable to write bagit.txt", details);
-			}
-		}
+        if (entryCount != dataFileCount) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(MessageCodes.BAGIT_024, Integer.toString(dataFileCount), Integer.toString(entryCount));
+            }
 
-		// We check actual files in the checkPayload method, run after this one
-		int entryCount = aBag.getManifest().countEntries();
-		int dataFileCount = aBag.getBagData().fileCount();
+            throw new BagException(MessageCodes.BAGIT_022);
+        }
+    }
 
-		if (entryCount != dataFileCount) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(getI18n(
-						"bagit.debug.file_count",
-						new String[] { Integer.toString(dataFileCount),
-								Integer.toString(entryCount) }));
-			}
+    /**
+     * Checks the structure of the bag directory to make sure it is complete.
+     *
+     * @param aBag A bag to check for completeness
+     * @throws BagException If there is a structural problem with the bag
+     * @throws IOException If there is trouble reading or writing files in the bag
+     */
+    private void checkStructure(final Bag aBag) throws BagException, IOException {
+        checkRequiredFiles(aBag);
+        checkPayload(aBag.getManifest(), new File(aBag.myDir, BagData.FILE_NAME));
+        checkTagManifest(aBag.getTagManifest());
+    }
 
-			throw new BagException(BagException.MISSING_MANIFEST);
-		}
-	}
+    private void checkTagManifest(final TagManifest aTagManifest) throws BagException, IOException {
+        for (final File tagFile : aTagManifest.getFiles()) {
+            if (!tagFile.exists()) {
+                throw new BagException(MessageCodes.BAGIT_019, tagFile);
+            }
+        }
+    }
 
-	/**
-	 * Checks the structure of the bag directory to make sure it is complete.
-	 * 
-	 * @param aBag A bag to check for completeness
-	 * @throws BagException If there is a structural problem with the bag
-	 * @throws IOException If there is trouble reading or writing files in the
-	 *         bag
-	 */
-	private void checkStructure(Bag aBag) throws BagException, IOException {
-		checkRequiredFiles(aBag);
-		checkPayload(aBag.getManifest(),
-				new File(aBag.myDir, BagData.FILE_NAME));
-		checkTagManifest(aBag.getTagManifest(), aBag.myDir);
-	}
-
-	private void checkTagManifest(TagManifest aTagManifest, File aBagDir)
-			throws BagException, IOException {
-		for (File tagFile : aTagManifest.getFiles()) {
-			if (!tagFile.exists()) {
-				throw new BagException(
-						BagException.TAG_MANIFEST_DIFFERS_FROM_BAG_DIR, tagFile);
-			}
-		}
-	}
 }

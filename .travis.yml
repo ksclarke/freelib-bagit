@@ -1,0 +1,36 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+env:
+  global:
+    secure: "bpFMZd3liKFcl+yloDaHWgCksEVGGL4G6clQYFs0FCe2TngWnnhJF7RX9X+/iOqUOrB0MiOUebv/qBlzc8wJvxz9P+eCflGsC78G3hDMYAvzf1Yl9A+0Ht+XowofwJu5iCOTOB5VLcvG04YU2D0/HahOWgClnH8f6XvYQrFuZ80="
+    secure: "SL4DV51OfbDCcS38+9v65FNjMIjY/zZRBWyKY4rR88Y9XVxFbTnETHp3S7dY0Gp+5CVk4fxLzVyekx0p73uELu70mEYAtn5d/Yx72EGrJrZSfCzF73kCJE2G6bUOJKok3KpMXJewxsS/iQQ9k9Kn5hRuAkYbCJTfsWaK4sVpIYY="
+
+install:
+  mvn validate
+
+script:
+  mvn install pmd:pmd pmd:check
+
+after_success:
+  - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken="${PROJECT_TOKEN}" -DapiToken="${API_TOKEN}"
+
+cache:
+  directories:
+    - $HOME/.m2
+
+notifications:
+  email:
+    recipients:
+      - ksclarke@ksclarke.io
+    on_failure: change
+    on_success: never
+  irc:
+    channels:
+      - irc.freenode.org#freelibrary
+    on_failure: always
+    on_success: always
+
+sudo: false

@@ -5,7 +5,7 @@
 	name="FreeLibrary BagIt">
 	<bannerLeft>
 		<name>FreeLibrary BagIt</name>
-		<src>images/freelib-bagit.png</src>
+		<src>images/freelib-bagit_png</src>
 		<alt>FreeLibrary BagIt</alt>
 		<href>http://freelibrary.info/freelib-bagit/index.html</href>
 	</bannerLeft>

@@ -1,132 +1,127 @@
+
 package info.freelibrary.bagit;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import info.freelibrary.util.FileUtils;
-import info.freelibrary.util.StringUtils;
-
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.AfterClass;
 import org.junit.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.FileUtils;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.StringUtils;
 
 public class BagDataTest {
 
-	private static final String BAG_DIR = "src/test/resources/bags/";
+    private static final String BAG_DIR = "src/test/resources/bags/";
 
-	private static final String WORK_DIR = "src/test/resources/bagDataTests/";
+    private static final String WORK_DIR = "target/tests/bag-data-tests/";
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(BagDataTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagDataTest.class, Constants.BUNDLE_NAME);
 
-	private static Bag myBag;
+    private static final String[] EXPECTED = new String[] { "dryadpub.xml", "datafile-5/ApineOPSIN.nexus",
+        "datafile-5/dryadfile-5.xml", "datafile-1/ApineCYTB.nexus", "datafile-1/dryadfile-1.xml", "dryadpkg.xml",
+        "datafile-3/dryadfile-3.xml", "datafile-3/Apine16S.nexus", "datafile-4/dryadfile-4.xml",
+        "datafile-4/Apine28S.nexus", "datafile-2/dryadfile-2.xml", "datafile-2/ApineDNA.morph.nexus" };
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		System.setProperty(Bag.WORK_DIR, WORK_DIR);
-		myBag = new Bag(BAG_DIR + "dryad_630");
-	}
+    private static Bag myBag;
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		FileUtils.delete(new File(WORK_DIR));
-	}
+    /**
+     * Sets up for tests.
+     *
+     * @throws Exception If there is trouble with the setup
+     */
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        System.setProperty(Bag.WORK_DIR, WORK_DIR);
+        myBag = new Bag(BAG_DIR + "dryad_630");
+    }
 
-	@Test
-	public void testGetAsUTF8StringString() {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Running testGetAsUTF8StringString");
-		}
+    /**
+     * Cleans up after tests.
+     *
+     * @throws Exception If there is trouble with the clean up
+     */
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+        FileUtils.delete(new File(WORK_DIR));
+    }
 
-		try {
-			BagData data = myBag.getBagData();
-			String xml = data.getAsUTF8String("datafile-3/dryadfile-3.xml");
+    /**
+     * Testing getting as UTF-8 string.
+     */
+    @Test
+    public void testGetAsUTF8StringString() {
+        try {
+            final BagData data = myBag.getBagData();
+            final String xml = data.getAsUTF8String(EXPECTED[5]);
+            // here
+            if (!xml.startsWith("<?xml version") || !xml.endsWith("</DryadDataPackage>")) {
+                Assert.fail(xml);
+            }
+        } catch (final IOException details) {
+            Assert.fail(details.getMessage());
+        }
+    }
 
-			if (!xml.startsWith("<?xml version")
-					|| !xml.endsWith("</DryadDataFile>")) {
-				Assert.fail(xml);
-			}
-		}
-		catch (IOException details) {
-			Assert.fail(details.getMessage());
-		}
-	}
+    /**
+     * Test get file paths.
+     */
+    @Test
+    public void testGetFilePaths() {
+        final String[] paths = myBag.getBagData().getFilePaths();
+        final String[] expected = EXPECTED.clone();
 
-	@Test
-	public void testGetFilePaths() {
-		String[] expected = new String[] { "dryadpub.xml",
-				"datafile-5/ApineOPSIN.nexus", "datafile-5/dryadfile-5.xml",
-				"datafile-1/ApineCYTB.nexus", "datafile-1/dryadfile-1.xml",
-				"dryadpkg.xml", "datafile-3/dryadfile-3.xml",
-				"datafile-3/Apine16S.nexus", "datafile-4/dryadfile-4.xml",
-				"datafile-4/Apine28S.nexus", "datafile-2/dryadfile-2.xml",
-				"datafile-2/ApineDNA.morph.nexus" };
+        Arrays.sort(paths);
+        Arrays.sort(expected);
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Running testGetFilePaths");
-		}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_004, StringUtils.toString(paths, '|'));
+        }
 
-		String[] paths = myBag.getBagData().getFilePaths();
+        Assert.assertArrayEquals(paths, expected);
+    }
 
-		Arrays.sort(paths);
-		Arrays.sort(expected);
+    /**
+     * Tests getting file path as string.
+     */
+    @Test
+    public void testGetFilePathsString() {
+        final String[] expected = new String[] { EXPECTED[0], EXPECTED[2], EXPECTED[4], EXPECTED[5], EXPECTED[6],
+            EXPECTED[8], EXPECTED[10] };
+        final BagData data = myBag.getBagData();
+        final String[] paths = data.getFilePaths("^d.*");
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Found paths: {}", StringUtils.toString(paths, '|'));
-		}
+        Arrays.sort(paths);
+        Arrays.sort(expected);
 
-		Assert.assertArrayEquals(paths, expected);
-	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_004, StringUtils.toString(paths, '|'));
+        }
 
-	@Test
-	public void testGetFilePathsString() {
-		String[] expected = new String[] { "dryadpub.xml",
-				"datafile-5/dryadfile-5.xml", "datafile-1/dryadfile-1.xml",
-				"dryadpkg.xml", "datafile-3/dryadfile-3.xml",
-				"datafile-4/dryadfile-4.xml", "datafile-2/dryadfile-2.xml" };
+        Assert.assertArrayEquals(paths, expected);
+    }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Running testGetFilePathsRegex");
-		}
+    /**
+     * Tests getting file path as string.
+     */
+    @Test
+    public void testGetFilePathsStringString() {
+        final String[] expected = new String[] { EXPECTED[2], EXPECTED[4], EXPECTED[6], EXPECTED[8], EXPECTED[10] };
+        final BagData data = myBag.getBagData();
+        final String[] paths = data.getFilePaths("^datafile.*", ".*\\.xml");
 
-		BagData data = myBag.getBagData();
-		String[] paths = data.getFilePaths("^d.*");
+        Arrays.sort(paths);
+        Arrays.sort(expected);
 
-		Arrays.sort(paths);
-		Arrays.sort(expected);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageCodes.BAGIT_004, StringUtils.toString(paths, '|'));
+        }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Found paths: {}", StringUtils.toString(paths, '|'));
-		}
-
-		Assert.assertArrayEquals(paths, expected);
-	}
-
-	@Test
-	public void testGetFilePathsStringString() {
-		String[] expected = new String[] { "datafile-5/dryadfile-5.xml",
-				"datafile-1/dryadfile-1.xml", "datafile-3/dryadfile-3.xml",
-				"datafile-4/dryadfile-4.xml", "datafile-2/dryadfile-2.xml" };
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Running testGetFilePathsRegexRegex");
-		}
-
-		BagData data = myBag.getBagData();
-		String[] paths = data.getFilePaths("^datafile.*", ".*\\.xml");
-
-		Arrays.sort(paths);
-		Arrays.sort(expected);
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Found paths: {}", StringUtils.toString(paths, '|'));
-		}
-
-		Assert.assertArrayEquals(paths, expected);
-	}
+        Assert.assertArrayEquals(paths, expected);
+    }
 }

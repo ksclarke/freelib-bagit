@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="message-class-name">info.freelibrary.bagit.MessageCodes</entry>
+
+  <!-- To process file: -->
+  <!-- mvn info.freelibrary:freelib-utils:generate-codes -DmessageFiles=`ls src/main/resources/*_messages.xml` -->
+
+  <!-- Main messages, used mostly for exceptions -->
+  <entry key="BAGIT-001">Using hash algorithm: {}</entry>
+  <entry key="BAGIT-002">Found existing tagmanifest: {}</entry>
+  <entry key="BAGIT-003">Unable to write bagit.txt</entry>
+  <entry key="BAGIT-004">Found paths: {}</entry>
+  <entry key="BAGIT-005">Unable to create directory: {}</entry>
+  <entry key="BAGIT-006">Unable to delete file: {}</entry>
+  <entry key="BAGIT-007">Couldn't create a bag-info.txt file: {}</entry>
+  <entry key="BAGIT-008">Invalid bag-info.txt file: {}; metadata: {}</entry>
+  <entry key="BAGIT-009">Found bagit.txt file is invalid: missing required bagit version</entry>
+  <entry key="BAGIT-010">Invalid bagit version</entry>
+  <entry key="BAGIT-011">Found bagit.txt file is invalid: missing required bagit encoding</entry>
+  <entry key="BAGIT-012">Invalid bagit encoding</entry>
+  <entry key="BAGIT-013">Found bagit.txt file is invalid: incorrect number of lines or structure</entry>
+  <entry key="BAGIT-014">Can't change a bag that has been validated; clone instead</entry>
+  <entry key="BAGIT-015">Cleaning up the bagit work directories: {}</entry>
+  <entry key="BAGIT-016">The {} bag is not yet complete: {}</entry>
+  <entry key="BAGIT-017">Couldn't read bag '{}' because its MIME type '{}' isn't recognized</entry>
+  <entry key="BAGIT-018">Data directory or payload manifest is missing a file</entry>
+  <entry key="BAGIT-019">A tag file is missing from the directory: {}</entry>
+  <entry key="BAGIT-020">Invalid tag checksum for: {} ({} vs. {})</entry>
+  <entry key="BAGIT-021">Invalid data checksum for: {} ({} vs. {})</entry>
+  <entry key="BAGIT-022">Missing the required payload manifest file</entry>
+  <entry key="BAGIT-023">Problem with the bag's data directory</entry>
+  <entry key="BAGIT-024">Data file count: {}; file entries in payload manifest: {}</entry>
+  <entry key="BAGIT-025">Getting {} bytes for oxum from file: {}</entry>
+  <entry key="BAGIT-026">Creating new Bag object: {}</entry>
+  <entry key="BAGIT-027">Using bag's existing data files</entry>
+  <entry key="BAGIT-028">Writing BagInfo metadata [{}: {}]</entry>
+  <entry key="BAGIT-029">Adding a new data file: {}</entry>
+  <entry key="BAGIT-030">Setting a new BagInfo object</entry>
+  <entry key="BAGIT-031">Deleting the existing payload manifest: {}</entry>
+  <entry key="BAGIT-032">Creating a new payload manifest object</entry>
+  <entry key="BAGIT-033">Creating a new tag manifest object</entry>
+  <entry key="BAGIT-034">Reading from an existing manifest file: {}</entry>
+  <entry key="BAGIT-035">Reading: {}</entry>
+  <entry key="BAGIT-036">Instantiating the BagIt data directory</entry>
+  <entry key="BAGIT-037">Bag '{}' has a '{}' MIME type</entry>
+  <entry key="BAGIT-038">Unpacking '{}' from tar and bzip2</entry>
+  <entry key="BAGIT-039">Packaging '{}' with tar and bzip2</entry>
+  <entry key="BAGIT-040">Unpacking '{}' from zip</entry>
+  <entry key="BAGIT-041">Packaging '{}' with zip</entry>
+  <entry key="BAGIT-042">Unpacking '{}' from tar</entry>
+  <entry key="BAGIT-043">Packaging '{}' with tar</entry>
+  <entry key="BAGIT-044">Compressing '{}' with bzip2</entry>
+  <entry key="BAGIT-045">Unable to delete temporary tar file: {}</entry>
+  <entry key="BAGIT-046">Writing tar entry: {}</entry>
+  <entry key="BAGIT-047">Writing zip entry: {}</entry>
+  <entry key="BAGIT-048">Getting a new file: {}</entry>
+  <entry key="BAGIT-049">Getting ready to clean, but '{}' seems to already have been cleaned up</entry>
+  <entry key="BAGIT-050">Finalizing (i.e., garbage collecting) the bag at: {}</entry>
+  <entry key="BAGIT-051">Running the shutdown hook for the bag at: {}</entry>
+  <entry key="BAGIT-052">Number of matching paths found: {}</entry>
+  <entry key="BAGIT-053">Testing {} regex against file names</entry>
+  <entry key="BAGIT-054">Testing {} regex against file paths</entry>
+  <entry key="BAGIT-055">Testing file extensions {} against file names</entry>
+  <entry key="BAGIT-056">Failed to notice BagIt directory was a file: {}</entry>
+  <entry key="BAGIT-057">Tar file written to: {}</entry>
+  <entry key="BAGIT-058"></entry>
+  <entry key="BAGIT-059">Zip file written to: {}</entry>
+  <entry key="BAGIT-060">Created bag directory: {}</entry>
+  <entry key="BAGIT-061">Failed to find expected bag-info tag: {}</entry>
+  <entry key="BAGIT-062">Failed for unexpected reason: {}</entry>
+  <entry key="BAGIT-063">Comparing data directory files: {} and {}</entry>
+  <entry key="BAGIT-064">Catching expected exception from the BagValidator: {}</entry>
+  <entry key="BAGIT-065">Reading zip entry: {}</entry>
+  <entry key="BAGIT-066">Reading tar entry: {}</entry>
+  <entry key="BAGIT-067">Reading tar.gz file: {}</entry>
+  <entry key="BAGIT-068">Writing tar.gz file: {}</entry>
+  <entry key="BAGIT-069">Failed to remove all the temporary work files</entry>
+  <entry key="BAGIT-070">Invalid bag: missing declaration</entry>
+</properties>

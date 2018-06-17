@@ -1,384 +1,370 @@
-package info.freelibrary.bagit;
 
-import info.freelibrary.util.BufferedFileWriter;
-import info.freelibrary.util.I18nObject;
+package info.freelibrary.bagit;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import info.freelibrary.util.BufferedFileWriter;
+import info.freelibrary.util.I18nRuntimeException;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.StringUtils;
 
 /**
- * Metadata elements describing the bag and payload. The metadata elements, all
- * optional, are intended primarily for human readability.
- * 
- * @author Kevin S. Clarke &lt;<a
- *         href="mailto:ksclarke@gmail.com">ksclarke@gmail.com</a>&gt;
+ * Metadata elements describing the bag and payload. The metadata elements, all optional, are intended primarily for
+ * human readability.
  */
-public class BagInfo extends I18nObject implements BagInfoConstants, Cloneable {
+public class BagInfo {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BagInfo.class);
+    static final String FILE_NAME = "bag-info.txt";
 
-	static final String FILE_NAME = "bag-info.txt";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BagInfo.class, Constants.BUNDLE_NAME);
 
-	private static class Metadata implements Cloneable {
+    private static final String METADATA_DELIM = ": ";
 
-		private String myTag;
-		private String myValue;
+    /**
+     * Whether the bag-info has been validated or not yet.
+     */
+    boolean isValid;
 
-		private Metadata(String aTag, String aValue) {
-			if (aTag == null || aValue == null) {
-				throw new NullPointerException();
-			}
+    private final List<Metadata> myMetadata;
 
-			myTag = aTag;
-			myValue = aValue;
-		}
+    /**
+     * Creates a new <code>BagInfo</code> for <code>Bag</code> metadata.
+     */
+    public BagInfo() {
+        myMetadata = new ArrayList<>();
+    }
 
-		public Metadata clone() {
-			return new Metadata(myTag, myValue);
-		}
-	}
+    /**
+     * Creates a new <code>BagInfo</code> from a Java <code>Properties</code> object.
+     *
+     * @param aProperties A Java <code>Properties</code> from which to build the <code>BagInfo</code>
+     */
+    public BagInfo(final Properties aProperties) {
+        final Iterator<String> props = aProperties.stringPropertyNames().iterator();
 
-	private ArrayList<Metadata> myMetadata;
+        myMetadata = new ArrayList<>();
 
-	/**
-	 * Whether the bag-info has been validated or not yet.
-	 */
-	boolean isValid;
+        while (props.hasNext()) {
+            final String name = props.next();
+            final String value = aProperties.getProperty(name);
 
-	/**
-	 * Creates a new <code>BagInfo</code> for <code>Bag</code> metadata.
-	 */
-	public BagInfo() {
-		myMetadata = new ArrayList<Metadata>();
-	}
+            if (StringUtils.trimToNull(value) != null) {
+                myMetadata.add(new Metadata(name, value));
+            }
+        }
+    }
 
-	/**
-	 * Creates a new <code>BagInfo</code> from a Java <code>Properties</code>
-	 * object.
-	 * 
-	 * @param aProperties A Java <code>Properties</code> from which to build the
-	 *        <code>BagInfo</code>
-	 */
-	public BagInfo(Properties aProperties) {
-		Iterator<String> props = aProperties.stringPropertyNames().iterator();
+    /**
+     * Creates a <code>BagInfo</code> for <code>Bag</code> metadata from the metadata of another <code>BagInfo</code>.
+     */
+    public BagInfo(final BagInfo aBagInfo) {
+        final Iterator<Metadata> iterator = aBagInfo.myMetadata.iterator();
 
-		myMetadata = new ArrayList<Metadata>();
+        myMetadata = new ArrayList<>();
 
-		while (props.hasNext()) {
-			String name = props.next();
-			String value = aProperties.getProperty(name);
+        while (iterator.hasNext()) {
+            myMetadata.add(iterator.next().copy());
+        }
+    }
 
-			if (!value.equals("")) {
-				myMetadata.add(new Metadata(name, value));
-			}
-		}
-	}
+    /**
+     * Creates a new <code>BagInfo</code> for <code>Bag</code> metadata from an existing <code>bag-info.txt</code>
+     * file. If a bag directory is passed in, the <code>bag-info.txt</code> is located and used.
+     *
+     * @param aFile An existing <code>bag-info.txt</code> file or the <code>BagIt</code> directory
+     * @throws IOException If there is trouble reading the <code>bag-info.txt</code> file
+     */
+    BagInfo(final File aFile) throws IOException {
+        final File bagInfo = new File(aFile, FILE_NAME);
+        myMetadata = new ArrayList<>();
 
-	/**
-	 * Creates a <code>BagInfo</code> for <code>Bag</code> metadata from the
-	 * metadata of another <code>BagInfo</code>.
-	 */
-	public BagInfo(BagInfo aBagInfo) {
-		Iterator<Metadata> iterator = aBagInfo.myMetadata.iterator();
+        if (bagInfo.exists()) {
+            readFrom(bagInfo);
+        } else {
+            if (!bagInfo.createNewFile()) {
+                throw new IOException(LOGGER.getMessage(MessageCodes.BAGIT_007, bagInfo));
+            }
+        }
+    }
 
-		myMetadata = new ArrayList<Metadata>();
+    /**
+     * Creates a new <code>BagInfo</code> from this one.
+     */
+    public BagInfo copy() {
+        return new BagInfo(this);
+    }
 
-		while (iterator.hasNext()) {
-			Metadata metadata = iterator.next();
-			myMetadata.add(metadata.clone());
-		}
-	}
+    /**
+     * Tests whether the <code>BagInfo</code> contains the supplied tag.
+     *
+     * @param aTag A tag to test for occurrence
+     * @return True if the supplied tag can be found; else, false
+     */
+    public final boolean containsTag(final String aTag) {
+        for (int index = 0; index < myMetadata.size(); index++) {
+            if (aTag.equals(myMetadata.get(index).myTag)) {
+                return true;
+            }
+        }
 
-	/**
-	 * Creates a new <code>BagInfo</code> for <code>Bag</code> metadata from an
-	 * existing <code>bag-info.txt</code> file. If a bag directory is passed in,
-	 * the <code>bag-info.txt</code> is located and used.
-	 * 
-	 * @param aFile An existing <code>bag-info.txt</code> file or the
-	 *        <code>BagIt</code> directory
-	 * @throws IOException If there is trouble reading the
-	 *         <code>bag-info.txt</code> file
-	 */
-	BagInfo(File aFile) throws IOException {
-		File bagInfo = new File(aFile, FILE_NAME);
-		myMetadata = new ArrayList<Metadata>();
+        return false;
+    }
 
-		if (bagInfo.exists()) {
-			readFrom(bagInfo);
-		}
-		else {
-			if (!bagInfo.createNewFile()) {
-				throw new IOException(getI18n("bagit.baginfo_create", bagInfo));
-			}
-		}
-	}
+    /**
+     * Returns the number of tags found in this <code>BagInfo</code>.
+     *
+     * @return The number of tags found in this <code>BagInfo</code>
+     */
+    public final int countTags() {
+        return myMetadata.size();
+    }
 
-	/**
-	 * Creates a new <code>BagInfo</code> from this one.
-	 */
-	public BagInfo clone() throws CloneNotSupportedException {
-		super.clone();
-		return new BagInfo(this);
-	}
+    /**
+     * Returns an array of tags found in this <code>BagInfo</code>.
+     *
+     * @return An array of tags
+     */
+    public final String[] getTags() {
+        final String[] tags = new String[myMetadata.size()];
 
-	/**
-	 * Tests whether the <code>BagInfo</code> contains the supplied tag.
-	 * 
-	 * @param aTag A tag to test for occurrence
-	 * @return True if the supplied tag can be found; else, false
-	 */
-	public boolean containsTag(String aTag) {
-		for (int index = 0; index < myMetadata.size(); index++) {
-			if (aTag.equals(myMetadata.get(index).myTag)) {
-				return true;
-			}
-		}
+        for (int index = 0; index < tags.length; index++) {
+            tags[index] = myMetadata.get(index).myTag;
+        }
 
-		return false;
-	}
+        return tags;
+    }
 
-	/**
-	 * Returns the number of tags found in this <code>BagInfo</code>.
-	 * 
-	 * @return The number of tags found in tihs <code>BagInfo</code>
-	 */
-	public int countTags() {
-		return myMetadata.size();
-	}
+    /**
+     * Returns the value for the supplied tag or null if the tag isn't found.
+     *
+     * @param aTag The tag whose value we want to learn
+     * @return The value for the supplied tag
+     */
+    public final String getValue(final String aTag) {
+        for (int index = 0; index < myMetadata.size(); index++) {
+            final Metadata metadata = myMetadata.get(index);
 
-	/**
-	 * Returns an array of tags found in this <code>BagInfo</code>.
-	 * 
-	 * @return An array of tags
-	 */
-	public String[] getTags() {
-		String[] tags = new String[myMetadata.size()];
+            if (aTag.equals(metadata.myTag)) {
+                return metadata.myValue;
+            }
+        }
 
-		for (int index = 0; index < tags.length; index++) {
-			tags[index] = myMetadata.get(index).myTag;
-		}
+        return null;
+    }
 
-		return tags;
-	}
+    /**
+     * Returns the number of values found for a particular tag.
+     *
+     * @param aTag The tag to locate
+     * @return The number of values found for the supplied tag
+     */
+    public final int countTags(final String aTag) {
+        return getValues(aTag).length;
+    }
 
-	/**
-	 * Returns the value for the supplied tag or null if the tag isn't found.
-	 * 
-	 * @param aTag The tag whose value we want to learn
-	 * @return The value for the supplied tag
-	 */
-	public String getValue(String aTag) {
-		for (int index = 0; index < myMetadata.size(); index++) {
-			Metadata metadata = myMetadata.get(index);
+    /**
+     * Returns all the values for the supplied tag or an empty array if the tag isn't found.
+     *
+     * @param aTag The tag whose value we want to learn
+     * @return The value for the supplied tag
+     */
+    public final String[] getValues(final String aTag) {
+        final ArrayList<String> matches = new ArrayList<>();
 
-			if (aTag.equals(metadata.myTag)) {
-				return metadata.myValue;
-			}
-		}
+        for (int index = 0; index < myMetadata.size(); index++) {
+            final Metadata metadata = myMetadata.get(index);
 
-		return null;
-	}
+            if (aTag.equals(metadata.myTag)) {
+                matches.add(metadata.myValue);
+            }
+        }
 
-	/**
-	 * Returns the number of values found for a particular tag.
-	 * 
-	 * @param aTag The tag to locate
-	 * @return The number of values found for the supplied tag
-	 */
-	public int countTags(String aTag) {
-		return getValues(aTag).length;
-	}
+        return matches.toArray(new String[matches.size()]);
+    }
 
-	/**
-	 * Returns all the values for the supplied tag or an empty array if the tag
-	 * isn't found.
-	 * 
-	 * @param aTag The tag whose value we want to learn
-	 * @return The value for the supplied tag
-	 */
-	public String[] getValues(String aTag) {
-		ArrayList<String> matches = new ArrayList<String>();
+    /**
+     * Returns the value for the supplied tag; if the tag isn't found the supplied default value is returned.
+     *
+     * @param aTag The tag whose value we want to learn
+     * @param aDefaultValue The default value to return if the supplied tag isn't found
+     * @return The value for the supplied tag or the default value
+     */
+    public final String getValue(final String aTag, final String aDefaultValue) {
+        final String value = getValue(aTag);
+        return value == null ? aDefaultValue : value;
+    }
 
-		for (int index = 0; index < myMetadata.size(); index++) {
-			Metadata metadata = myMetadata.get(index);
+    /**
+     * Returns the value of the metadata element at the supplied index position.
+     *
+     * @param aIndex The index position from which we want the value
+     * @return The value of the metadata element at the supplied index position
+     */
+    public final String getValue(final int aIndex) {
+        return myMetadata.get(aIndex).myValue;
+    }
 
-			if (aTag.equals(metadata.myTag)) {
-				matches.add(metadata.myValue);
-			}
-		}
+    /**
+     * Returns the tag of the metadata element at the supplied index position.
+     *
+     * @param aIndex The index position from which we want the tag
+     * @return The tag of the metadata element at the supplied index position
+     */
+    public final String getTag(final int aIndex) {
+        return myMetadata.get(aIndex).myTag;
+    }
 
-		return matches.toArray(new String[matches.size()]);
-	}
+    /**
+     * Removes all metadata elements that match the supplied tag.
+     *
+     * @param aTag The tag whose metadata element we want to remove
+     * @return True if the metadata elements were successfully removed; else, false
+     */
+    public final boolean removeMetadata(final String aTag) {
+        if (isValid) {
+            throw new I18nRuntimeException(Constants.BUNDLE_NAME, MessageCodes.BAGIT_014);
+        }
 
-	/**
-	 * Returns the value for the supplied tag; if the tag isn't found the
-	 * supplied default value is returned.
-	 * 
-	 * @param aTag The tag whose value we want to learn
-	 * @param aDefaultValue The default value to return if the supplied tag
-	 *        isn't found
-	 * @return The value for the supplied tag or the default value
-	 */
-	public String getValue(String aTag, String aDefaultValue) {
-		String value = getValue(aTag);
-		return value == null ? aDefaultValue : value;
-	}
+        int totalCount = myMetadata.size();
 
-	/**
-	 * Returns the value of the metadata element at the supplied index position.
-	 * 
-	 * @param aIndex The index position from which we want the value
-	 * @return The value of the metadata element at the supplied index position
-	 */
-	public String getValue(int aIndex) {
-		return myMetadata.get(aIndex).myValue;
-	}
+        for (int index = 0; index < totalCount; index++) {
+            final Metadata metadata = myMetadata.get(index);
 
-	/**
-	 * Returns the tag of the metadata element at the supplied index position.
-	 * 
-	 * @param aIndex The index position from which we want the tag
-	 * @return The tag of the metadata element at the supplied index position
-	 */
-	public String getTag(int aIndex) {
-		return myMetadata.get(aIndex).myTag;
-	}
+            if (aTag.equals(metadata.myTag)) {
+                if (myMetadata.remove(index) == null) {
+                    return false;
+                }
 
-	/**
-	 * Removes all metadata elements that match the supplied tag.
-	 * 
-	 * @param aTag The tag whose metadata element we want to remove
-	 * @return True if the metadata elements were successfully removed; else,
-	 *         false
-	 */
-	public boolean removeMetadata(String aTag) {
-		int totalCount = myMetadata.size();
+                totalCount -= 1;
+            }
+        }
 
-		if (isValid) {
-			throw new RuntimeException(getI18n("bagit.validated"));
-		}
+        return totalCount < myMetadata.size();
+    }
 
-		for (int index = 0; index < totalCount; index++) {
-			Metadata metadata = myMetadata.get(index);
+    /**
+     * Sets the <code>BagInfo</code> metadata (tag and value) supplied.
+     *
+     * @param aTag A metadata tag
+     * @param aValue A metadata value
+     */
+    public final boolean addMetadata(final String aTag, final String aValue) {
+        if (isValid) {
+            throw new I18nRuntimeException(Constants.BUNDLE_NAME, MessageCodes.BAGIT_014);
+        }
 
-			if (aTag.equals(metadata.myTag)) {
-				if (myMetadata.remove(index) == null) {
-					return false;
-				}
+        return myMetadata.add(new Metadata(aTag, aValue));
+    }
 
-				totalCount -= 1;
-			}
-		}
+    /**
+     * Outputs an XML representation of the <code>BagInfo</code>, useful for debugging.
+     *
+     * @return An XML representation of the <code>BagInfo</code>
+     */
+    @Override
+    public String toString() {
+        final String eol = System.getProperty("line.separator");
+        final Iterator<Metadata> iterator = myMetadata.iterator();
+        final StringBuilder builder = new StringBuilder(60);
 
-		return totalCount < myMetadata.size();
-	}
+        builder.append("<bagInfo>").append(eol);
 
-	/**
-	 * Sets the <code>BagInfo</code> metadata (tag and value) supplied.
-	 * 
-	 * @param aTag A metadata tag
-	 * @param aValue A metadata value
-	 */
-	public boolean addMetadata(String aTag, String aValue) {
-		if (isValid) {
-			throw new RuntimeException(getI18n("bagit.validated"));
-		}
+        while (iterator.hasNext()) {
+            final Metadata metadata = iterator.next();
 
-		return myMetadata.add(new Metadata(aTag, aValue));
-	}
+            builder.append("<metadata tag=\"").append(metadata.myTag).append("\" value=\"").append(metadata.myValue)
+                    .append("\" />").append(eol);
+        }
 
-	/**
-	 * Outputs an XML representation of the <code>BagInfo</code>, useful for
-	 * debugging.
-	 * 
-	 * @return An XML representation of the <code>BagInfo</code>
-	 */
-	public String toString() {
-		String eol = System.getProperty("line.separator");
-		Iterator<Metadata> iterator = myMetadata.iterator();
-		StringBuilder builder = new StringBuilder();
+        builder.append("</bagInfo>").append(eol);
 
-		builder.append("<bagInfo>").append(eol);
+        return builder.toString();
+    }
 
-		while (iterator.hasNext()) {
-			Metadata metadata = iterator.next();
+    private void readFrom(final File aBagInfoFile) throws IOException {
+        final FileReader fileReader = new FileReader(aBagInfoFile);
+        final BufferedReader reader = new BufferedReader(fileReader);
+        final String whitespacePattern = "^\\s.*";
+        String lastProp = null;
+        String line;
 
-			builder.append("<metadata tag=\"").append(metadata.myTag);
-			builder.append("\" value=\"").append(metadata.myValue);
-			builder.append("\" />").append(eol);
-		}
+        try {
+            while ((line = reader.readLine()) != null) {
+                if (line.matches(whitespacePattern)) {
+                    if (lastProp != null) {
+                        line = line.replaceFirst(whitespacePattern, " ");
+                        addMetadata(lastProp, getValue(lastProp) + line);
+                    }
+                } else {
+                    final String[] parts = line.split(METADATA_DELIM);
 
-		builder.append("</bagInfo>").append(eol);
+                    if (parts.length == 2) {
+                        lastProp = parts[0].trim();
+                        addMetadata(lastProp, parts[1]);
+                    } else {
+                        // don't throw exception here; postpone to validation
+                        if (LOGGER.isWarnEnabled()) {
+                            LOGGER.warn(MessageCodes.BAGIT_008, aBagInfoFile.getAbsolutePath(), line);
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.close();
+        }
+    }
 
-		return builder.toString();
-	}
+    void writeTo(final File aBagInfoFile) throws IOException {
+        final BufferedFileWriter writer = new BufferedFileWriter(aBagInfoFile);
 
-	private void readFrom(File aBagInfoFile) throws IOException {
-		FileReader fileReader = new FileReader(aBagInfoFile);
-		BufferedReader reader = new BufferedReader(fileReader);
-		String whitespacePattern = "^\\s.*";
-		String lastProp = null;
-		String line;
+        try {
+            for (int index = 0; index < myMetadata.size(); index++) {
+                final Metadata metadata = myMetadata.get(index);
 
-		try {
-			while ((line = reader.readLine()) != null) {
-				if (line.matches(whitespacePattern)) {
-					if (lastProp != null) {
-						line = line.replaceFirst(whitespacePattern, " ");
-						addMetadata(lastProp, getValue(lastProp) + line);
-					}
-				}
-				else {
-					String[] parts = line.split(": ");
+                writer.append(metadata.myTag).append(METADATA_DELIM);
+                writer.append(metadata.myValue);
 
-					if (parts.length == 2) {
-						lastProp = parts[0].trim();
-						addMetadata(lastProp, parts[1]);
-					}
-					else {
-						// don't throw exception here; postpone to validation
-						if (LOGGER.isWarnEnabled()) {
-							LOGGER.warn("bagit.invalid_baginfo", new String[] {
-									aBagInfoFile.getAbsolutePath(), line });
-						}
-					}
-				}
-			}
-		}
-		finally {
-			reader.close();
-		}
-	}
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(MessageCodes.BAGIT_028, metadata.myTag, metadata.myValue);
+                }
 
-	void writeTo(File aBagInfoFile) throws IOException {
-		BufferedFileWriter writer = new BufferedFileWriter(aBagInfoFile);
+                writer.newLine();
+            }
+        } finally {
+            writer.close();
+        }
+    }
 
-		try {
-			for (int index = 0; index < myMetadata.size(); index++) {
-				Metadata metadata = myMetadata.get(index);
+    private static final class Metadata implements Cloneable {
 
-				writer.append(metadata.myTag).append(": ");
-				writer.append(metadata.myValue);
+        private final String myTag;
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(getI18n("bagit.debug.metadata"), new String[] {
-							metadata.myTag, metadata.myValue });
-				}
+        private final String myValue;
 
-				writer.newLine();
-			}
-		}
-		finally {
-			writer.close();
-		}
-	}
+        private Metadata(final String aTag, final String aValue) {
+            Objects.requireNonNull(aTag);
+            Objects.requireNonNull(aValue);
+
+            myTag = aTag;
+            myValue = aValue;
+        }
+
+        public Metadata copy() {
+            return new Metadata(myTag, myValue);
+        }
+
+        @Override
+        public String toString() {
+            return myTag + METADATA_DELIM + myValue;
+        }
+    }
 }

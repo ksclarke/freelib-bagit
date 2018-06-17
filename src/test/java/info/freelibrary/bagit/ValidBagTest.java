@@ -1,8 +1,7 @@
+
 package info.freelibrary.bagit;
 
-import static org.junit.Assert.*;
-
-import info.freelibrary.util.FileUtils;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,44 +12,57 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import info.freelibrary.util.FileUtils;
+
 public class ValidBagTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ValidBagTest.class);
-	
-	private static final String WORK_DIR = "src/test/resources/bagTests";
+    private static final Logger LOGGER = LoggerFactory.getLogger(Constants.BUNDLE_NAME);
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		System.setProperty(Bag.WORK_DIR, WORK_DIR);
-	}
+    private static final String WORK_DIR = "target/tests/valid-bag-tests";
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		FileUtils.delete(new File(WORK_DIR));
-	}
+    /**
+     * Sets up the tests.
+     *
+     * @throws Exception If the tests cannot be successfully set up
+     */
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        System.setProperty(Bag.WORK_DIR, WORK_DIR);
+    }
 
-	@Test
-	public void testValidBag() {
-		try {
-			Bag bag = new Bag("papas_got_a_brand_new").complete();
-			ValidBag validBag = new BagValidator().validate(bag);
-			
-			validBag.toDir();
-		}
-		catch (IOException details) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(details.getMessage(), details);
-			}
-			
-			fail(details.getMessage());
-		}
-		catch (BagException details) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(details.getMessage(), details);
-			}
-			
-			fail(details.getMessage());
-		}
-	}
+    /**
+     * Cleans up after tests.
+     *
+     * @throws Exception If the tests cannot be cleaned up.
+     */
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+        FileUtils.delete(new File(WORK_DIR));
+    }
+
+    /**
+     * Tests creating a valid bag.
+     */
+    @Test
+    public void testValidBag() {
+        try {
+            final Bag bag = new Bag("papas_got_a_brand_new").complete();
+            final ValidBag validBag = new BagValidator().validate(bag);
+
+            validBag.toDir();
+        } catch (final IOException details) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(details.getMessage(), details);
+            }
+
+            fail(details.getMessage());
+        } catch (final BagException details) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(details.getMessage(), details);
+            }
+
+            fail(details.getMessage());
+        }
+    }
 
 }
