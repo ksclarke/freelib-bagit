@@ -43,13 +43,13 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>0.9.24</version>
+			<version>1.2.0</version>
 		</dependency>
 		<!-- License: LGPL 3.0 -->
 		<dependency>
 			<groupId>info.freelibrary</groupId>
 			<artifactId>freelib-utils</artifactId>
-			<version>0.2.3</version>
+			<version>0.3.0</version>
 		</dependency>
 		<!-- License: ASL 2.0 -->
 		<dependency>
