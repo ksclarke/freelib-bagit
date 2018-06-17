@@ -196,6 +196,7 @@ public class Bag {
      *
      * @param aBagName The name of a bag (either a bag directory, new or existing, or a tar, tar.bz, zip, or tar.gz
      *        file)
+     * @param aOverwrite Whether a bag's contents should be overwritten
      * @throws IOException An exception indicating there was problem reading or writing the bag
      */
     public Bag(final String aBagName, final boolean aOverwrite) throws IOException {
@@ -233,7 +234,7 @@ public class Bag {
      * Gets a representation of the bag's payload. However, files can be added to the bag by using
      * <code>addData(File)</code> without having to get the <code>BagData</code> object.
      *
-     * @return
+     * @return Bag data
      */
     public BagData getBagData() {
         if (myBagData == null) {
@@ -272,6 +273,7 @@ public class Bag {
     /**
      * Completes the bag structure.
      *
+     * @return Bag
      * @throws IOException If there is difficulty writing the missing files
      */
     public Bag complete() throws IOException {

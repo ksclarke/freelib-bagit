@@ -1,7 +1,7 @@
-FreeLib BagIt (version 0.0.1-SNAPSHOT)
-===============================================================================
+# freelib-bagit
+&nbsp;[![Build Status](https://travis-ci.org/ksclarke/freelib-bagit.svg)](https://travis-ci.org/ksclarke/freelib-bagit) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/514cebb0b7ae4b63905eedcc3fe45a57)](https://www.codacy.com/app/ksclarke/freelib-bagit?utm_source=github.com&utm_medium=referral&utm_content=ksclarke/freelib-bagit&utm_campaign=Badge_Coverage) [![Known Vulnerabilities](https://snyk.io/test/github/ksclarke/freelib-bagit/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/ksclarke/freelib-bagit?targetFile=pom.xml) [![Maven](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/info/freelibrary/freelib-bagit/maven-metadata.xml.svg?colorB=brightgreen)](http://mvnrepository.com/artifact/info.freelibrary/freelib-bagit) [![Javadocs](http://javadoc.io/badge/info.freelibrary/freelib-bagit.svg)](http://projects.freelibrary.info/freelib-bagit/javadocs.html)
 
-FreeLib-BagIt is a Java library for working with and creating BagIt packages.
+Freelib-bagit is a Java library for working with and creating BagIt packages.
 It supports most of the BagIt spec, but does not yet support fetch.txt files.
 
 For more on the BagIt spec, start with: http://en.wikipedia.org/wiki/BagIt
@@ -12,11 +12,7 @@ FreeLib-BagIt's development is taking place on github:
 FreeLib-BagIt's project page (with test results, javadocs, etc.) is at:
     http://freelibrary.info/freelib-bagit/
 
-Note: This library is not ready for real use... it's still just in alpha stage
-===============================================================================
-
-How to use FreeLib-BagIt:
-
+### How to use FreeLib-BagIt:
 
 From within a Java program, you can create a new bag:
 
@@ -35,8 +31,8 @@ You can add metadata to the bag:
     Bag bag = new Bag("dryad_630");
     BagInfo bagInfo = bag.getBagInfo();
 
-    bagInfo.addMetadata(BagInfo.CONTACT_NAME_TAG, "Kevin S. Clarke");
-    bagInfo.addMetadata(BagInfo.CONTACT_PHONE_TAG, "ksclarke@gmail.com");
+    bagInfo.addMetadata(BagInfoTags.CONTACT_NAME, "Kevin S. Clarke");
+    bagInfo.addMetadata(BagInfoTags.CONTACT_PHONE, "ksclarke@gmail.com");
     bagInfo.addMetadata("Alt-Email", "thetrashcan@gmail.com");
     
 or add metadata via Java Properties:
@@ -107,10 +103,8 @@ You can also write a valid bag to a compressed file for transport:
         System.out.println(details.getMessage());
     }
     
-===============================================================================
+### Contact
 
-FreeLib-BagIt is licensed under GNU LGPL, Version 2.1 (or later).  Feel free to
-try it out, kick the tires, and have some fun with it.
-
-You can direct questions and comments to: Kevin S. Clarke <ksclarke@gmail.com>
-or to the github issues tracker: http://github.com/ksclarke/freelib-bagit/issues
+If you have questions about freelib-bagit <a href="mailto:ksclarke@ksclarke.io">feel free to ask</a> or, if you encounter a 
+problem, please feel free to [open an issue](https://github.com/ksclarke/freelib-bagit/issues "GitHub Issue Queue") in the 
+project's issue queue.

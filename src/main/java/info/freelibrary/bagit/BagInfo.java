@@ -64,7 +64,9 @@ public class BagInfo {
     }
 
     /**
-     * Creates a <code>BagInfo</code> for <code>Bag</code> metadata from the metadata of another <code>BagInfo</code>.
+     * Creates a BagInfo for Bag metadata from the metadata of another BagInfo.
+     *
+     * @param aBagInfo A bag info
      */
     public BagInfo(final BagInfo aBagInfo) {
         final Iterator<Metadata> iterator = aBagInfo.myMetadata.iterator();
@@ -98,6 +100,8 @@ public class BagInfo {
 
     /**
      * Creates a new <code>BagInfo</code> from this one.
+     *
+     * @return Bag info
      */
     public BagInfo copy() {
         return new BagInfo(this);
@@ -256,6 +260,7 @@ public class BagInfo {
      *
      * @param aTag A metadata tag
      * @param aValue A metadata value
+     * @return True if metadata was added; false, if it couldn't be added
      */
     public final boolean addMetadata(final String aTag, final String aValue) {
         if (isValid) {
