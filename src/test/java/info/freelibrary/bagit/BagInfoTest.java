@@ -59,15 +59,15 @@ public class BagInfoTest {
         final Properties properties = new Properties();
         final BagInfo bagInfo;
 
-        properties.setProperty(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
-        properties.setProperty(BagInfoTags.CONTACT_NAME_TAG, NAME);
-        properties.setProperty(BagInfoTags.SOURCE_ORG_TAG, ORG);
+        properties.setProperty(BagInfoTags.CONTACT_EMAIL, EMAIL);
+        properties.setProperty(BagInfoTags.CONTACT_NAME, NAME);
+        properties.setProperty(BagInfoTags.SOURCE_ORG, ORG);
 
         bagInfo = new BagInfo(properties);
 
-        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG), EMAIL);
-        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_NAME_TAG), NAME);
-        assertEquals(bagInfo.getValue(BagInfoTags.SOURCE_ORG_TAG), ORG);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_EMAIL), EMAIL);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_NAME), NAME);
+        assertEquals(bagInfo.getValue(BagInfoTags.SOURCE_ORG), ORG);
 
         assertEquals(3, bagInfo.countTags());
     }
@@ -79,11 +79,11 @@ public class BagInfoTest {
     public void testSetMetadata() {
         final BagInfo bagInfo = new BagInfo();
 
-        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
-        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, NAME);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME, NAME);
 
-        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG), EMAIL);
-        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_NAME_TAG), NAME);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_EMAIL), EMAIL);
+        assertEquals(bagInfo.getValue(BagInfoTags.CONTACT_NAME), NAME);
         assertEquals(bagInfo.countTags(), 2);
     }
 
@@ -94,8 +94,8 @@ public class BagInfoTest {
     public void testGetValueString() {
         final BagInfo bagInfo = new BagInfo();
 
-        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
-        assertEquals(EMAIL, bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG));
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL, EMAIL);
+        assertEquals(EMAIL, bagInfo.getValue(BagInfoTags.CONTACT_EMAIL));
     }
 
     /**
@@ -104,9 +104,9 @@ public class BagInfoTest {
     @Test
     public void testRemoveMetadata() {
         final BagInfo bagInfo = new BagInfo();
-        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL, EMAIL);
         assertEquals(bagInfo.countTags(), 1);
-        bagInfo.removeMetadata(BagInfoTags.CONTACT_EMAIL_TAG);
+        bagInfo.removeMetadata(BagInfoTags.CONTACT_EMAIL);
         assertEquals(bagInfo.countTags(), 0);
     }
 
@@ -119,12 +119,12 @@ public class BagInfoTest {
         final BagInfo bagInfo = new BagInfo();
         String result;
 
-        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
-        result = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG, email);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL, EMAIL);
+        result = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL, email);
         assertEquals(result, EMAIL);
 
-        bagInfo.removeMetadata(BagInfoTags.CONTACT_EMAIL_TAG);
-        result = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG, email);
+        bagInfo.removeMetadata(BagInfoTags.CONTACT_EMAIL);
+        result = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL, email);
         assertEquals(result, email);
     }
 
@@ -135,9 +135,9 @@ public class BagInfoTest {
     public void testGetTags() {
         final BagInfo bagInfo = new BagInfo();
 
-        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
-        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, NAME);
-        bagInfo.addMetadata(BagInfoTags.ORG_ADDRESS_TAG, ORG);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME, NAME);
+        bagInfo.addMetadata(BagInfoTags.ORG_ADDRESS, ORG);
         assertEquals(3, bagInfo.countTags());
 
         final String[] tags = bagInfo.getTags();
@@ -159,9 +159,9 @@ public class BagInfoTest {
         final File testBagInfo = new File(WORK_DIR, BagInfo.FILE_NAME);
         final BagInfo bagInfo = new BagInfo();
 
-        bagInfo.addMetadata(BagInfoTags.ORG_ADDRESS_TAG, ORG);
-        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL_TAG, EMAIL);
-        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, NAME);
+        bagInfo.addMetadata(BagInfoTags.ORG_ADDRESS, ORG);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_EMAIL, EMAIL);
+        bagInfo.addMetadata(BagInfoTags.CONTACT_NAME, NAME);
 
         try {
             bagInfo.writeTo(testBagInfo);
@@ -207,9 +207,9 @@ public class BagInfoTest {
     public void testReadFrom() {
         try {
             final BagInfo bagInfo = new BagInfo(new File("src/test/resources/files/baginfo"));
-            final String contactName = bagInfo.getValue(BagInfoTags.CONTACT_NAME_TAG);
-            final String sourceOrg = bagInfo.getValue(BagInfoTags.SOURCE_ORG_TAG);
-            final String email = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL_TAG);
+            final String contactName = bagInfo.getValue(BagInfoTags.CONTACT_NAME);
+            final String sourceOrg = bagInfo.getValue(BagInfoTags.SOURCE_ORG);
+            final String email = bagInfo.getValue(BagInfoTags.CONTACT_EMAIL);
 
             assertEquals(ORG, sourceOrg);
             assertEquals(EMAIL, email);

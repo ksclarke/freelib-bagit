@@ -71,8 +71,8 @@ public class ExamplesTest {
             final Bag bag = new Bag("new_bag_metadata");
             final BagInfo bagInfo = bag.getBagInfo();
 
-            bagInfo.addMetadata(BagInfoTags.CONTACT_NAME_TAG, "Kevin S. Clarke");
-            bagInfo.addMetadata(BagInfoTags.CONTACT_PHONE_TAG, "ksclarke@ksclarke.io");
+            bagInfo.addMetadata(BagInfoTags.CONTACT_NAME, "Kevin S. Clarke");
+            bagInfo.addMetadata(BagInfoTags.CONTACT_PHONE, "ksclarke@ksclarke.io");
             bagInfo.addMetadata("Alt-Email", "thetrashcan@gmail.com");
         } catch (final IOException details) {
             fail(details.getMessage());

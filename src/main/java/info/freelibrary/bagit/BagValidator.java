@@ -102,11 +102,11 @@ public class BagValidator {
         final BagInfo bagInfo = aBag.getBagInfo();
 
         if (bagInfo.countTags() > 0) {
-            bagInfo.removeMetadata(BagInfoTags.BAG_SIZE_TAG);
-            bagInfo.removeMetadata(BagInfoTags.PAYLOAD_OXUM_TAG);
+            bagInfo.removeMetadata(BagInfoTags.BAG_SIZE);
+            bagInfo.removeMetadata(BagInfoTags.PAYLOAD_OXUM);
 
-            bagInfo.addMetadata(BagInfoTags.BAG_SIZE_TAG, FileUtils.sizeFromBytes(aBag.getSize(), true));
-            bagInfo.addMetadata(BagInfoTags.PAYLOAD_OXUM_TAG, aBag.getPayloadOxum());
+            bagInfo.addMetadata(BagInfoTags.BAG_SIZE, FileUtils.sizeFromBytes(aBag.getSize(), true));
+            bagInfo.addMetadata(BagInfoTags.PAYLOAD_OXUM, aBag.getPayloadOxum());
 
             // If we change, we need to recalculate the file's checksum
             try {
