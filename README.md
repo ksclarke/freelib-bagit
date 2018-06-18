@@ -5,13 +5,7 @@ It supports most of the BagIt spec, but does not yet support fetch.txt files.
 
 For more on the BagIt spec, start with: http://en.wikipedia.org/wiki/BagIt
 
-FreeLib-BagIt's development is taking place on github:
-    http://github.com/ksclarke/freelib-bagit
-    
-FreeLib-BagIt's project page (with test results, javadocs, etc.) is at:
-    http://freelibrary.info/freelib-bagit/
-
-### How to use FreeLib-BagIt:
+### How to use freelib-bagIt:
 
 From within a Java program, you can create a new bag:
 
