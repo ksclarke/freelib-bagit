@@ -43,7 +43,7 @@
     <mime.util.version>2.1.3</mime.util.version>
     <freelib.utils.version>0.8.8</freelib.utils.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
-    <commons.compress.version>1.18</commons.compress.version>
+    <commons.compress.version>1.26.0</commons.compress.version>
 
     <!-- Project settings -->
     <maven.compiler.source>1.8</maven.compiler.source>
